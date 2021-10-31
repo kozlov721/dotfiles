@@ -1,0 +1,5 @@
+#!/bin/sh
+
+while read -r line; do
+    cp -r $line /home/martin/Backup/dotfiles/
+done < /home/martin/Backup/dotfiles/backup-list
