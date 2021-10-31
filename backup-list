@@ -1,4 +1,5 @@
 /home/martin/.config/xmobar/*
+/home/martin/.config/qutebrowser/config.py
 /home/martin/.config/picom/picom.conf
 /home/martin/.xmonad/xmonad.hs
 /home/martin/.config/fish/config.fish
