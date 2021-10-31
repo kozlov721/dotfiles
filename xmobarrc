@@ -1,0 +1,58 @@
+Config {font="xft:Ubuntu:size=11:weight=semibold:antialias=true:hinting=true"
+    , additionalFonts = [ "xft:Mononoki:size=11:antialias=true:hinting=true"
+                        , "xft:Font Awesome 5 Free Solid:size=11"
+                        , "xft:Font Awesome 5 Brands:size=11"
+                        , "xft:wqy-zenhei:size=11"
+                        ]
+    , bgColor = "#282c34"
+    , fgColor = "#ff6c6b"
+    , alpha = 220
+    , position     = Top
+    , lowerOnStart = True
+    , hideOnStart  = False
+    , persistent   = True
+    , iconRoot     = ".config/xmobar/icons"  -- default: "."
+    , commands = [
+        Run Battery [ "--template"  , "<leftipat> <acstatus>"
+                    , "--Low"       , "36"      -- units: %
+                    , "--High"      , "71"      -- units: %
+                    , "--low"       , "#a54242"
+                    , "--normal"    , "#de935f"
+                    , "--high"      , "#b5bd68"
+                    , "--maxtwidth" , "10"
+                    , "--"
+                    , "--on-icon-pattern"   , "<icon=battery/on/battery_on_%%.xpm/>"
+                    , "--off-icon-pattern"  , "<icon=battery/off/battery_off_%%.xpm/>"
+                    , "--idle-icon-pattern" , "<icon=battery/idle/battery_idle_%%.xpm/>"
+                    , "-o" , "<left><fc=#c5c8c6>%</fc> <timeleft>" -- discharging status
+                    , "-O" , "<left><fc=#c5c8c6>% <timeleft></fc>" -- plugged in status
+                    , "-i" , "<fc=#707880>IDLE</fc>"               -- charged status
+                    ] 50
+
+    -- Cpu usage in percent
+    , Run Cpu ["-t", "<fn=2>\xf108</fn>  cpu: (<total>%)","-H","50","--high","red"] 20
+
+    -- Ram used number and percent
+    , Run Memory ["-t", "<fn=2>\xf233</fn>  mem: (<usedratio>%)"] 20
+
+    -- Current volume
+    , Run Com ".local/bin/xmobar-volume" [] "volume" 1
+
+    -- Echos a "bell" icon in front of the pacman updates.
+    , Run Com "echo" ["<fn=2>\xf0f3</fn>"] "bell" 3600
+
+    -- Check for pacman updates (script found in .local/bin)
+    , Run Com ".local/bin/pacupdate" [] "pacupdate" 18000
+
+    -- Time and date
+    , Run Date "%A, %B %d, %Y  %T" "date" 10
+
+    -- Prints out the left side items such as workspaces, layout, etc.
+    , Run UnsafeStdinReader ]
+
+    , sepChar = "%"
+
+    , alignSep = "}{"
+
+    , template = "   <action=`dmenu_run`><fc=#ffffff>λ</fc></action>  %UnsafeStdinReader% }<action=`st -e calcurse`><fc=#ddbb20>%date%</fc></action>{<fc=#ecbe7b><action=`~/.local/bin/xmobar-htop`>%cpu%</action></fc> <fc=#555555><fn=1>|</fn></fc>  <fc=#ff6c6b><action=`~/.local/bin/xmobar-htop`>%memory%</action></fc> <fc=#555555><fn=1>|</fn></fc> <fc=#c678dd><action=`st -e sudo pacman -Syu`>%bell%  %pacupdate%</action></fc> <fc=#555555><fn=1>|</fn></fc> <action=`pactl set-sink-mute @DEFAULT_SINK@ toggle`> %volume% </action> <fc=#555555><fn=1>|</fn></fc> %battery% "
+}
