@@ -5,3 +5,4 @@
 /home/martin/.config/fish/config.fish
 /home/martin/.config/alacritty/*
 /home/martin/.config/nvim/init.vim
+/home/martin/.local/bin/*

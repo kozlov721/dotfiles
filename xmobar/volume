@@ -1,0 +1,10 @@
+#/bin/bash
+
+VOLUME="Vol: $(pamixer --get-volume)%"
+MUTE="$(pamixer --get-mute)"
+
+if [ $MUTE = "true" ];
+    then echo "$VOLUME <fc=#ff5555>[off]</fc>";
+    else echo "$VOLUME <fc=#77ff77>[on] </fc>";
+fi
+

@@ -1,0 +1,11 @@
+# !/bin/sh
+
+X=`ps ax | grep 'st -e htop' | wc -l`
+PID=`ps ax | grep 'st -e htop' | awk '{print $1}' | head -n 1`
+
+echo $PID
+if [ $X -gt 1 ];
+    # htop already running
+    then kill $PID
+    else st -e htop&
+fi

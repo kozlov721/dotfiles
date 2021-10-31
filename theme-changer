@@ -1,0 +1,39 @@
+#!/bin/python
+import os
+import importlib.util
+import sys
+
+sys.path.append(os.getenv('HOME') +
+                '/.config/theme-changer')
+
+from config import config_paths
+
+
+
+def change_theme(path, theme_name):
+    theme_path = f'{path[:path.rindex("/")]}/{theme_name}.chng'
+    base_path = f'{path[:path.rindex("/")]}/base.chng'
+    with open(path, mode='w') as config, \
+         open(theme_path) as theme, \
+         open(base_path) as base:
+        print(base.read() + '\n' + theme.read(), file=config)
+
+
+def change_lock_and_get_current_theme():
+    path = '/var/local/change_theme/light_on.lck'
+    if os.path.isfile(path):
+        os.remove(path)
+        return 'dark'
+    else:
+        open(path, 'w').close()
+        return 'light'
+
+
+
+if __name__ == '__main__':
+    theme = change_lock_and_get_current_theme()
+    os.system(
+        f'nitrogen --set-zoom-fill ~/Pictures/Wallpapers/wallpaper-{theme}.png --save'
+    ) 
+    for path in config_paths:
+        change_theme(path, theme)

@@ -1,0 +1,6 @@
+#/usr/bin/sh
+
+xdotool key super+shift+ctrl+s
+kitty -e cbonsai -S -w 2 -L 80 -M 15 -m "Enjoy your time off!" &
+slock
+xdotool key super+shift+ctrl+w
