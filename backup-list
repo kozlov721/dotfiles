@@ -1,9 +1,10 @@
-/home/martin/.config/xmobar/*
-/home/martin/.config/qutebrowser/config.py
-/home/martin/.config/picom/picom.conf
-/home/martin/.xmonad/xmonad.hs
-/home/martin/.config/fish/config.fish
-/home/martin/.config/alacritty/*
-/home/martin/.config/nvim/init.vim
-/home/martin/.local/bin/*
-/home/martin/.config/ranger/rc.conf
+.config/xmobar/* xmobar
+.config/qutebrowser/config.py qutebrowser
+.config/picom/picom.conf picom
+.xmonad/xmonad.hs xmonad
+.config/fish/config.fish fish
+.local/share/omf/themes/bira/functions/fish_prompt.fish fish
+.config/alacritty/* alacritty
+.config/nvim/init.vim nvim
+.local/bin/* scripts
+.config/ranger/rc.conf ranger
