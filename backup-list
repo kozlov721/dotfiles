@@ -8,3 +8,4 @@
 .config/nvim/init.vim nvim
 .local/bin/* scripts
 .config/ranger/* ranger
+.config/mimeapps.list mimeapps
