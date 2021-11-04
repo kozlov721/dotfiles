@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cupd=$(checkupdates | wc -l)
-echo "$cupd upd "
+UPD=$(checkupdates | wc -l)
+echo "$UPD upd "

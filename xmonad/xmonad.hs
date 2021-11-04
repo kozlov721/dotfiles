@@ -307,8 +307,8 @@ myStartupHook = do
 ----------------------------------------------------------------------
 
 main = do
-	xmproc <- spawnPipe "xmobar ~/.config/xmobar/xmobarrc"
-	xmonad $ ewmh def {
+    xmproc <- spawnPipe "xmobar ~/.config/xmobar/xmobar.hs"
+    xmonad $ ewmh def {
           terminal           = myTerminal
         , focusFollowsMouse  = myFocusFollowsMouse
         , clickJustFocuses   = myClickJustFocuses

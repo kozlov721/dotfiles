@@ -1,0 +1,10 @@
+xmonad ~/.xmonad/xmonad.hs
+xmobar ~/.config/xmobar/xmobar.hs
+qutebrowser ~/.config/qutebrowser/config.py
+vim ~/.config/nvim/init.vim
+fish ~/.config/fish/config.fish
+zathura ~/.config/zathura/zathurarc
+alacritty ~/.config/alacritty/alacritty.yml
+neofetch ~/.config/neofetch/config.conf
+picom ~/.config/picom/picom.conf
+ranger ~/.config/ranger/rifle.conf
