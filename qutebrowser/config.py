@@ -142,7 +142,11 @@ c.tabs.last_close = 'ignore'
 # Type: FuzzyUrl
 c.url.default_page = 'https://google.com'
 
-c.url.searchengines = {'DEFAULT': 'https://www.google.com/search?q={}', 'y': 'https://www.youtube.com/results?search_query={}', 'a': 'https://wiki.archlinux.org/index.php?search={}'}
+c.url.searchengines = {
+    'DEFAULT': 'https://www.google.com/search?q={}',
+    'y': 'https://www.youtube.com/results?search_query={}',
+    'a': 'https://wiki.archlinux.org/index.php?search={}',
+    'r': 'https://www.reddit.com/r/{}/'}
 
 # Page(s) to open at the start.
 # Type: List of FuzzyUrl, or FuzzyUrl
