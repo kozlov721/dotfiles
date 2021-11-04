@@ -355,8 +355,8 @@ autocmd FileType python nmap <leader>x :0,$!~/.config/nvim/env/bin/python -m yap
 nmap <silent> <leader><leader> :noh<CR>
 nmap <Tab> :bnext<CR>
 nmap <S-Tab> :bprevious<CR>
-vmap <leader>y :w! /tmp/vitmp<CR>
-nmap <leader>p :r! cat /tmp/vitmp<CR>
+nmap <leader>s :w<CR>
+
 " Custom settings
 
 set whichwrap+=<,>,h,l
@@ -368,7 +368,7 @@ autocmd BufWritePost *ma007*.tex silent !pdflatex <afile>
 
 let NERDSpaceDelims=1
 
-if !empty(glob("/var/local/theme-changer/light_on.lck"))
+if !empty(glob("/var/local/change_theme/light_on.lck"))
     color nemo-light
     let g:airline_theme="tomorrow"
 else

@@ -11,8 +11,6 @@ import XMonad.Actions.DynamicWorkspaces
 import XMonad.Actions.SpawnOn
 import XMonad.Config.Dmwit (altMask)
 import XMonad.Hooks.DynamicLog
-import XMonad.Layout.Reflect
-import XMonad.Layout.MultiToggle as MToggle
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.ManageDocks
@@ -30,7 +28,9 @@ import XMonad.Util.SpawnOnce
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
 
--- Default terminal
+-- The preferred terminal program, which is used in a binding below and by
+-- certain contrib modules.
+--
 myTerminal = "alacritty"
 
 -- Whether focus follows the mouse pointer.
@@ -44,32 +44,37 @@ myClickJustFocuses = False
 myModMask = mod4Mask
 
 myWorkspaces = ["term", "www", "dir", "mus", "docs",
-                "free", "call", "vid", "chat", "dev"]
+                "free", "mail", "vid", "chat", "dev"]
 
 workspacesApps = [myTerminal, "qutebrowser", "alacritty -e ranger",
                   "spotify", "onlyoffice-desktopeditors", myTerminal,
-                  "skypeforlinux", "vlc", "discord", "code"]
+                  "alacritty -e neomutt", "vlc", "discord", "code"]
 
 -- For 'clickable' function
 myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces $ [1..9] ++ [0]
 
 
-myBorderWidth = 4
+myBorderWidth = 0
 
 myNormalBorderColor  = "#ffffff"
+--myNormalBorderColor  = "#ffffff"
 
-myFocusedBorderColor = "#ce2d52"
--- myFocusedBorderColor = "#1939b9"
+--myFocusedBorderColor = "#ce2d52"
+--myFocusedBorderColor = "#1979a9"
+myFocusedBorderColor = "#000000"
 
 
---------------------- Key Bindings ----------------------
----------------------------------------------------------
+----------------------------------------------------------------------
+-- Key bindings. Add, modify or remove key bindings here.
+--
 myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
-    -- Special function keys
-    [ ((0, xF86XK_AudioRaiseVolume), spawn "amixer -qD pulse sset Master 2%+")
+    -- function keys
+    [ ((0, xF86XK_MonBrightnessUp), spawn "lux -a 2%")
+    , ((0, xF86XK_MonBrightnessDown), spawn "lux -s 2%")
+    , ((0, xF86XK_AudioRaiseVolume), spawn "amixer -qD pulse sset Master 2%+")
     , ((0, xF86XK_AudioLowerVolume), spawn "amixer -qD pulse sset Master 2%-")
     , ((0, xF86XK_AudioMute), spawn "amixer -qD pulse sset Master toggle")
-    , ((0, xF86XK_AudioPlay), spawn "playerctl play-pause")
+    , ((modm, xK_F2), spawn "playerctl play-pause")
     , ((modm, xK_F1), spawn "playerctl previous")
     , ((modm, xK_F3), spawn "playerctl next")
     ]
@@ -77,7 +82,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- Spawn certain apps on certain workspaces
     [((modm .|. m, k), sequence_ [spawnOn w c, windows (W.greedyView (w))])
       | (k, m, w, c) <- zip4
-        [xK_Return, xK_w, xK_r, xK_s, xK_o, xK_Return, xK_s, xK_v, xK_d, xK_b]
+        [xK_Return, xK_w, xK_r, xK_s, xK_o,
+         xK_Return, xK_m, xK_v, xK_d, xK_b]
         [0, 0, 0, 0, 0, altMask, altMask, 0, 0, 0]
         (XMonad.workspaces conf)
         workspacesApps
@@ -92,15 +98,11 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     ]
     ++
     -- Somehow simulates drop down terminal on F12 key
-    -- (runs floating st, kills it if it runs already)
-    [  ((0, xK_F12), spawn "~/.local/bin/dropdown-term")
+    [  ((0, xK_F12), toggleOrView "term")
 
     -- Toggles light theme
     ,  ((modm .|. controlMask .|. shiftMask, xK_l)
         , spawn "python3 ~/.local/bin/theme-changer")
-
-    -- retoggle skype floating window
-    ,  ((modm .|. altMask, xK_l), sequence_ [windows (W.greedyView (XMonad.workspaces conf !! 6)), toggleWS])
 
     -- Increase opacity
     ,  ((modm .|. controlMask, xK_Up), spawn "picom-trans -c -o -5")
@@ -150,18 +152,17 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- Move focus to the master window
     , ((modm, xK_m), windows W.focusMaster)
 
+    -- Spawn floating terminal
+    , ((modm .|. shiftMask, xK_Return), spawn "st")
+
     -- Spawn floating facebook messenger
     , ((modm .|. shiftMask, xK_m), spawn "caprine")
-    , ((altMask, xK_F12), spawn "caprine")
 
     -- Swap the focused window with the next window
     , ((modm .|. shiftMask, xK_j), windows W.swapDown)
 
     -- Swap the focused window with the previous window
     , ((modm .|. shiftMask, xK_k), windows W.swapUp)
-
-    -- Reflect the layout vertically
-    , ((modm .|. controlMask, xK_x), sendMessage $ MToggle.Toggle REFLECTX)
 
     -- Shrink the master area
     , ((modm, xK_h), sendMessage Shrink)
@@ -171,6 +172,12 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- Push window back into tiling
     , ((modm, xK_t), withFocused $ windows . W.sink)
+
+    -- Increment the number of windows in the master area
+    , ((modm, xK_comma), sendMessage (IncMasterN 1))
+
+    -- Deincrement the number of windows in the master area
+    , ((modm, xK_period), sendMessage (IncMasterN (-1)))
 
     -- Quit xmonad
     , ((modm .|. shiftMask, xK_q), io (exitWith ExitSuccess))
@@ -188,15 +195,15 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     ]
     ++
     -- mod-[1..0], toggles workspace N
-    -- mod-shift-[1..0], move client to workspace N, keep focus on the moved window
-    let shiftAndFocus i = W.greedyView i . W.shift i in
+    -- mod-shift-[1..0], move client to workspace N
+    --let shiftAndFocus i = W.greedyView i . W.shift i in
     [ ((m .|. modm, k), f i)
       | (i, k) <- zip (XMonad.workspaces conf) ([xK_1 .. xK_9] ++ [xK_0])
-      , (f, m) <- [(toggleOrView, 0), (windows . shiftAndFocus, shiftMask), (windows . W.shift, controlMask)]
+      , (f, m) <- [(toggleOrView, 0), (windows . \i -> W.greedyView i . W.shift i, shiftMask), (windows . W.shift, controlMask)]
     ]
     ++
     -- Special bindings to run cbonsai as screensaver
-    -- Not to be used by the user
+    -- Not to use by the user
     [ ((modm .|. controlMask .|. shiftMask, xK_s), sequence_ [appendWorkspace "saver"])
     , ((modm .|. controlMask .|. shiftMask, xK_w), sequence_ [kill, toggleWS, removeWorkspaceByTag "saver"])
     ]
@@ -210,15 +217,11 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
     [ ((modm, button1), (\w -> focus w >> mouseMoveWindow w
                                        >> windows W.shiftMaster))
 
-    , ((0, 9), (\w -> focus w >> mouseMoveWindow w
-                                       >> windows W.shiftMaster))
     -- mod-button2, Raise the window to the top of the stack
-    , ((modm, button2), \w -> withFocused $ windows . W.sink)
+    , ((modm, button2), (\w -> focus w >> windows W.shiftMaster))
 
     -- mod-button3, Set the window to floating mode and resize by dragging
     , ((modm, button3), (\w -> focus w >> mouseResizeWindow w
-                                       >> windows W.shiftMaster))
-    , ((0, 8), (\w -> focus w >> mouseResizeWindow w
                                        >> windows W.shiftMaster))
     ]
 
@@ -227,37 +230,45 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 
 mySpacing x = spacingRaw False (Border x x x x) True (Border x x x x) True
 
-myLayout = mkToggle (single REFLECTX)
-            $ avoidStruts
-            $ smartBorders
-            $ windowNavigation
-            $ mySpacing 16
-            $ toggleLayouts Full myTiled    |||
-              toggleLayouts Full myMirrored |||
-              toggleLayouts Full Grid
+myLayout = avoidStruts $
+              toggleLayouts myFull myTiled    |||
+              toggleLayouts myFull myMirrored |||
+              toggleLayouts myFull myGrid
     where
         myTiled = renamed [Replace "Tall"]
-            $ reflectHoriz
+            $ smartBorders
+            $ windowNavigation
+            $ mySpacing spaces
             $ ResizableTall 1 (3 / 100) (1 / 2) []
         myMirrored = renamed [Replace "Mirr"]
+            $ smartBorders
+            $ windowNavigation
+            $ mySpacing spaces
             $ Mirror
             $ ResizableTall 1 (3 / 100) (1 / 2) []
+        myGrid = renamed [Replace "Grid"]
+            $ smartBorders
+            $ windowNavigation
+            $ mySpacing spaces
+            $ Grid
+        myFull = renamed [Replace "Full"]
+            $ smartBorders
+            $ windowNavigation
+            $ mySpacing spaces
+            $ Full
+        spaces = 8
 
 
 ----------------------------------------------------------------------
 -- Window rules:
 
-
 myManageHook = composeAll
-    [ className =? "ImageJ"           --> doFloat
-    , className =? "Skype"            --> doFloat
-    , className =? "st-256color"      -->
-      let {dx = (2/7); dy = (1/5)}
-      in doRectFloat (W.RationalRect dx dy (1 - 2 * dx) (2 * dy))
-    , className =? "Surf"             --> doRectFloat (W.RationalRect (1/6) (1/6) (2/3) (2/3))
-    , className =? "Gpick"            --> doRectFloat (W.RationalRect (1/6) (1/6) (2/3) (2/3))
-    , className =? "Caprine"          --> doRectFloat (W.RationalRect (1/4) (1/4) (1/2) (1/2))
-    , resource  =? "desktop_window"   --> doIgnore ]
+    [ className =? "ImageJ"         --> doFloat
+    , className =? "st-256color"    --> doRectFloat (W.RationalRect (1/6) (1/6) (2/3) (2/3))
+    , className =? "Surf"           --> doRectFloat (W.RationalRect (1/6) (1/6) (2/3) (2/3))
+    , className =? "Gpick"           --> doRectFloat (W.RationalRect (1/6) (1/6) (2/3) (2/3))
+    , className =? "Caprine"           --> doRectFloat (W.RationalRect (1/6) (1/6) (2/3) (2/3))
+    , resource  =? "desktop_window" --> doIgnore ]
 
 ----------------------------------------------------------------------
 --
@@ -271,7 +282,9 @@ clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
 
 
 filterSaver :: String -> String
-filterSaver str = if isInfixOf saverText strText then "" else str
+filterSaver str = if isInfixOf saverText strText
+                  then ""
+                  else str
             where
                 saverText = pack "saver"
                 strText = pack str
@@ -281,15 +294,14 @@ filterSaver str = if isInfixOf saverText strText then "" else str
 -- Startup hook
 myStartupHook = do
     spawnOnce "nitrogen --restore &"
-    spawnOnce "numlockx on"
     spawnOnce "dropbox &"
+    spawnOnce "bluetooth off"
     spawnOnce "setxkbmap -layout cz coder"
     spawnOnce "picom --experimental-backends &"
     spawnOnce "xset r rate 330 30"
-    spawnOnce "imwheel -kill"
-    -- spawnOnce "xautolock -time 10 -locker 'screensaver' &"
+    spawnOnce "xautolock -time 10 -locker 'screensaver' &"
     -- spawnOnce "xautolock -time 20 -locker 'slock' &"
-    -- spawnOnce "xinput set-prop 'ELAN2602:00 04F3:3109 Touchpad' 'libinput Natural Scrolling Enabled' 1"
+    spawnOnce "xinput set-prop 'ELAN2602:00 04F3:3109 Touchpad' 'libinput Natural Scrolling Enabled' 1"
     spawnNOnOnce 2 "term" myTerminal
 
 ----------------------------------------------------------------------
@@ -314,26 +326,25 @@ main = do
         , layoutHook         = myLayout
         , manageHook         = manageSpawn <+> myManageHook <+> manageDocks
         , handleEventHook    = myEventHook
-        , logHook            = let separator = "<fc=#555555><fn=1>|</fn></fc> " in
-            dynamicLogWithPP $ xmobarPP {
+        , logHook            = dynamicLogWithPP $ xmobarPP {
               ppOutput = \x -> hPutStrLn xmproc x
             -- Current workspace
-            , ppCurrent = xmobarColor "#CCE01B" "" . wrap (separator ++ "[ ") " ]" . filterSaver
+            , ppCurrent = xmobarColor "#CCE01B" "" . wrap "<fc=#555555><fn=1>|</fn></fc> [ " " ]" . filterSaver
 
             -- Hidden workspaces
-            , ppHidden = xmobarColor "#C792EA" "" . wrap separator "" . clickable . filterSaver
+            , ppHidden = xmobarColor "#C792EA" "" . wrap "<fc=#555555><fn=1>|</fn></fc> " "" . clickable . filterSaver
 
             -- Hidden workspaces (no windows)
-            , ppHiddenNoWindows = xmobarColor "#82AAFF" "" . wrap separator ""  . clickable . filterSaver
+            , ppHiddenNoWindows = xmobarColor "#82AAFF" "" . wrap "<fc=#555555><fn=1>|</fn></fc> " ""  . clickable . filterSaver
 
             -- Title of active window
-            , ppTitle = \x -> ""
+            , ppTitle = (\x -> "")
 
             -- Separator character
             , ppSep =  " <fc=#999999><fn=1>| </fn></fc> "
 
             -- Type of layout
-            , ppLayout = wrap "<action=xdotool key super+space>" "</action>" . last . words
+            , ppLayout = wrap "<action=xdotool key super+space>" "</action>"
 
             -- Urgent workspace
             , ppUrgent = xmobarColor "#C45500" "" . wrap "!" "!"

@@ -1,8 +1,9 @@
 #!/bin/sh
 
 while read -r line; do
-    CONFIG_PATH=$HOME/`echo $line | awk '{print $1}'`
-    FOLDER=`echo $line | awk '{print $2}'`
+    FOLDER=`echo $line | awk '{print $1}'`
+    CONFIG_PATH=`echo $line | awk '{print $2}'`
+    CONFIG_PATH=$(echo $CONFIG_PATH | sed "s/~/$(echo $HOME | sed 's/\//\\\//g')/g")
     COPY_PATH="$HOME/Backup/dotfiles/$FOLDER"
     echo "Gathering" $CONFIG_PATH
     mkdir -p $COPY_PATH && cp -r $CONFIG_PATH $COPY_PATH

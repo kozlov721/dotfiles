@@ -1,3 +1,8 @@
+neofetch ~/.config/neofetch/config.conffont: size: 11 normal: picom 
+~/.config/picom/picom.conf family: Source Code Pro ranger 
+~/.config/ranger/rifle.conf style: Bold
+
+
 colors:
   name: Euphrasia
   author: ""
@@ -25,4 +30,5 @@ colors:
     magenta: "#c953ef"
     cyan: "#60c6c8"
     white: "#c0c0c0"
+
 
