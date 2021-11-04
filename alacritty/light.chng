@@ -2,7 +2,7 @@ colors:
   name: Euphrasia
   author: ""
   primary:
-    background: "#afccff"
+    background: "#cfdcff"
     foreground: "#1c2027"
   cursor:
     text: "#ffffff"

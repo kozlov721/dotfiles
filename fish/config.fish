@@ -8,6 +8,7 @@ alias cleanup 'doas -- pacman -Rns (pacman -Qtdq)'
 alias fixpacman 'doas -- rm /var/lib/pacman/db.lck'
 alias tarnow 'tar -acf'
 alias untar 'tar -zxvf'
+alias update-grub 'sudo grub-mkconfig -o /boot/grub/grub.cfg'
 alias .. 'cd ..'
 alias ... 'cd ../..'
 alias .... 'cd ../../..'
@@ -27,4 +28,4 @@ end
 eval /home/martin/anaconda3/bin/conda "shell.fish" "hook" $argv | source
 # <<< conda initialize <<<
 
-source /usr/share/doc/find-the-command/ftc.fish
+source /usr/share/doc/find-the-command/ftc.fish noprompt info > /dev/null

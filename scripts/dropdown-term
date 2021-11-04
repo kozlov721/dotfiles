@@ -1,0 +1,11 @@
+#!/bin/bash
+
+DOES_RUN=`ps ax | grep dropdown-st | wc -l`
+PID=`ps ax | grep dropdown-st | awk '{print $1}' | head -n 1`
+
+echo $DOES_RUN $PID
+
+if [ "$DOES_RUN" = "1" ]
+    then st -t 'dropdown-st' &
+    else kill $PID
+fi

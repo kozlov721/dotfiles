@@ -20,7 +20,7 @@ def change_theme(path, theme_name):
 
 
 def change_lock_and_get_current_theme():
-    path = '/var/local/change_theme/light_on.lck'
+    path = '/var/local/theme-changer/light_on.lck'
     if os.path.isfile(path):
         os.remove(path)
         return 'dark'
@@ -33,7 +33,7 @@ def change_lock_and_get_current_theme():
 if __name__ == '__main__':
     theme = change_lock_and_get_current_theme()
     os.system(
-        f'nitrogen --set-zoom-fill ~/Pictures/Wallpapers/wallpaper-{theme}.png --save'
+        f'nitrogen --set-zoom-fill ~/Pictures/Wallpapers/{theme}.jpg --save'
     ) 
     for path in config_paths:
         change_theme(path, theme)
