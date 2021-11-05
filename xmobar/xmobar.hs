@@ -40,7 +40,7 @@ myCommands = [
     , Run $ Date "%A, %B %d, %Y  %T" "date" 10
 
     -- Prints out the workspaces and layout
-    , Run $ UnsafeStdinReader ]
+    , Run UnsafeStdinReader ]
 
 
 actionWrap :: String -> String -> String

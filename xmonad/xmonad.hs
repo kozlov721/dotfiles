@@ -47,7 +47,7 @@ workspacesApps = [ myTerminal, "qutebrowser"
                  , "vlc", "discord", "code" ]
 
 -- For 'clickable' function
-myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces $ [1..9] ++ [0]
+myWorkspaceIndices = M.fromList $ zip myWorkspaces $ [1..9] ++ [0]
 
 
 myBorderWidth = 0
@@ -74,7 +74,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     ]
     ++
     -- Spawn certain apps on certain workspaces
-    [((modm .|. m, k), sequence_ [spawnOn w c, windows (W.greedyView (w))])
+    [((modm .|. m, k), sequence_ [spawnOn w c, windows (W.greedyView w)])
       | (k, m, w, c) <- zip4
         [xK_Return, xK_w, xK_r, xK_s, xK_o,
          xK_Return, xK_m, xK_v, xK_d, xK_b]
@@ -167,7 +167,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm, xK_t), withFocused $ windows . W.sink)
 
     -- Quit xmonad
-    , ((modm .|. shiftMask, xK_q), io (exitWith ExitSuccess))
+    , ((modm .|. shiftMask, xK_q), io exitSuccess)
 
     -- Restart xmonad
     , ((modm, xK_q), spawn "xmonad --recompile && xmonad --restart")
@@ -200,19 +200,16 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
 
 ----------------------------------------------------------------------
--- Mouse bindings: default actions bound to mouse events
---
-myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
-    -- mod-button1, Set the window to floating mode and move by dragging
-    [ ((modm, button1), (\w -> focus w >> mouseMoveWindow w
-                                       >> windows W.shiftMaster))
+-- Mouse bindings:
 
-    -- mod-button2, Raise the window to the top of the stack
-    , ((modm, button2), (\w -> focus w >> windows W.shiftMaster))
+myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList
+    -- mod-button1, move by dragging
+    [ ((modm, button1), \w -> focus w >> mouseMoveWindow w
+                                       >> windows W.shiftMaster)
 
-    -- mod-button3, Set the window to floating mode and resize by dragging
-    , ((modm, button3), (\w -> focus w >> mouseResizeWindow w
-                                       >> windows W.shiftMaster))
+    -- mod-button3, resize by dragging
+    , ((modm, button3), \w -> focus w >> mouseResizeWindow w
+                                       >> windows W.shiftMaster)
     ]
 
 ----------------------------------------------------------------------
@@ -220,33 +217,19 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 
 mySpacing x = spacingRaw False (Border x x x x) True (Border x x x x) True
 
-myLayout = avoidStruts $
-              toggleLayouts myFull myTiled    |||
-              toggleLayouts myFull myMirrored |||
-              toggleLayouts myFull myGrid
+myLayout = avoidStruts 
+         $ smartBorders
+         $ windowNavigation
+         $ mySpacing 8
+         $ toggleLayouts Full myTiled    |||
+           toggleLayouts Full myMirrored |||
+           toggleLayouts Full Grid
     where
         myTiled = renamed [Replace "Tall"]
-            $ smartBorders
-            $ windowNavigation
-            $ mySpacing spaces
             $ ResizableTall 1 (3 / 100) (1 / 2) []
         myMirrored = renamed [Replace "Mirr"]
-            $ smartBorders
-            $ windowNavigation
-            $ mySpacing spaces
             $ Mirror
             $ ResizableTall 1 (3 / 100) (1 / 2) []
-        myGrid = renamed [Replace "Grid"]
-            $ smartBorders
-            $ windowNavigation
-            $ mySpacing spaces
-            $ Grid
-        myFull = renamed [Replace "Full"]
-            $ smartBorders
-            $ windowNavigation
-            $ mySpacing spaces
-            $ Full
-        spaces = 8
 
 
 ----------------------------------------------------------------------
@@ -256,8 +239,8 @@ myManageHook = composeAll
     [ className =? "ImageJ"         --> doFloat
     , className =? "st-256color"    --> doRectFloat (W.RationalRect (1/6) (1/6) (2/3) (2/3))
     , className =? "Surf"           --> doRectFloat (W.RationalRect (1/6) (1/6) (2/3) (2/3))
-    , className =? "Gpick"           --> doRectFloat (W.RationalRect (1/6) (1/6) (2/3) (2/3))
-    , className =? "Caprine"           --> doRectFloat (W.RationalRect (1/6) (1/6) (2/3) (2/3))
+    , className =? "Gpick"          --> doRectFloat (W.RationalRect (1/6) (1/6) (2/3) (2/3))
+    , className =? "Caprine"        --> doRectFloat (W.RationalRect (1/6) (1/6) (2/3) (2/3))
     , resource  =? "desktop_window" --> doIgnore ]
 
 ----------------------------------------------------------------------
@@ -272,7 +255,7 @@ clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
 
 
 filterSaver :: String -> String
-filterSaver str = if isInfixOf saverText strText
+filterSaver str = if saverText `isInfixOf` strText
                   then ""
                   else str
             where
@@ -290,7 +273,6 @@ myStartupHook = do
     spawnOnce "picom --experimental-backends &"
     spawnOnce "xset r rate 330 30"
     spawnOnce "xautolock -time 10 -locker 'screensaver' &"
-    -- spawnOnce "xautolock -time 20 -locker 'slock' &"
     spawnOnce "xinput set-prop 'ELAN2602:00 04F3:3109 Touchpad' 'libinput Natural Scrolling Enabled' 1"
     spawnNOnOnce 2 "term" myTerminal
 
@@ -317,7 +299,7 @@ main = do
         , manageHook         = manageSpawn <+> myManageHook <+> manageDocks
         , handleEventHook    = myEventHook
         , logHook            = dynamicLogWithPP $ xmobarPP {
-              ppOutput = \x -> hPutStrLn xmproc x
+              ppOutput = hPutStrLn xmproc
             -- Current workspace
             , ppCurrent = xmobarColor "#CCE01B" "" . wrap "<fc=#555555><fn=1>|</fn></fc> [ " " ]" . filterSaver
 
@@ -328,18 +310,18 @@ main = do
             , ppHiddenNoWindows = xmobarColor "#82AAFF" "" . wrap "<fc=#555555><fn=1>|</fn></fc> " ""  . clickable . filterSaver
 
             -- Title of active window
-            , ppTitle = (\x -> "")
+            , ppTitle = const ""
 
             -- Separator character
             , ppSep =  " <fc=#999999><fn=1>| </fn></fc> "
 
             -- Type of layout
-            , ppLayout = wrap "<action=xdotool key super+space>" "</action>"
+            , ppLayout = wrap "<action=xdotool key super+space>" "</action>" . last . words
 
             -- Urgent workspace
             , ppUrgent = xmobarColor "#C45500" "" . wrap "!" "!"
 
-            , ppOrder  = \(ws:l:t:ex) -> [ws,l]++ex++[t]
+            , ppOrder  = \(ws:l:t:ex) -> [ws,l] ++ ex ++ [t]
         }
 
         , startupHook        = myStartupHook
