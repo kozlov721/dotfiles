@@ -1,8 +1,17 @@
 #!/bin/sh
 
+getopts ":e" opt
+
 while IFS= read -r line; do
     CONFIG_NAME=`echo $line | awk '{print $1}'`
     CONFIG_PATH=`echo $line | awk '{print $2}'`
-    if [ $CONFIG_NAME = $1 ]; then break; fi
+    if [ $CONFIG_NAME = ${@: -1} ]; then break; fi
 done < $HOME/.config/confedit.list
-nvim $(echo $CONFIG_PATH | sed "s/~/$(echo $HOME | sed 's/\//\\\//g')/g")
+
+SED_PATH=$(echo $CONFIG_PATH | sed "s/~/$(echo $HOME | sed 's/\//\\\//g')/g")
+
+case ${opt} in
+    e  ) kitty -e nvim $SED_PATH ;;
+    \? ) nvim $SED_PATH ;;
+esac
+

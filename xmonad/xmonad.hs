@@ -12,8 +12,8 @@ import XMonad.Actions.SpawnOn
 import XMonad.Config.Dmwit (altMask)
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.EwmhDesktops
-import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.ManageHelpers
 import XMonad.Layout.Grid
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Renamed
@@ -25,30 +25,26 @@ import XMonad.Util.EZConfig (additionalKeys, additionalKeysP)
 import XMonad.Util.Run
 import XMonad.Util.SpawnOnce
 
-import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
+import qualified XMonad.StackSet as W
 
--- The preferred terminal program, which is used in a binding below and by
--- certain contrib modules.
---
-myTerminal = "alacritty"
 
--- Whether focus follows the mouse pointer.
-myFocusFollowsMouse :: Bool
+
+myTerminal = "kitty"
+
 myFocusFollowsMouse = True
-
--- Whether clicking on a window to focus also passes the click to the window
-myClickJustFocuses :: Bool
 myClickJustFocuses = False
 
 myModMask = mod4Mask
 
-myWorkspaces = ["term", "www", "dir", "mus", "docs",
-                "free", "mail", "vid", "chat", "dev"]
+myWorkspaces = [ "term", "www", "dir" , "mus", "docs"
+               , "free", "mail", "vid", "chat", "dev"]
 
-workspacesApps = [myTerminal, "qutebrowser", "alacritty -e ranger",
-                  "spotify", "onlyoffice-desktopeditors", myTerminal,
-                  "alacritty -e neomutt", "vlc", "discord", "code"]
+workspacesApps = [ myTerminal, "qutebrowser"
+                 , myTerminal ++ " -e ranger"
+                 , "spotify", "onlyoffice-desktopeditors"
+                 , myTerminal, myTerminal ++ " -e neomutt"
+                 , "vlc", "discord", "code" ]
 
 -- For 'clickable' function
 myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces $ [1..9] ++ [0]
@@ -56,11 +52,9 @@ myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces $ [1..9] ++ [0]
 
 myBorderWidth = 0
 
-myNormalBorderColor  = "#ffffff"
---myNormalBorderColor  = "#ffffff"
-
---myFocusedBorderColor = "#ce2d52"
---myFocusedBorderColor = "#1979a9"
+myNormalBorderColor  = "#FFFFFF"
+--myFocusedBorderColor = "#CE2D52"
+--myFocusedBorderColor = "#1979A9"
 myFocusedBorderColor = "#000000"
 
 
@@ -92,29 +86,28 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- With ctrl, spawn the app on current workspace
     [((modm .|. controlMask, k), spawn c)
       | (k, c) <- zip
-        [xK_Return, xK_w, xK_r, xK_s, xK_o,
-         xK_Return, xK_m, xK_v, xK_d, xK_b]
+        [ xK_Return, xK_w, xK_r, xK_s, xK_o
+        , xK_Return, xK_m, xK_v, xK_d, xK_b]
         workspacesApps
     ]
     ++
-    -- Somehow simulates drop down terminal on F12 key
-    [  ((0, xK_F12), toggleOrView "term")
+    -- Toggle 1st workspace
+    [ ((0, xK_F12), toggleOrView "term")
 
-    -- Toggles light theme
-    ,  ((modm .|. controlMask .|. shiftMask, xK_l)
-        , spawn "python3 ~/.local/bin/theme-changer")
+    -- Toggle light theme
+    , ((modm .|. controlMask .|. shiftMask, xK_l), spawn "change_theme")
 
     -- Increase opacity
-    ,  ((modm .|. controlMask, xK_Up), spawn "picom-trans -c -o -5")
+    , ((modm .|. controlMask, xK_Up), spawn "picom-trans -c -o -5")
 
     -- Decrease opacity
-    ,  ((modm .|. controlMask, xK_Down), spawn "picom-trans -c -o +5")
+    , ((modm .|. controlMask, xK_Down), spawn "picom-trans -c -o +5")
 
     -- mod-F12 toggles 'free' workspace
-    ,  ((modm, xK_F12), toggleOrView "free")
+    , ((modm, xK_F12), toggleOrView "free")
 
     -- Launch dmenu
-    ,  ((modm, xK_p), spawn "dmenu_run")
+    , ((modm, xK_p), spawn "dmenu_run")
 
     -- Launch rofi window
     , ((modm .|. shiftMask, xK_p), spawn "rofi -show window")
@@ -173,12 +166,6 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- Push window back into tiling
     , ((modm, xK_t), withFocused $ windows . W.sink)
 
-    -- Increment the number of windows in the master area
-    , ((modm, xK_comma), sendMessage (IncMasterN 1))
-
-    -- Deincrement the number of windows in the master area
-    , ((modm, xK_period), sendMessage (IncMasterN (-1)))
-
     -- Quit xmonad
     , ((modm .|. shiftMask, xK_q), io (exitWith ExitSuccess))
 
@@ -189,23 +176,26 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- Rotate through workspaces using j and k
     -- Shift window on the way using h and l
     [ ((modm .|. controlMask, k), sequence_ (f1:f2))
-      |  (k, f1, f2) <- zip3 [xK_k, xK_j, xK_h, xK_l]
-                             [nextWS, prevWS, shiftToPrev, shiftToNext]
-                             [[], [], [prevWS], [nextWS]]
+      | (k, f1, f2) <- zip3 [xK_k, xK_j, xK_h, xK_l]
+                            [nextWS, prevWS, shiftToPrev, shiftToNext]
+                            [[], [], [prevWS], [nextWS]]
     ]
     ++
     -- mod-[1..0], toggles workspace N
     -- mod-shift-[1..0], move client to workspace N
-    --let shiftAndFocus i = W.greedyView i . W.shift i in
+    let shiftAndFocus i = W.greedyView i . W.shift i in
     [ ((m .|. modm, k), f i)
       | (i, k) <- zip (XMonad.workspaces conf) ([xK_1 .. xK_9] ++ [xK_0])
-      , (f, m) <- [(toggleOrView, 0), (windows . \i -> W.greedyView i . W.shift i, shiftMask), (windows . W.shift, controlMask)]
+      , (f, m) <- [ (toggleOrView, 0)
+                  , (windows . shiftAndFocus, shiftMask)
+                  , (windows . W.shift, controlMask)
+                  ]
     ]
     ++
     -- Special bindings to run cbonsai as screensaver
     -- Not to use by the user
     [ ((modm .|. controlMask .|. shiftMask, xK_s), sequence_ [appendWorkspace "saver"])
-    , ((modm .|. controlMask .|. shiftMask, xK_w), sequence_ [kill, toggleWS, removeWorkspaceByTag "saver"])
+    , ((modm .|. controlMask .|. shiftMask, xK_w), sequence_ [toggleWS, removeWorkspaceByTag "saver"])
     ]
 
 

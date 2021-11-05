@@ -1,0 +1,20 @@
+#!/bin/bash
+LOCK=/var/local/change_theme/light_on.lck
+
+if [ -f $LOCK ]
+then
+    THEME="dark"
+    rm $LOCK
+else
+    THEME="light"
+    touch $LOCK
+fi
+
+nitrogen --set-zoom-fill ~/Pictures/Wallpapers/wallpaper-$THEME.png --save
+
+cat $HOME/.config/kitty/$THEME.theme > $HOME/.config/kitty/current.theme
+
+for pid in $(ps -ef | awk '/kitty/ {print $2}' | head -n -1)
+do
+    kill -s SIGUSR1 $pid
+done
