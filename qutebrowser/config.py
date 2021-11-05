@@ -1,3 +1,4 @@
+# pylint: disable=C0321
 import os
 
 # Documentation:
@@ -89,7 +90,7 @@ c.url.searchengines = {
 
 c.url.start_pages = 'https://google.com'
 
-c.zoom.default = '140%'
+c.zoom.default = '150%'
 
 c.zoom.levels = [
     '25%', '33%', '50%', '67%', '75%', '90%', '100%', '110%', '125%', '135%',

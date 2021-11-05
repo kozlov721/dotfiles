@@ -218,8 +218,6 @@ let g:signify_sign_add    = '+'
 let g:signify_sign_delete = '-'
 let g:signify_sign_change = '│'
 
-hi DiffDelete guifg=#ff5555 guibg=none
-
 " FixCursorHold for better performance
 let g:cursorhold_updatetime = 100
 
@@ -232,6 +230,7 @@ autocmd FileType xml  setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType markdown setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType journal  setlocal shiftwidth=2 tabstop=2 softtabstop=2
 
+autocmd FileType python call nerdcommenter#SwitchToAlternativeDelimiters(1)
 """ Custom Functions
 
 function! TrimWhitespace()
@@ -282,9 +281,11 @@ autocmd FileType python nmap <leader>x :0,$!~/.config/nvim/env/bin/python -m yap
 set whichwrap+=<,>,h,l
 set whichwrap+=<,>,"<left>","<right>"
 set nofoldenable
+
 autocmd VimEnter * RainbowParentheses
 autocmd VimEnter * ColorToggle
 autocmd BufWritePost *ma007*.tex silent !pdflatex <afile>
+autocmd BufWritePost *kitty/current.theme silent !fish -c "kill -s SIGUSR1 kitty"
 
 let NERDSpaceDelims=1
 
@@ -293,4 +294,7 @@ if !empty(glob("/var/local/change_theme/light_on.lck"))
 else
     call ColorDark()
 endif
+
 let g:tex_conceal = ""
+let g:python3_host_prog = $HOME."~/anaconda3/bin/python"
+
