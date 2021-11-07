@@ -29,7 +29,6 @@ import qualified Data.Map        as M
 import qualified XMonad.StackSet as W
 
 
-
 myTerminal = "kitty"
 
 myFocusFollowsMouse = True
@@ -84,8 +83,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     ]
     ++
     -- With ctrl, spawn the app on current workspace
-    [((modm .|. controlMask, k), spawn c)
-      | (k, c) <- zip
+    [((modm .|. controlMask, k), spawn c) |
+        (k, c) <- zip
         [ xK_Return, xK_w, xK_r, xK_s, xK_o
         , xK_Return, xK_m, xK_v, xK_d, xK_b]
         workspacesApps
@@ -175,8 +174,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     ++
     -- Rotate through workspaces using j and k
     -- Shift window on the way using h and l
-    [ ((modm .|. controlMask, k), sequence_ (f1:f2))
-      | (k, f1, f2) <- zip3 [xK_k, xK_j, xK_h, xK_l]
+    [ ((modm .|. controlMask, k), sequence_ (f1:f2)) |
+        (k, f1, f2) <- zip3 [xK_k, xK_j, xK_h, xK_l]
                             [nextWS, prevWS, shiftToPrev, shiftToNext]
                             [[], [], [prevWS], [nextWS]]
     ]
@@ -184,8 +183,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- mod-[1..0], toggles workspace N
     -- mod-shift-[1..0], move client to workspace N
     let shiftAndFocus i = W.greedyView i . W.shift i in
-    [ ((m .|. modm, k), f i)
-      | (i, k) <- zip (XMonad.workspaces conf) ([xK_1 .. xK_9] ++ [xK_0])
+    [ ((m .|. modm, k), f i) |
+        (i, k) <- zip (XMonad.workspaces conf) $ [xK_1 .. xK_9] ++ [xK_0]
       , (f, m) <- [ (toggleOrView, 0)
                   , (windows . shiftAndFocus, shiftMask)
                   , (windows . W.shift, controlMask)
@@ -194,8 +193,10 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     ++
     -- Special bindings to run cbonsai as screensaver
     -- Not to use by the user
-    [ ((modm .|. controlMask .|. shiftMask, xK_s), sequence_ [appendWorkspace "saver"])
-    , ((modm .|. controlMask .|. shiftMask, xK_w), sequence_ [toggleWS, removeWorkspaceByTag "saver"])
+    [ ((modm .|. controlMask .|. shiftMask, xK_s)
+       , sequence_ [appendWorkspace "saver"])
+    , ((modm .|. controlMask .|. shiftMask, xK_w)
+       , sequence_ [toggleWS, removeWorkspaceByTag "saver"])
     ]
 
 
@@ -205,11 +206,11 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList
     -- mod-button1, move by dragging
     [ ((modm, button1), \w -> focus w >> mouseMoveWindow w
-                                       >> windows W.shiftMaster)
+                                      >> windows W.shiftMaster)
 
     -- mod-button3, resize by dragging
     , ((modm, button3), \w -> focus w >> mouseResizeWindow w
-                                       >> windows W.shiftMaster)
+                                      >> windows W.shiftMaster)
     ]
 
 ----------------------------------------------------------------------
@@ -217,7 +218,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList
 
 mySpacing x = spacingRaw False (Border x x x x) True (Border x x x x) True
 
-myLayout = avoidStruts 
+myLayout = avoidStruts
          $ smartBorders
          $ windowNavigation
          $ mySpacing 8
@@ -236,11 +237,12 @@ myLayout = avoidStruts
 -- Window rules:
 
 myManageHook = composeAll
+    $ let rect = W.RationalRect (1/6) (1/6) (2/3) (2/3) in
     [ className =? "ImageJ"         --> doFloat
-    , className =? "st-256color"    --> doRectFloat (W.RationalRect (1/6) (1/6) (2/3) (2/3))
-    , className =? "Surf"           --> doRectFloat (W.RationalRect (1/6) (1/6) (2/3) (2/3))
-    , className =? "Gpick"          --> doRectFloat (W.RationalRect (1/6) (1/6) (2/3) (2/3))
-    , className =? "Caprine"        --> doRectFloat (W.RationalRect (1/6) (1/6) (2/3) (2/3))
+    , className =? "st-256color"    --> doRectFloat rect
+    , className =? "Surf"           --> doRectFloat rect 
+    , className =? "Gpick"          --> doRectFloat rect
+    , className =? "Caprine"        --> doRectFloat rect
     , resource  =? "desktop_window" --> doIgnore ]
 
 ----------------------------------------------------------------------
@@ -266,6 +268,7 @@ filterSaver str = if saverText `isInfixOf` strText
 --
 -- Startup hook
 myStartupHook = do
+    spawnOnce "wal -R"
     spawnOnce "nitrogen --restore &"
     spawnOnce "dropbox &"
     spawnOnce "bluetooth off"
@@ -289,33 +292,34 @@ main = do
         , workspaces         = myWorkspaces
         , normalBorderColor  = myNormalBorderColor
         , focusedBorderColor = myFocusedBorderColor
-
-        -- key bindings
         , keys               = myKeys
         , mouseBindings      = myMouseBindings
-
-        -- hooks, layouts
         , layoutHook         = myLayout
         , manageHook         = manageSpawn <+> myManageHook <+> manageDocks
         , handleEventHook    = myEventHook
-        , logHook            = dynamicLogWithPP $ xmobarPP {
+        , logHook            =
+            let sep = "<fc=#555555><fn=1>|</fn></fc> " in
+            dynamicLogWithPP $ xmobarPP {
               ppOutput = hPutStrLn xmproc
-            -- Current workspace
-            , ppCurrent = xmobarColor "#CCE01B" "" . wrap "<fc=#555555><fn=1>|</fn></fc> [ " " ]" . filterSaver
 
-            -- Hidden workspaces
-            , ppHidden = xmobarColor "#C792EA" "" . wrap "<fc=#555555><fn=1>|</fn></fc> " "" . clickable . filterSaver
+            , ppCurrent = xmobarColor "#CCE01B" "" 
+                . wrap (sep ++ "[ ") " ]" 
+                . filterSaver
 
-            -- Hidden workspaces (no windows)
-            , ppHiddenNoWindows = xmobarColor "#82AAFF" "" . wrap "<fc=#555555><fn=1>|</fn></fc> " ""  . clickable . filterSaver
+            , ppHidden = xmobarColor "#C792EA" ""
+                . wrap sep ""
+                . clickable
+                . filterSaver
 
-            -- Title of active window
+            , ppHiddenNoWindows = xmobarColor "#82AAFF" ""
+                . wrap sep ""
+                . clickable
+                . filterSaver
+
             , ppTitle = const ""
 
-            -- Separator character
             , ppSep =  " <fc=#999999><fn=1>| </fn></fc> "
 
-            -- Type of layout
             , ppLayout = wrap "<action=xdotool key super+space>" "</action>" . last . words
 
             -- Urgent workspace

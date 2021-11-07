@@ -6,16 +6,16 @@ myCommands = [
       [ "--template"  , "<leftipat> <acstatus>"
       , "--Low"       , "36"
       , "--High"      , "71"
-      , "--low"       , "#a54242"
-      , "--normal"    , "#de935f"
-      , "--high"      , "#b5bd68"
+      , "--low"       , "#A54242"
+      , "--normal"    , "#DE935F"
+      , "--high"      , "#B5BD68"
       , "--maxtwidth" , "10"
       , "--"
       , "--on-icon-pattern" , "<icon=battery/on/battery_on_%%.xpm/>"
       , "--off-icon-pattern" , "<icon=battery/off/battery_off_%%.xpm/>"
       , "--idle-icon-pattern" , "<icon=battery/idle/battery_idle_%%.xpm/>"
-      , "-o" , "<left><fc=#c5c8c6>%</fc> <timeleft>"
-      , "-O" , "<left><fc=#c5c8c6>% <timeleft></fc>"
+      , "-o" , "<left><fc=#C5C8C6>%</fc> <timeleft>"
+      , "-O" , "<left><fc=#C5C8C6>% <timeleft></fc>"
       , "-i" , "<fc=#707880>IDLE</fc>"
     ] 50
 
@@ -59,7 +59,7 @@ fullWrap :: String -> String -> String -> String -> String
 fullWrap fg bg cmd str = actionWrap cmd $ colorWrap fg bg str
 
 
--- Concatenates two string with bar separator in between
+-- Concatenates two strings with bar separator in between
 (+|+) :: String -> String -> String
 str1 +|+ str2 = str1 ++ " " ++ sep ++ " " ++ str2
     where sep = colorWrap "#888888" "" "<fn=1>|</fn>"
@@ -73,21 +73,22 @@ myTemplate =  "   "
           ++  "{"
           ++  cpu
           +|+ mem
-          +|+ upd
           +|+ volume
+          +|+ upd
           +|+ battery
 
-    where lambda  = fullWrap "#ffffff" "" "`dmenu_run`" "λ"
-          time    = fullWrap "#ddbb20" "" "`st -e calcurse`" "%date%"
-          cpu     = fullWrap "#ecbe7b" "" htop "%cpu%"
-          mem     = fullWrap "#ff6c6b" "" htop " %memory%"
-          upd     = fullWrap "#c678dd" "" "`st -e yay -Syu`" update
+    where lambda  = fullWrap "#FFFFFF" "" "`dmenu_run`" "λ"
+          time    = fullWrap "#DDBB20" "" "`st -e calcurse`" "%date%"
+          cpu     = fullWrap "#ECBE7B" "" htop "%cpu%"
+          mem     = fullWrap "#FF6C6B" "" htop " %memory%"
+          upd     = fullWrap "#C678DD" "" "`st -e yay -Syu`" update
           update  = bell ++ " %pacupdate%"
           bell    = "<fn=2>\xf0f3</fn>"
-          volume  = fullWrap "#ff6c6b" "" mute "%volume%"
+          volume  = fullWrap "#FF4C6B" "" mute "%volume%"
           battery = "%battery%"
           htop    = "`.local/bin/xmobar/htop`"
           mute    = "`pactl set-sink-mute @DEFAULT_SINK@ toggle`"
+          textColor = "#FFFFFF"
 
 
 config = defaultConfig {
@@ -97,8 +98,8 @@ config = defaultConfig {
         , "xft:Font Awesome 5 Free Solid:size=11"
         , "xft:Font Awesome 5 Brands:size=11"
     ]
-    , bgColor      = "#282c34"
-    , fgColor      = "#ff6c6b"
+    , bgColor      = "#282C34"
+    , fgColor      = "#FF6C6B"
     , alpha        = 250
     , position     = Top
     , lowerOnStart = True
@@ -106,8 +107,8 @@ config = defaultConfig {
     , persistent   = True
     , iconRoot     = ".config/xmobar/icons"
     , sepChar      = "%"
-    , commands     = myCommands
     , alignSep     = "}{"
+    , commands     = myCommands
     , template     = myTemplate
 }
 

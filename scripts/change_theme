@@ -10,11 +10,8 @@ else
     touch $LOCK
 fi
 
-nitrogen --set-zoom-fill ~/Pictures/Wallpapers/wallpaper-$THEME.png --save
+$HOME/anaconda3/bin/wal -f $HOME/.config/wal/colorschemes/$THEME/w_$THEME.json
 
-cat $HOME/.config/kitty/$THEME.theme > $HOME/.config/kitty/current.theme
+nitrogen --set-zoom-fill $HOME/Pictures/Wallpapers/wallpaper-$THEME.png --save
 
-for pid in $(ps -ef | awk '/kitty/ {print $2}' | head -n -1)
-do
-    kill -s SIGUSR1 $pid
-done
+

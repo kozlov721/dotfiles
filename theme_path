@@ -2,12 +2,12 @@ selection_foreground #fdfdfd
 selection_background #111417
 cursor               #1C2027
 cursor_text_color    #fdfdfd
-background           #AFCCFF
+background           #0FCCFF
 foreground           #1C2027
 color0               #192033
 color1               #A61A2E
-color2               #18711C
-color3               #C25D00
+color2               #38912B
+color3               #B27D12
 color4               #254C8A
 color5               #7C4F9F
 color6               #19A999

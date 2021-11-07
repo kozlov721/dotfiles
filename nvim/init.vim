@@ -223,10 +223,9 @@ let g:cursorhold_updatetime = 100
 
 """ Filetype-Specific Configurations
 
-autocmd FileType html setlocal shiftwidth=2 tabstop=2 softtabstop=2
-autocmd FileType css  setlocal shiftwidth=2 tabstop=2 softtabstop=2
-autocmd FileType xml  setlocal shiftwidth=2 tabstop=2 softtabstop=2
-
+autocmd FileType html     setlocal shiftwidth=2 tabstop=2 softtabstop=2
+autocmd FileType css      setlocal shiftwidth=2 tabstop=2 softtabstop=2
+autocmd FileType xml      setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType markdown setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType journal  setlocal shiftwidth=2 tabstop=2 softtabstop=2
 
@@ -249,14 +248,24 @@ function! ColorLight()
     color forgotten-light
 endfunction
 
+function! SaveKittyTheme()
+    if !empty(glob("/var/local/change_theme/light_on.lck"))
+        let theme_path = $HOME . "/.config/kitty/light.theme"
+    else
+        let theme_path = $HOME . "/.config/kitty/dark.theme"
+    endif
+    silent execute "!cat <afile> " . " > " . theme_path
+    silent !fish -c "kill -s SIGUSR1 kitty"
+endfunction
+
 """ Custom Mappings
 
 let mapleader=","
 
 nmap -          $
 xmap -          $
-nmap <leader>$s <C-w>s<C-w>j:terminal<CR>:set nonumber<CR><S-a>
-nmap <leader>$v <C-w>v<C-w>l:terminal<CR>:set nonumber<CR><S-a>
+nmap <leader>term <C-w>s<C-w>j:terminal<CR>:set nonumber<CR><S-a>
+nmap <leader>Term <C-w>v<C-w>l:terminal<CR>:set nonumber<CR><S-a>
 nmap <leader>O  O<ESC>
 nmap <leader>a  gaip*
 xmap <leader>a  gaip*
@@ -269,13 +278,15 @@ nmap <leader>q  :NERDTreeToggle<CR>
 nmap <leader>r  :so ~/.config/nvim/init.vim<CR>
 nmap <leader>s  :%s/
 nmap <leader>t  :call TrimWhitespace()<CR>
+nmap <leader>tt  :call TrimWhitespace()<CR>
 nmap <leader>w  :TagbarToggle<CR>
 nmap <silent>   <leader><leader> :noh<CR>
 nmap <Tab>      :bnext<CR>
 nmap <S-Tab>    :bprevious<CR>
 
-autocmd FileType python nmap <leader>x :0,$!~/.config/nvim/env/bin/python -m yapf<CR>
+" autocmd FileType python nmap <leader>x :0,$!~/.config/nvim/env/bin/python -m yapf<CR>
 
+autocmd FileType python nmap <leader>x :w<CR>:execute "!python " . expand("%:p")<CR>
 " Custom settings
 
 set whichwrap+=<,>,h,l
@@ -285,8 +296,8 @@ set nofoldenable
 autocmd VimEnter * RainbowParentheses
 autocmd VimEnter * ColorToggle
 autocmd BufWritePost *ma007*.tex silent !pdflatex <afile>
-autocmd BufWritePost *kitty/current.theme silent !fish -c "kill -s SIGUSR1 kitty"
-
+autocmd BufWritePost *kitty/current.theme call SaveKittyTheme()
+autocmd BufWritePost *kitty.conf silent !fish -c 'kill -s SIGUSR1 kitty'
 let NERDSpaceDelims=1
 
 if !empty(glob("/var/local/change_theme/light_on.lck"))
