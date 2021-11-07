@@ -9,4 +9,3 @@ neofetch    ~/.config/neofetch/config.conf
 picom       ~/.config/picom/picom.conf
 ranger      ~/.config/ranger/rifle.conf
 kitty       ~/.config/kitty/kitty.conf
-kitty-theme ~/.config/kitty/current.theme

@@ -94,7 +94,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [ ((0, xK_F12), toggleOrView "term")
 
     -- Toggle light theme
-    , ((modm .|. controlMask .|. shiftMask, xK_l), spawn "change_theme")
+    , ((modm .|. controlMask .|. shiftMask, xK_l), spawn "fish -c 'change_theme'")
 
     -- Increase opacity
     , ((modm .|. controlMask, xK_Up), spawn "picom-trans -c -o -5")
@@ -269,12 +269,12 @@ filterSaver str = if saverText `isInfixOf` strText
 -- Startup hook
 myStartupHook = do
     spawnOnce "wal -R"
-    spawnOnce "nitrogen --restore &"
+    -- spawnOnce "nitrogen --restore &"
     spawnOnce "dropbox &"
     spawnOnce "bluetooth off"
     spawnOnce "setxkbmap -layout cz coder"
     spawnOnce "picom --experimental-backends &"
-    spawnOnce "xset r rate 330 30"
+    spawnOnce "xset r rate 310 40"
     spawnOnce "xautolock -time 10 -locker 'screensaver' &"
     spawnOnce "xinput set-prop 'ELAN2602:00 04F3:3109 Touchpad' 'libinput Natural Scrolling Enabled' 1"
     spawnNOnOnce 2 "term" myTerminal

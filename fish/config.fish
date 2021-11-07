@@ -14,7 +14,7 @@ alias untar 'tar -zxvf'
 alias icat 'kitty +kitten icat'
 alias kuni 'kitty +kitten unicode_input'
 alias kdiff 'kitty +kitten diff'
-alias refresh-kitty 'kill -s SIGUSR1 (ps ax | grep \'kitty\($\| \)\' | awk \'{print $1}\')'
+alias refresh-kitty 'kill -s SIGUSR1 (ps ax | awk \'/kitty/ {print $1 " " $5}\' | awk \'/kitty/ {print $1}\'); wal -R > /dev/null'
 alias .. 'cd ..'
 alias ... 'cd ../..'
 alias .... 'cd ../../..'
@@ -36,4 +36,4 @@ eval /home/martin/anaconda3/bin/conda "shell.fish" "hook" $argv | source
 
 source /usr/share/doc/find-the-command/ftc.fish
 
-
+fish_add_path -P $HOME/.local/bin

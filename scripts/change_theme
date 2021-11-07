@@ -1,4 +1,5 @@
 #!/bin/bash
+
 LOCK=/var/local/change_theme/light_on.lck
 
 if [ -f $LOCK ]
@@ -10,8 +11,16 @@ else
     touch $LOCK
 fi
 
-$HOME/anaconda3/bin/wal -f $HOME/.config/wal/colorschemes/$THEME/w_$THEME.json
+THEME_PATH=$HOME/.config/wal/colorschemes/$THEME/w_$THEME.json
+
+wal -f $THEME_PATH 
 
 nitrogen --set-zoom-fill $HOME/Pictures/Wallpapers/wallpaper-$THEME.png --save
 
+VIM_CONFIG=$HOME/.config/nvim/init.vim
+
+for SERVER in $(nvr --nostart --serverlist)
+do
+    nvr --servername $SERVER --remote -cc "so ${VIM_CONFIG}"
+done
 
