@@ -46,21 +46,15 @@ workspacesApps = [ myTerminal, "qutebrowser"
                  , myTerminal, myTerminal ++ " -e neomutt"
                  , "vlc", "discord", "code" ]
 
--- For 'clickable' function
-myWorkspaceIndices = M.fromList $ zip myWorkspaces $ [1..9] ++ [0]
-
-
 myBorderWidth = 0
 
 myNormalBorderColor  = "#FFFFFF"
---myFocusedBorderColor = "#CE2D52"
---myFocusedBorderColor = "#1979A9"
-myFocusedBorderColor = "#000000"
+myFocusedBorderColor = "#CE2D52"
 
 
 ----------------------------------------------------------------------
--- Key bindings. Add, modify or remove key bindings here.
---
+
+
 myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- function keys
     [ ((0, xF86XK_MonBrightnessUp), spawn "lux -a 2%")
@@ -95,12 +89,14 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [ ((0, xK_F12), toggleOrView "term")
 
     -- Toggle light theme
-    , ((modm .|. controlMask .|. shiftMask, xK_l), spawn "fish -c 'change_theme'")
+    , ((modm .|. controlMask .|. shiftMask, xK_l)
+      , spawn "fish -c 'change_theme'")
 
     -- Increase opacity
     , ((modm .|. controlMask, xK_Up), spawn "picom-trans -c -o -5")
 
-    , ((0, xK_Print), spawn "maim $HOME/Pictures/Screenshots/$(date +%s)")
+    , ((0, xK_Print)
+      , spawn "maim $HOME/Pictures/Screenshots/$(date +%s)")
 
     -- Decrease opacity
     , ((modm .|. controlMask, xK_Down), spawn "picom-trans -c -o +5")
@@ -195,7 +191,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     ]
     ++
     -- Special bindings to run cbonsai as screensaver
-    -- Not to use by the user
+    -- Not to be used by the user
     [ ((modm .|. controlMask .|. shiftMask, xK_s)
        , sequence_ [appendWorkspace "saver"])
     , ((modm .|. controlMask .|. shiftMask, xK_w)
@@ -204,7 +200,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
 
 ----------------------------------------------------------------------
--- Mouse bindings:
+
 
 myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList
     -- mod-button1, move by dragging
@@ -216,8 +212,9 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList
                                       >> windows W.shiftMaster)
     ]
 
+
 ----------------------------------------------------------------------
--- Layouts:
+
 
 mySpacing x = spacingRaw False (Border x x x x) True (Border x x x x) True
 
@@ -238,26 +235,41 @@ myLayout = avoidStruts
 
 
 ----------------------------------------------------------------------
--- Window rules:
+
 
 myManageHook = composeAll
     $ let rect = W.RationalRect (1/6) (1/6) (2/3) (2/3) in
     [ className =? "ImageJ"         --> doFloat
     , className =? "st-256color"    --> doRectFloat rect
-    , className =? "Surf"           --> doRectFloat rect 
+    , className =? "Surf"           --> doRectFloat rect
     , className =? "Gpick"          --> doRectFloat rect
     , className =? "Caprine"        --> doRectFloat rect
     , resource  =? "desktop_window" --> doIgnore ]
 
+
 ----------------------------------------------------------------------
---
--- Event handling
-myEventHook = fullscreenEventHook
+
+
+-- The rest is managed in ~/.xsession
+myStartupHook = do
+    spawnOnce "picom --experimental-backends &"
+    spawnOnce "xautolock -time 10 -locker 'screensaver' &"
+    spawnNOnOnce 2 "term" myTerminal
+
+
+----------------------------------------------------------------------
 
 
 clickable :: String -> String
-clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
-    where i = fromJust $ M.lookup ws myWorkspaceIndices
+clickable ws = "<action=xdotool key super+"
+                ++ show index
+                ++ ">"
+                ++ ws
+                ++ "</action>"
+
+    where index   = fromJust $ M.lookup ws indices
+          indices = M.fromList $ zip myWorkspaces $ [1..9] ++ [0]
+
 
 
 filterSaver :: String -> String
@@ -268,70 +280,58 @@ filterSaver str = if saverText `isInfixOf` strText
                 saverText = pack "saver"
                 strText = pack str
 
-----------------------------------------------------------------------
---
--- Startup hook
-myStartupHook = do
-    -- spawnOnce "wal -R"
-    spawnOnce "nitrogen --restore &"
-    spawnOnce "dropbox &"
-    spawnOnce "bluetooth off"
-    -- spawnOnce "setxkbmap -layout cz coder"
-    spawnOnce "picom --experimental-backends &"
-    -- spawnOnce "xset r rate 310 40"
-    spawnOnce "xautolock -time 10 -locker 'screensaver' &"
-    -- spawnOnce "xinput set-prop 'ELAN2602:00 04F3:3109 Touchpad' 'libinput Natural Scrolling Enabled' 1"
-    spawnNOnOnce 2 "term" myTerminal
+
+myLogHook proc = dynamicLogWithPP $ xmobarPP {
+      ppOutput = hPutStrLn proc
+    , ppCurrent = xmobarColor "#CCE01B" ""
+        . wrap (sep ++ "[ ") " ]"
+        . filterSaver
+    , ppHidden = xmobarColor "#C792EA" ""
+        . wrap sep ""
+        . clickable
+        . filterSaver
+    , ppHiddenNoWindows = xmobarColor "#82AAFF" ""
+        . wrap sep ""
+        . clickable
+        . filterSaver
+    , ppTitle = const ""
+    , ppSep =  " <fc=#999999><fn=1>| </fn></fc> "
+    , ppLayout = wrap "<action=xdotool key super+space>" "</action>"
+        . last
+        . words
+    , ppUrgent = xmobarColor "#C45500" ""
+        . wrap "!" "!"
+    , ppOrder  = \(ws:l:t:ex) -> [ws,l] ++ ex ++ [t]
+}
+    where sep = "<fc=#555555><fn=1>|</fn></fc> "
+
 
 ----------------------------------------------------------------------
+
+
+myConfig logHandle = def {
+      terminal           = myTerminal
+    , focusFollowsMouse  = myFocusFollowsMouse
+    , clickJustFocuses   = myClickJustFocuses
+    , borderWidth        = myBorderWidth
+    , modMask            = myModMask
+    , workspaces         = myWorkspaces
+    , normalBorderColor  = myNormalBorderColor
+    , focusedBorderColor = myFocusedBorderColor
+    , keys               = myKeys
+    , mouseBindings      = myMouseBindings
+    , layoutHook         = myLayout
+    , manageHook         = manageSpawn <+> myManageHook <+> manageDocks
+    , handleEventHook    = fullscreenEventHook
+    , logHook            = myLogHook logHandle
+    , startupHook        = myStartupHook
+}
+
+
+----------------------------------------------------------------------
+
 
 main = do
-    xmproc <- spawnPipe "xmobar ~/.config/xmobar/xmobar.hs"
-    xmonad $ docks $ ewmh def {
-          terminal           = myTerminal
-        , focusFollowsMouse  = myFocusFollowsMouse
-        , clickJustFocuses   = myClickJustFocuses
-        , borderWidth        = myBorderWidth
-        , modMask            = myModMask
-        , workspaces         = myWorkspaces
-        , normalBorderColor  = myNormalBorderColor
-        , focusedBorderColor = myFocusedBorderColor
-        , keys               = myKeys
-        , mouseBindings      = myMouseBindings
-        , layoutHook         = myLayout
-        , manageHook         = manageSpawn <+> myManageHook <+> manageDocks
-        , handleEventHook    = myEventHook
-        , logHook            =
-            let sep = "<fc=#555555><fn=1>|</fn></fc> " in
-            dynamicLogWithPP $ xmobarPP {
-              ppOutput = hPutStrLn xmproc
-
-            , ppCurrent = xmobarColor "#CCE01B" "" 
-                . wrap (sep ++ "[ ") " ]" 
-                . filterSaver
-
-            , ppHidden = xmobarColor "#C792EA" ""
-                . wrap sep ""
-                . clickable
-                . filterSaver
-
-            , ppHiddenNoWindows = xmobarColor "#82AAFF" ""
-                . wrap sep ""
-                . clickable
-                . filterSaver
-
-            , ppTitle = const ""
-
-            , ppSep =  " <fc=#999999><fn=1>| </fn></fc> "
-
-            , ppLayout = wrap "<action=xdotool key super+space>" "</action>" . last . words
-
-            -- Urgent workspace
-            , ppUrgent = xmobarColor "#C45500" "" . wrap "!" "!"
-
-            , ppOrder  = \(ws:l:t:ex) -> [ws,l] ++ ex ++ [t]
-        }
-
-        , startupHook        = myStartupHook
-    }
+    xmproc <- spawnPipe "xmobar"
+    xmonad $ docks $ ewmh $ myConfig xmproc
 
