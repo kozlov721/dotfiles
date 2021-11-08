@@ -1,5 +1,3 @@
-""" Optixal's Neovim Init.vim
-
 """ Vim-Plug
 call plug#begin()
 
@@ -25,9 +23,10 @@ Plug 'preservim/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'ryanoasis/vim-devicons'
 Plug 'scrooloose/nerdcommenter'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'neoclide/coc.nvim', { 'branch': 'release' }
 Plug 'mhinz/vim-signify'
-Plug 'jiangmiao/auto-pairs'
+" Plug 'jiangmiao/auto-pairs'
+Plug 'windwp/nvim-autopairs'
 Plug 'junegunn/vim-easy-align'
 Plug 'alvan/vim-closetag'
 Plug 'tpope/vim-abolish'
@@ -59,6 +58,8 @@ set hidden
 set number
 set title
 
+lua require('nvim-autopairs').setup{}
+
 """ Coloring
 
 " Main Coloring Configurations
@@ -79,14 +80,13 @@ autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTr
 let g:airline_powerline_fonts = 1
 let g:airline_section_x = ' %{&filetype}'
 let g:airline_section_z = '%p%%  %{strftime("%-I:%M %p")}'
-" let g:airline_section_z = '%p%% : Line:%l/%L: Col:%'
 let g:airline_section_warning = ''
-let g:airline#extensions#tabline#enabled = 1 " Uncomment to display buffer tabline above
+let g:airline#extensions#tabline#enabled = 1
 
 " Neovim :Terminal
 tmap <Esc> <C-\><C-n>
 tmap <C-w> <Esc><C-w>
-"tmap <C-d> <Esc>:q<CR>
+tmap <C-d> <Esc>:q<CR>
 autocmd BufWinEnter,WinEnter term://* startinsert
 autocmd BufLeave term://* stopinsert
 
@@ -118,18 +118,8 @@ let g:limelight_conceal_guifg = 'gray'
 " Startify
 let g:startify_fortune_use_unicode = 1
 
-" Startify + NERDTree on start when no file is specified
-autocmd VimEnter *
-    \   if !argc()
-    \ |   Startify
-    \ |   NERDTree
-    \ |   wincmd w
-    \ | endif
-
 " coc.vim START
 
-" Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
-" delays and poor user experience.
 set updatetime=300
 
 " Don't pass messages to |ins-completion-menu|.

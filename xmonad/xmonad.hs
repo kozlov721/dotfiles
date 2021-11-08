@@ -16,6 +16,7 @@ import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers
 import XMonad.Layout.Grid
 import XMonad.Layout.NoBorders
+import XMonad.Layout.Reflect
 import XMonad.Layout.Renamed
 import XMonad.Layout.ResizableTile
 import XMonad.Layout.Spacing
@@ -31,7 +32,7 @@ import qualified XMonad.StackSet as W
 
 myTerminal = "kitty"
 
-myFocusFollowsMouse = True
+myFocusFollowsMouse = False
 myClickJustFocuses = False
 
 myModMask = mod4Mask
@@ -40,7 +41,7 @@ myWorkspaces = [ "term", "www", "dir" , "mus", "docs"
                , "free", "mail", "vid", "chat", "dev"]
 
 workspacesApps = [ myTerminal, "qutebrowser"
-                 , myTerminal ++ " -e ranger"
+                 , myTerminal ++ " -e ~/.local/bin/window-ranger"
                  , "spotify", "onlyoffice-desktopeditors"
                  , myTerminal, myTerminal ++ " -e neomutt"
                  , "vlc", "discord", "code" ]
@@ -99,6 +100,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- Increase opacity
     , ((modm .|. controlMask, xK_Up), spawn "picom-trans -c -o -5")
 
+    , ((0, xK_Print), spawn "maim $HOME/Pictures/Screenshots/$(date +%s)")
+
     -- Decrease opacity
     , ((modm .|. controlMask, xK_Down), spawn "picom-trans -c -o +5")
 
@@ -106,7 +109,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm, xK_F12), toggleOrView "free")
 
     -- Launch dmenu
-    , ((modm, xK_p), spawn "dmenu_run")
+    , ((modm, xK_p), spawn "rofi -show run")
 
     -- Launch rofi window
     , ((modm .|. shiftMask, xK_p), spawn "rofi -show window")
@@ -157,10 +160,10 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm .|. shiftMask, xK_k), windows W.swapUp)
 
     -- Shrink the master area
-    , ((modm, xK_h), sendMessage Shrink)
+    , ((modm, xK_h), sendMessage Expand)
 
     -- Expand the master area
-    , ((modm, xK_l), sendMessage Expand)
+    , ((modm, xK_l), sendMessage Shrink)
 
     -- Push window back into tiling
     , ((modm, xK_t), withFocused $ windows . W.sink)
@@ -227,6 +230,7 @@ myLayout = avoidStruts
            toggleLayouts Full Grid
     where
         myTiled = renamed [Replace "Tall"]
+            $ reflectHoriz
             $ ResizableTall 1 (3 / 100) (1 / 2) []
         myMirrored = renamed [Replace "Mirr"]
             $ Mirror
@@ -248,7 +252,7 @@ myManageHook = composeAll
 ----------------------------------------------------------------------
 --
 -- Event handling
-myEventHook = docksEventHook <+> fullscreenEventHook
+myEventHook = fullscreenEventHook
 
 
 clickable :: String -> String
@@ -268,22 +272,22 @@ filterSaver str = if saverText `isInfixOf` strText
 --
 -- Startup hook
 myStartupHook = do
-    spawnOnce "wal -R"
-    -- spawnOnce "nitrogen --restore &"
+    -- spawnOnce "wal -R"
+    spawnOnce "nitrogen --restore &"
     spawnOnce "dropbox &"
     spawnOnce "bluetooth off"
-    spawnOnce "setxkbmap -layout cz coder"
+    -- spawnOnce "setxkbmap -layout cz coder"
     spawnOnce "picom --experimental-backends &"
-    spawnOnce "xset r rate 310 40"
+    -- spawnOnce "xset r rate 310 40"
     spawnOnce "xautolock -time 10 -locker 'screensaver' &"
-    spawnOnce "xinput set-prop 'ELAN2602:00 04F3:3109 Touchpad' 'libinput Natural Scrolling Enabled' 1"
+    -- spawnOnce "xinput set-prop 'ELAN2602:00 04F3:3109 Touchpad' 'libinput Natural Scrolling Enabled' 1"
     spawnNOnOnce 2 "term" myTerminal
 
 ----------------------------------------------------------------------
 
 main = do
     xmproc <- spawnPipe "xmobar ~/.config/xmobar/xmobar.hs"
-    xmonad $ ewmh def {
+    xmonad $ docks $ ewmh def {
           terminal           = myTerminal
         , focusFollowsMouse  = myFocusFollowsMouse
         , clickJustFocuses   = myClickJustFocuses

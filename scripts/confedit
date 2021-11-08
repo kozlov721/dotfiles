@@ -10,8 +10,13 @@ done < $HOME/.config/confedit.list
 
 SED_PATH=$(echo $CONFIG_PATH | sed "s/~/$(echo $HOME | sed 's/\//\\\//g')/g")
 
-case ${opt} in
-    e  ) kitty -e nvim $SED_PATH ;;
-    \? ) nvim $SED_PATH ;;
-esac
-
+# case ${opt} in
+    # e  ) kitty -e nvim $SED_PATH ;;
+    # \? ) nvim $SED_PATH ;;
+# esac
+if [[ $SHLVL > 1 && $opt != "e" ]]
+then
+    nvim $SED_PATH
+else
+    kitty -e nvim $SED_PATH
+fi

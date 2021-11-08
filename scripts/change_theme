@@ -11,9 +11,14 @@ else
     touch $LOCK
 fi
 
-THEME_PATH=$HOME/.config/wal/colorschemes/$THEME/w_$THEME.json
+KITTY_CONF=$HOME/.config/kitty
+cat $KITTY_CONF/$THEME.theme > $KITTY_CONF/current.theme
 
-wal -f $THEME_PATH 
+for pid in $(ps -ef | awk '/kitty/ {print $2}' | head -n -1)
+do
+    kill -s SIGUSR1 $pid
+done
+# fish -c refresh-kitty
 
 nitrogen --set-zoom-fill $HOME/Pictures/Wallpapers/wallpaper-$THEME.png --save
 

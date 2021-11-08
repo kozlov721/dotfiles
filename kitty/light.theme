@@ -1,7 +1,7 @@
-selection_foreground #fdfdfd
+selection_foreground #FDFDFD
 selection_background #111417
 cursor               #1C2027
-cursor_text_color    #fdfdfd
+cursor_text_color    #FDFDFD
 background           #AFCCFF
 foreground           #1C2027
 color0               #192033

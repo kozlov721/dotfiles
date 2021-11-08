@@ -52,6 +52,12 @@ c.tabs.last_close = 'ignore'
 
 c.url.default_page = 'https://google.com'
 
+
+# class RedditSearch(str):
+    # def format(*args):
+        
+
+
 c.url.searchengines = {
     'DEFAULT': 'https://www.google.com/search?q={}',
     'y':       'https://www.youtube.com/results?search_query={}',
