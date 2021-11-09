@@ -4,7 +4,7 @@ hide_ascii = false
 hide_bar_delimiters = true
 prefer_small_ascii = false
 separator = "->"
-key_color = "Blue"
+key_color = "LightBlue"
 separator_color = "Cyan"
 palette = "Full"
 

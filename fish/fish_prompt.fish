@@ -12,7 +12,7 @@ function __user_host
 end
 
 function __current_path
-  echo -n (set_color --bold blue) (prompt_pwd) (set_color normal) 
+  echo -n (set_color --bold brblue) (prompt_pwd) (set_color normal) 
 end
 
 function _git_branch_name
@@ -28,12 +28,12 @@ function __git_status
     set -l git_branch (_git_branch_name)
 
     if [ (_git_is_dirty) ]
-      set git_info '<'$git_branch"*"'>'
+      set git_color 'yellow'
     else
-      set git_info '<'$git_branch'>'
+      set git_color 'brgreen'
     end
 
-    echo -n (set_color yellow) $git_info (set_color normal) 
+    echo -n (set_color $git_color) '<'$git_branch'>' (set_color normal) 
   end
 end
 
@@ -42,7 +42,7 @@ function fish_mode_prompt; end
 function __fish_mode_prompt
     switch $fish_bind_mode
     case default
-        set_color --bold red
+        set_color --bold brred
         echo '[N]'
     case insert
         set_color --bold green
@@ -51,10 +51,10 @@ function __fish_mode_prompt
         set_color --bold green
         echo '[R]'
     case visual
-        set_color --bold brmagenta
+        set_color --bold blue
         echo '[V]'
     case '*'
-        set_color --bold red
+        set_color --bold brred
         echo '[?]'
     end
     set_color normal

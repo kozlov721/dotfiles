@@ -8,64 +8,66 @@ configuration {
 @theme "/dev/null"
 
 * {
-    bg:               #01131a;
-    fg:               #f5f0f1;
-    button:           #09181f;
-
+    bg:               #f8f9f7;
+    fg:               #372d2f;
+    button:           #c2c7be;
     background-color: @bg;
     text-color:       @fg;
 }
 
-window {
-    transparency:     "real";
-    border-radius:    7px;
-    width:            40%;
-    fullscreen:       true;
-    background-color: #0000;
-    padding:          100px 50% 100px 10%;
-}
+window { width: 50%; }
 
 prompt { enabled: false; }
+
+pfp {
+    padding:          50px;
+    width:            110px;
+    expand:           false;
+    border:           5px;
+    border-color:     @bg;
+    background-image: url("img/pfp.png", height);
+}
 
 entry {
     placeholder:       "Search";
     expand:            true;
-    background-color:  @button;
-    placeholder-color: @fg;
-    border-radius:     10px;
+    padding:           10px 2% 10px 2%;
     vertical-align:    0.5;
-    padding:           13px 2% 13px 2%;
+    background-color:  @fg;
+    text-color:        @bg;
+    placeholder-color: @button;
+    margin:            29px 0 29px 0;
+    border:            5px;
+    border-color:      @bg;
 }
 
 inputbar {
-    children:         [ prompt, entry ];
+    children:         [ pfp, entry ];
     text-color:       @fg;
     expand:           false;
-    padding:          64px 64px 32px 64px;
-    border-radius:    10px;
-    background-image: url("img/bg.png", width);
+    spacing:          64px;
+    padding:          64px 64px 0 64px;
+    background-image: url("img/banner.png", width);
 }
 
 listview {
-    columns:       1;
-    lines:         8;
-    cycle:         false;
-    dynamic:       true;
-    layout:        vertical;
-    border-radius: 10px;
-    padding:       32px;
+    columns: 2;
+    lines:   4;
+    cycle:   false;
+    dynamic: true;
+    layout:  vertical;
+    padding: 16px 32px 32px 32px;
 }
 
 mainbox {
-    children:         [ inputbar, listview ];
-    spacing:          2%;
-    background-color: #0000;
+    children: [ inputbar, listview ];
+    spacing:  2%;
+    layout:   horizontal;
 }
 
 element {
-    orientation:   vertical;
-    border-radius: 0%;
-    padding:       1.5% 0% 1.5% 0%;
+    orientation: vertical;
+    padding:     1.5% 0% 1.5% 0%;
 }
 
 element-text {
@@ -76,8 +78,5 @@ element-text {
     text-color:       inherit;
 }
 
-element selected {
-    background-color: @button;
-    text-color:       @fg;
-    border-radius:    6px;
-}
+element selected { background-color: @button; }
+
