@@ -41,7 +41,7 @@ myWorkspaces = [ "term", "www", "dir" , "mus", "docs"
                , "free", "mail", "vid", "chat", "dev"]
 
 workspacesApps = [ myTerminal, "qutebrowser"
-                 , myTerminal ++ " -e ~/.local/bin/window-ranger"
+                 , myTerminal ++ " -e ranger"
                  , "spotify", "onlyoffice-desktopeditors"
                  , myTerminal, myTerminal ++ " -e neomutt"
                  , "vlc", "discord", "code" ]
@@ -216,8 +216,6 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList
 ----------------------------------------------------------------------
 
 
-mySpacing x = spacingRaw False (Border x x x x) True (Border x x x x) True
-
 myLayout = avoidStruts
          $ smartBorders
          $ windowNavigation
@@ -232,6 +230,9 @@ myLayout = avoidStruts
         myMirrored = renamed [Replace "Mirr"]
             $ Mirror
             $ ResizableTall 1 (3 / 100) (1 / 2) []
+        mySpacing x = spacingRaw False
+            (Border x x x x) True
+            (Border x x x x) True
 
 
 ----------------------------------------------------------------------

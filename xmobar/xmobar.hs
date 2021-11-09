@@ -59,7 +59,7 @@ fullWrap :: String -> String -> String -> String -> String
 fullWrap fg bg cmd str = actionWrap cmd $ colorWrap fg bg str
 
 
--- Concatenates two strings with bar separator in between
+-- Concatenates two strings with a bar separator in between
 (+|+) :: String -> String -> String
 str1 +|+ str2 = str1 ++ " " ++ sep ++ " " ++ str2
     where sep = colorWrap "#888888" "" "<fn=1>|</fn>"

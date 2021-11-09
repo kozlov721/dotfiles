@@ -12,13 +12,12 @@ else
 fi
 
 KITTY_CONF=$HOME/.config/kitty
-cat $KITTY_CONF/$THEME.theme > $KITTY_CONF/current.theme
+ROFI_CONF=$HOME/.config/rofi
 
-for pid in $(ps -ef | awk '/kitty/ {print $2}' | head -n -1)
-do
-    kill -s SIGUSR1 $pid
-done
-# fish -c refresh-kitty
+cat $KITTY_CONF/$THEME.theme > $KITTY_CONF/current.theme
+cat $ROFI_CONF/$THEME.rasi > $ROFI_CONF/config.rasi 
+
+fish -c refresh-kitty
 
 nitrogen --set-zoom-fill $HOME/Pictures/Wallpapers/wallpaper-$THEME.png --save
 

@@ -44,6 +44,8 @@ config.set('content.notifications.enabled', False,
 config.set('content.notifications.enabled', False,
            'https://www.reddit.com')
 
+config.set('qt.highdpi', False)
+
 c.content.pdfjs = True
 
 c.scrolling.smooth = True
@@ -51,11 +53,6 @@ c.scrolling.smooth = True
 c.tabs.last_close = 'ignore'
 
 c.url.default_page = 'https://google.com'
-
-
-# class RedditSearch(str):
-    # def format(*args):
-        
 
 
 c.url.searchengines = {
@@ -68,7 +65,7 @@ c.url.searchengines = {
 c.url.start_pages = 'https://google.com'
 
 c.zoom.default = '150%'
-
+c.fonts.default_size = '11pt'
 c.zoom.levels = ['25%', '33%', '50%', '67%', '75%',
                  '90%', '100%', '110%', '125%', '135%',
                  '140%', '150%', '175%', '200%', '250%',
@@ -79,8 +76,6 @@ c.content.blocking.whitelist = ['https://www.googleadservices.com/*']
 
 # To prevent youtube from playing videos before I focus them
 c.content.autoplay = False
-
-c.fonts.default_size = '9pt'
 
 c.fonts.completion.category = 'bold default_size default_family'
 
@@ -119,6 +114,7 @@ c.colors.webpage.darkmode.algorithm = 'lightness-hsl'
 
 # Conditional dark mode
 if not os.path.isfile('/var/local/change_theme/light_on.lck'):
+    c.colors.webpage.preferred_color_scheme = "dark"
     c.colors.webpage.darkmode.enabled = True
     c.colors.webpage.bg = '#111111'
     c.content.user_stylesheets = ['~/.config/qutebrowser/style.css']

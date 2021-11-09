@@ -25,7 +25,6 @@ Plug 'ryanoasis/vim-devicons'
 Plug 'scrooloose/nerdcommenter'
 Plug 'neoclide/coc.nvim', { 'branch': 'release' }
 Plug 'mhinz/vim-signify'
-" Plug 'jiangmiao/auto-pairs'
 Plug 'windwp/nvim-autopairs'
 Plug 'junegunn/vim-easy-align'
 Plug 'alvan/vim-closetag'
@@ -239,6 +238,15 @@ function! ColorLight()
     color forgotten-light
 endfunction
 
+function! SaveKittyTheme()
+    if !empty(glob("/var/local/change_theme/light_on.lck"))
+        let theme_path = $HOME . "/.config/kitty/light.theme"
+    else
+        let theme_path = $HOME . "/.config/kitty/dark.theme"
+    endif
+    silent execute "!cat <afile> " . " > " . theme_path
+    silent !fish -c "kill -s SIGUSR1 kitty"
+endfunction
 
 """ Custom Mappings
 
@@ -263,7 +271,7 @@ nmap <leader>w    :TagbarToggle<CR>
 nmap <silent>     <leader><leader> :noh<CR>
 nmap <Tab>        :bnext<CR>
 nmap <S-Tab>      :bprevious<CR>
-nmap <leader>term <C-w>s<C-w>j:terminal<CR>:set nonumber<CR><S-a>
+nmap <leader>term <C-w>s<C-w>j:terminal<CR>:set nonumber<CR>:resize 12<CR><S-a>
 nmap <leader>Term <C-w>v<C-w>l:terminal<CR>:set nonumber<CR><S-a>
 
 " autocmd FileType python nmap <leader>x :0,$!~/.config/nvim/env/bin/python -m yapf<CR>
@@ -277,6 +285,7 @@ set nofoldenable
 autocmd VimEnter * RainbowParentheses
 autocmd VimEnter * ColorToggle
 autocmd BufWritePost *ma007*.tex silent !pdflatex <afile>
+autocmd BufWritePost *kitty/current.theme call SaveKittyTheme()
 autocmd BufWritePost *kitty.conf silent !fish -c 'refresh-kitty'
 let NERDSpaceDelims=1
 

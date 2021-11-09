@@ -20,11 +20,11 @@ alias .... 'cd ../../..'
 set fish_greeting
 
 if status --is-interactive
-    neofetch
+    macchina
 end
 
 function man
-    /usr/bin/man $argv || less $argv --help
+    /usr/bin/man $argv || $argv --help | less
 end
 
 function zathura

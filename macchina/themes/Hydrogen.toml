@@ -1,0 +1,51 @@
+spacing = 2
+padding = 0
+hide_ascii = false
+hide_bar_delimiters = true
+prefer_small_ascii = false
+separator = "->"
+key_color = "Blue"
+separator_color = "Cyan"
+palette = "Full"
+
+[bar]
+glyph = "ߋ"
+symbol_open = '['
+symbol_close = ']'
+visible = false
+
+[box]
+title = ""
+visible = true
+
+[box.inner_margin]
+x = 1
+y = 0
+
+[custom_ascii]
+color = "LightRed"
+path = "~/.config/macchina/themes/arch.ascii"
+
+[randomize]
+key_color = false
+separator_color = false
+
+[keys]
+host = "Host"
+kernel = "Kernel"
+battery = "Battery"
+os = "OS"
+de = "WM"
+wm = "WM"
+distro = "Distro"
+terminal = "Terminal"
+shell = "Shell"
+packages = "Packages"
+uptime = "Uptime"
+memory = "Memory"
+machine = "Machine"
+local_ip = "Local IP"
+backlight = "Brightness"
+resolution = "Resolution"
+cpu_load = "CPU Load"
+cpu = "CPU"
