@@ -30,7 +30,7 @@ function __git_status
     if [ (_git_is_dirty) ]
       set git_color 'yellow'
     else
-      set git_color 'brgreen'
+      set git_color 'green'
     end
 
     echo -n (set_color $git_color) '<'$git_branch'>' (set_color normal) 

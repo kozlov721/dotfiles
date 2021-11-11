@@ -261,8 +261,19 @@ myStartupHook = do
 ----------------------------------------------------------------------
 
 
-getIcon :: String -> String
-getIcon str
+clickable :: String -> String
+clickable ws = "<action=xdotool key super+"
+                ++ show index
+                ++ ">"
+                ++ ws
+                ++ "</action>"
+
+    where index   = fromJust $ M.lookup ws indices
+          indices = M.fromList $ zip myWorkspaces $ [1..9] ++ [0]
+
+
+getIcons :: String -> String
+getIcons str
     | str == "term" = "<fn=3>\xf120</fn>"
     | str == "www"  = "<fn=3>\xf719</fn>"
     | str == "dir"  = "<fn=3>\xf660</fn>"
@@ -273,30 +284,34 @@ getIcon str
     | str == "mail" = "<fn=3>\xf0e0</fn>"
     | str == "docs" = "<fn=3>\xf15b</fn>"
     | str == "free" = "<fn=3>\xf89a</fn>"
-    | otherwise = ""
 
 
-clickable :: (String, String) -> String
-clickable (name, icon) = "<action=xdotool key super+"
-                ++ show index
-                ++ ">"
-                ++ icon
-                ++ "</action>"
+filterSaver :: String -> String
+filterSaver str = if saverText `isInfixOf` strText
+                  then ""
+                  else str
+            where
+                saverText = pack "saver"
+                strText = pack str
 
-    where index   = fromJust $ M.lookup name indices
-          indices = M.fromList $ zip myWorkspaces $ [1..9] ++ [0]
-
+prepareWS :: String -> String
+prepareWS str = str
 
 myLogHook proc = dynamicLogWithPP $ xmobarPP {
       ppOutput = hPutStrLn proc
     , ppCurrent = xmobarColor "#CCE01B" ""
-        . prepareWS
+        . getIcons
+        . filterSaver
     , ppHidden = xmobarColor "#C792EA" ""
-        . prepareWS
+        . clickable
+        . getIcons
+        . filterSaver
     , ppHiddenNoWindows = xmobarColor "#82AAFF" ""
-        . prepareWS
+        . clickable
+        . getIcons
+        . filterSaver
     , ppTitle = const ""
-    , ppSep =  " <fc=#999999><fn=1>|</fn></fc>   "
+    , ppSep =  " <fc=#999999><fn=1>|</fn></fc> "
     , ppWsSep = " <fc=#555555><fn=1>|</fn></fc> "
     , ppLayout = wrap "<action=xdotool key super+space>" "</action>"
         . last
@@ -305,7 +320,6 @@ myLogHook proc = dynamicLogWithPP $ xmobarPP {
         . wrap "!" "!"
     , ppOrder  = \(ws:l:t:ex) -> [ws,l] ++ ex ++ [t]
 }
-    where prepareWS str = clickable (str, getIcon str)
 
 ----------------------------------------------------------------------
 

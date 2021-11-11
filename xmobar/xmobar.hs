@@ -19,27 +19,23 @@ myCommands = [
       , "-i" , "<fc=#707880>IDLE</fc>"
     ] 50
 
-    -- Cpu usage in percent
     , Run $ Cpu [ "-t"
-                , "<fn=2>\xf108</fn>  cpu: (<total>%)"
+                , "<fn=2>\xf108</fn>  <total>%"
                 , "-H"
                 , "50"
                 , "--high"
                 , "red" ] 20
 
-    -- Ram usage in percent
-    , Run $ Memory ["-t", "<fn=2>\xf233</fn>  mem: (<usedratio>%)"] 20
+    , Run $ Memory ["-t", "<fn=2>\xf233</fn>  <usedratio>%"] 20
 
-    -- Current volume
     , Run $ Com ".local/bin/xmobar/volume" [] "volume" 1
 
-    -- Check for pacman updates
     , Run $ Com ".local/bin/xmobar/pacupdate" [] "pacupdate" 1800
 
-    -- Time and date
     , Run $ Date "%A, %B %d, %Y  %T" "date" 10
 
-    -- Prints out the workspaces and layout
+    , Run $ Wireless "wlan0" ["-t", "<fn=2>\xf1eb</fn> <ssid> <quality>"] 10
+
     , Run UnsafeStdinReader ]
 
 
@@ -67,26 +63,28 @@ str1 +|+ str2 = str1 ++ " " ++ sep ++ " " ++ str2
 
 myTemplate =  "   "
           ++  lambda
-          ++  " %UnsafeStdinReader% "
+          +|+  "%UnsafeStdinReader% "
           ++  "}"
           ++  time
           ++  "{"
-          ++  cpu
+          ++  wifi
+          +|+ cpu
           +|+ mem
           +|+ volume
           +|+ upd
           +|+ battery
 
-    where lambda  = fullWrap "#FFFFFF" "" "`dmenu_run`" "λ"
-          time    = fullWrap "#DDBB20" "" "`st -e calcurse`" "%date%"
-          cpu     = fullWrap "#ECBE7B" "" htop "%cpu%"
-          mem     = fullWrap "#FF6C6B" "" htop " %memory%"
-          upd     = fullWrap "#C678DD" "" "`st -e yay -Syu`" update
-          update  = bell ++ " %pacupdate%"
+    where lambda  = fullWrap "#DDDDDD" "" "`rofi -show run`" "<fn=2>\xf66e</fn>  "
+          time    = fullWrap "#DDBB20" "" "`.local/bin/xmobar/run-process calcurse`" "%date%"
+          wifi    = fullWrap "#EEAA00" "" "`.local/bin/xmobar/run-process nmtui`" "%wlan0wi%"
+          cpu     = fullWrap "#E58030" "" htop "%cpu%"
+          mem     = fullWrap "#FF6050" "" htop " %memory%"
           bell    = "<fn=2>\xf0f3</fn>"
-          volume  = fullWrap "#FF4C6B" "" mute "%volume%"
+          volume  = fullWrap "#FF4C6B" "" mute "<fn=2>\xf6a8</fn>  %volume%"
+          upd     = fullWrap "#C678DD" "" "`st -e yay -Syu`" update
+          update  = bell ++ "  %pacupdate%"
           battery = "%battery%"
-          htop    = "`.local/bin/xmobar/htop`"
+          htop    = "`.local/bin/xmobar/run-process htop`"
           mute    = "`pactl set-sink-mute @DEFAULT_SINK@ toggle`"
           textColor = "#FFFFFF"
 
@@ -95,8 +93,8 @@ config = defaultConfig {
       font="xft:Roboto:size=11:weight=semibold:hinting=true"
     , additionalFonts = [
           "xft:Mononoki:size=11:antialias=true:hinting=true"
-        , "xft:Font Awesome 5 Free Solid:size=11"
-        , "xft:Font Awesome 5 Brands:size=11"
+        , "xft:Font Awesome 5 Pro-Regular:size=11:weight=bold"
+        , "xft:Font Awesome 5 Pro-Regular:size=11"
     ]
     , bgColor      = "#282C34"
     , fgColor      = "#FF6C6B"

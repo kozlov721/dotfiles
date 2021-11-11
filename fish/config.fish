@@ -13,6 +13,7 @@ alias icat 'kitty +kitten icat'
 alias kuni 'kitty +kitten unicode_input'
 alias kdiff 'kitty +kitten diff'
 alias refresh-kitty 'kill -s SIGUSR1 (ps ax | awk \'/kitty/ {print $1 " " $5}\' | awk \'/kitty/ {print $1}\')'
+alias mclear 'clear && macchina'
 alias .. 'cd ..'
 alias ... 'cd ../..'
 alias .... 'cd ../../..'
@@ -33,7 +34,8 @@ end
 
 eval /home/martin/anaconda3/bin/conda "shell.fish" "hook" $argv | source
 
-source /usr/share/doc/find-the-command/ftc.fish
+source /usr/share/doc/find-the-command/ftc.fish info > /dev/null
 
 fish_add_path -P $HOME/.local/bin
 
+set -q GHCUP_INSTALL_BASE_PREFIX[1]; or set GHCUP_INSTALL_BASE_PREFIX $HOME ; set -gx PATH $HOME/.cabal/bin /home/martin/.ghcup/bin $PATH # ghcup-env
