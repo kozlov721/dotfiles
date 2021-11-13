@@ -38,4 +38,4 @@ source /usr/share/doc/find-the-command/ftc.fish info > /dev/null
 
 fish_add_path -P $HOME/.local/bin
 
-set -q GHCUP_INSTALL_BASE_PREFIX[1]; or set GHCUP_INSTALL_BASE_PREFIX $HOME ; set -gx PATH $HOME/.cabal/bin /home/martin/.ghcup/bin $PATH # ghcup-env
+conda activate dev

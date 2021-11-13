@@ -1,3 +1,4 @@
+import Control.Monad (void)
 import Data.List (zip4)
 import Data.Maybe
 import Data.Monoid
@@ -9,6 +10,7 @@ import XMonad
 import XMonad.Actions.CycleWS
 import XMonad.Actions.DynamicWorkspaces
 import XMonad.Actions.SpawnOn
+-- import XMonad.Actions.Volume
 import XMonad.Config.Dmwit (altMask)
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.EwmhDesktops
@@ -62,6 +64,9 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((0, xF86XK_AudioRaiseVolume), spawn "amixer -qD pulse sset Master 2%+")
     , ((0, xF86XK_AudioLowerVolume), spawn "amixer -qD pulse sset Master 2%-")
     , ((0, xF86XK_AudioMute), spawn "amixer -qD pulse sset Master toggle")
+    -- , ((0, xF86XK_AudioRaiseVolume), void $ raiseVolume 3)
+    -- , ((0, xF86XK_AudioLowerVolume), void $ lowerVolume 3)
+    -- , ((0, xF86XK_AudioMute), void toggleMute)
     , ((modm, xK_F2), spawn "playerctl play-pause")
     , ((modm, xK_F1), spawn "playerctl previous")
     , ((modm, xK_F3), spawn "playerctl next")
@@ -96,7 +101,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm .|. controlMask, xK_Up), spawn "picom-trans -c -o -5")
 
     , ((0, xK_Print)
-      , spawn "maim $HOME/Pictures/Screenshots/$(date +%s)")
+      , spawn "flameshot gui")
 
     -- Decrease opacity
     , ((modm .|. controlMask, xK_Down), spawn "picom-trans -c -o +5")

@@ -190,8 +190,8 @@ autocmd CursorHold * silent call CocActionAsync('highlight')
 nmap <leader>rn <Plug>(coc-rename)
 
 " Formatting selected code.
-xmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
+xmap <leader>f <Plug>(coc-format-selected)
+nmap <leader>f <Plug>(coc-format-selected)
 
 augroup mygroup
   autocmd!
@@ -285,6 +285,7 @@ set nofoldenable
 autocmd VimEnter * RainbowParentheses
 autocmd VimEnter * ColorToggle
 autocmd BufWritePost *ma007*.tex silent !pdflatex <afile>
+autocmd BufWritePost *xmobar.hs !ghc <afile> -dynamic -threaded && xmonad --restart
 autocmd BufWritePost *kitty/current.theme call SaveKittyTheme()
 autocmd BufWritePost *kitty.conf silent !fish -c 'refresh-kitty'
 let NERDSpaceDelims=1
