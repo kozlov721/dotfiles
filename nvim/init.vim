@@ -1,6 +1,7 @@
 """ Vim-Plug
 call plug#begin()
 
+
 " Aesthetics
 Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'vim-airline/vim-airline'
@@ -13,9 +14,14 @@ Plug 'junegunn/vim-journal'
 Plug 'junegunn/rainbow_parentheses.vim'
 Plug 'nightsense/forgotten'
 Plug 'nightsense/nemo'
+Plug 'ghifarit53/tokyonight-vim'
+Plug 'sainnhe/sonokai'
+Plug 'srcery-colors/srcery-vim'
 
 " Functionalities
+Plug 'github/copilot.vim'
 Plug 'tpope/vim-fugitive'
+Plug 'chrisbra/unicode.vim'
 Plug 'tpope/vim-sensible'
 Plug 'tpope/vim-surround'
 Plug 'majutsushi/tagbar'
@@ -38,6 +44,7 @@ Plug 'metakirby5/codi.vim'
 Plug 'dkarter/bullets.vim'
 Plug 'psliwka/vim-smoothie'
 Plug 'antoinemadec/FixCursorHold.nvim'
+" Plug 'alx741/vim-hindent'
 
 call plug#end()
 
@@ -254,6 +261,7 @@ let mapleader=","
 
 nmap -            $
 xmap -            $
+nmap <leader>un   :UnicodeSearch!
 nmap <leader>O    O<ESC>
 nmap <leader>a    gaip*
 xmap <leader>a    gaip*
@@ -277,6 +285,7 @@ nmap <leader>Term <C-w>v<C-w>l:terminal<CR>:set nonumber<CR><S-a>
 " autocmd FileType python nmap <leader>x :0,$!~/.config/nvim/env/bin/python -m yapf<CR>
 
 autocmd FileType python nmap <leader>x :w<CR>:execute "!python " . expand("%:p")<CR>
+autocmd VimEnter *xmobar.hs nmap <leader>x :w<CR>:execute "!ghc " . expand("%:p") . " -dynamic -threaded && xmonad --restart"<CR>
 " Custom settings
 
 set whichwrap+=<,>,h,l,[,],"<left>","<right>"
@@ -285,7 +294,7 @@ set nofoldenable
 autocmd VimEnter * RainbowParentheses
 autocmd VimEnter * ColorToggle
 autocmd BufWritePost *ma007*.tex silent !pdflatex <afile>
-autocmd BufWritePost *xmobar.hs !ghc <afile> -dynamic -threaded && xmonad --restart
+" autocmd BufWritePost *xmobar.hs !ghc <afile> -dynamic -threaded && xmonad --restart
 autocmd BufWritePost *kitty/current.theme call SaveKittyTheme()
 autocmd BufWritePost *kitty.conf silent !fish -c 'refresh-kitty'
 let NERDSpaceDelims=1
@@ -298,4 +307,7 @@ endif
 
 let g:tex_conceal = ""
 let g:python3_host_prog = $HOME."~/anaconda3/bin/python"
+let g:tokyonight_style = 'storm' " available: night, storm
+let g:tokyonight_enable_italic = 1
+colorscheme tokyonight
 

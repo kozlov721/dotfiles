@@ -43,4 +43,4 @@ theme = "Hydrogen"
 # Example:
 show = ["Battery", "Memory", "ProcessorLoad",
         "Distribution", "Terminal", "DesktopEnvironment",
-        "Packages", "Shell", "Uptime", "Resolution"]
+        "Packages", "Kernel", "Shell", "Uptime", "Resolution"]

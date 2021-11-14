@@ -1,23 +1,43 @@
-import Control.Monad.IO.Class
+{- import Control.Monad.IO.Class -}
 import Data.Functor
 import System.Process
 import Xmobar
 
 
+script :: String -> String
+script name = "/home/martin/.local/bin/xmobar_scripts/" ++ name
+
 actionWrap :: String -> String -> String
 actionWrap cmd str = open ++ str ++ close
-    where open  = "<action=" ++ cmd ++ ">"
-          close = "</action>"
+  where
+    open  = "<action=" ++ cmd ++ ">"
+    close = "</action>"
+
+colorWrap :: String -> String -> String
+colorWrap fg str = open ++ str ++ close
+  where
+    open  = "<fc=" ++ fg ++ ">"
+    close = "</fc>"
+
+fullWrap :: String -> String -> String -> String
+fullWrap fg cmd str = actionWrap cmd $ colorWrap fg str
 
 
-colorWrap :: String -> String -> String -> String
-colorWrap fg bg str = open ++ str ++ close
-    where open  = "<fc=" ++ fg ++ "," ++ bg ++ ">"
-          close = "</fc>"
+newtype Bluetooth = Bluetooth String
+    deriving (Read, Show)
 
+instance Exec Bluetooth where
+    alias (Bluetooth a ) = a
+    run   (Bluetooth _ ) = bluetooth
 
-fullWrap :: String -> String -> String -> String -> String
-fullWrap fg bg cmd str = actionWrap cmd $ colorWrap fg bg str
+bluetooth :: IO String
+bluetooth = readProcess "bluetooth" ["get"] ""
+    <&> makeIcon . (=="on") . last . words
+  where
+    makeIcon isOn = fullWrap (color isOn) cmd icon
+    color isOn    = if isOn then "#90A050" else "#F6389D"
+    icon          = "<fn=4>\xf293</fn>"
+    cmd           = "bluetooth toggle"
 
 
 data MyVolume = MyVolume String Int
@@ -27,62 +47,66 @@ instance Exec MyVolume where
     alias (MyVolume a _) = a
     start (MyVolume _ r) = getVolume r
 
-newtype Bluetooth = Bluetooth String
+getVolume :: Int -> (String -> IO ()) -> IO ()
+getVolume r callback = readProcess path [] ""
+    >>= callback . status . words
+    >>  tenthSeconds r
+    >>  getVolume r callback
+  where
+    status [unm, vol] = colorWrap ((color . (=="true")) unm)
+        $ (icon . (=="true")) unm ++ vol
+    color muted = if muted then "#FF4C6B" else "#90A050"
+    icon muted  = if muted then mIcon else unmIcon
+    mIcon       = "<fn=2>\xf6a9</fn> "
+    unmIcon     = "<fn=2>\xf6a8</fn> "
+    path        = script "volume"
+
+
+data MyBattery = MyBattery String Int
     deriving (Read, Show)
 
-instance Exec Bluetooth where
-    alias (Bluetooth a ) = a
-    run (Bluetooth _ ) = bluetooth
+instance Exec MyBattery where
+    alias (MyBattery a _) = a
+    start (MyBattery _ r) = getBattery r
+
+getBattery :: Int -> (String -> IO ()) -> IO ()
+getBattery r callback = mapM
+    readFile [capacityPath, statusPath]
+    >>= callback . format . map init
+    >>  tenthSeconds r
+    >>  getBattery r callback
+  where
+    format [capacity, status] = colorWrap
+        color (icon ++ text capacity)
+      where
+        text capacity = capacity ++ "%"
+        (color, icon) = colorIcon capacity status
+    colorIcon capacity status
+        | status == "Charging" = ("#DDCC00", "<fn=3>\xf376</fn> ")
+        | status == "Idle"     = ("#BBBBBB", "<fn=3>\xf376</fn> ")
+        | cap    >= 90         = ("#A0DF10", "<fn=3>\xf240</fn> ")
+        | cap    >= 65         = ("#CCCC00", "<fn=3>\xf241</fn> ")
+        | cap    >= 35         = ("#E58030", "<fn=3>\xf242</fn> ")
+        | cap    >= 5          = ("#FF4C6B", "<fn=3>\xf243</fn> ")
+        | otherwise            = ("#FF2010", "<fn=3>\xf377</fn> ")
+      where
+        cap = read capacity::Int
+    capacityPath = path ++ "capacity"
+    statusPath   = path ++ "status"
+    path         = "/sys/class/power_supply/BAT0/"
 
 
-bluetooth :: IO String
-bluetooth = readProcess "bluetooth" ["get"] "" <&>
-    icon . (=="on") . last . words
-        where icon isOn = fullWrap (color isOn) "" toggle i
-              color isOn = if isOn then "#90A050" else "#F6389D"
-              i = "<fn=4>\xf293</fn>"
-              toggle = "`bluetooth toggle`"
-
-
-getVolume :: Int -> (String -> IO ()) -> IO ()
-getVolume r callback = readProcess path [] "" >>=
-            callback . status . words >>
-            tenthSeconds r >> getVolume r callback
-
-        where status [unm, vol] =
-                  colorWrap ((color . (=="true")) unm) ""
-                $ (icon . (=="true")) unm ++ vol
-              color unmuted = if unmuted then "#90A050" else "#FF4C6B"
-              icon unmuted  = if unmuted then unmIcon else mIcon
-              mIcon         = "<fn=2>\xf6a9</fn> "
-              unmIcon       = "<fn=2>\xf6a8</fn> "
-              path          = "/home/martin/.local/bin/xmobar/volume"
-
-
+myCommands :: [Runnable]
 myCommands = [
-    Run $ Battery
-      [ "--template"  , "<leftipat> <acstatus>"
-      , "--Low"       , "36"
-      , "--High"      , "71"
-      , "--low"       , "#A54242"
-      , "--normal"    , "#DE935F"
-      , "--high"      , "#B5BD68"
-      , "--maxtwidth" , "10"
-      , "--"
-      , "--on-icon-pattern" , "<icon=battery/on/battery_on_%%.xpm/>"
-      , "--off-icon-pattern" , "<icon=battery/off/battery_off_%%.xpm/>"
-      , "--idle-icon-pattern" , "<icon=battery/idle/battery_idle_%%.xpm/>"
-      , "-o" , "<left><fc=#C5C8C6>%</fc> <timeleft>"
-      , "-O" , "<left><fc=#C5C8C6>% <timeleft></fc>"
-      , "-i" , "<fc=#707880>IDLE</fc>"
-    ] 50
+      Run $ MyBattery "battery" 50
 
     , Run $ Cpu [ "-t"
                 , "<fn=2>\xf108</fn>  <total>%"
                 , "-H"
                 , "50"
                 , "--high"
-                , "red" ] 20
+                , "red"
+                ] 20
 
     , Run $ Memory ["-t", "<fn=3>\xf538</fn>  <usedratio>%"] 20
 
@@ -90,54 +114,58 @@ myCommands = [
 
     , Run $ Bluetooth "bluetooth"
 
-    , Run $ Com ".local/bin/xmobar/pacupdate" [] "pacupdate" 1800
+    , Run $ Com (script "pacupdate") [] "pacupdate" 1800
 
     , Run $ Date "%A, %B %d, %Y  %T" "date" 10
 
-    , Run $ Wireless "wlan0" ["-t", "<fn=2>\xf1eb</fn> <ssid> <quality>"] 10
+    , Run $ Wireless "wlan0" ["-t", "<ssid> <quality>"] 50
 
-    , Run UnsafeStdinReader ]
+    , Run UnsafeStdinReader
+    ]
 
 
 -- Concatenates two strings with a bar separator in between
 (+|+) :: String -> String -> String
 str1 +|+ str2 = str1 ++ " " ++ sep ++ " " ++ str2
-    where sep = colorWrap "#888888" "" "<fn=1>|</fn>"
+  where sep = colorWrap "#888888" "<fn=1>|</fn>"
 
 
+myTemplate :: String
 myTemplate =  "   "
-          ++  lambda
-          +|+  "%UnsafeStdinReader% "
-          ++  "}"
-          ++  time
-          ++  "{"
-          ++  wifi
-          +|+ cpu
-          +|+ mem
-          +|+ volume
-          +|+ upd
-          +|+  "%bluetooth%"
-          +|+ battery
-          ++  " "
+    ++  lambda
+    +|+  "%UnsafeStdinReader% "
+    ++  "}"
+    ++  time
+    ++  "{"
+    ++  wifi
+    +|+ cpu
+    +|+ mem
+    +|+ volume
+    +|+ upd
+    +|+  "%bluetooth%"
+    +|+ battery
+    ++  " "
+  where
+    lambda  = fullWrap "#DDDDDD" "rofi -show run"
+               "<fn=2>\xf66e</fn> "
+    time    = fullWrap "#EEBB30"
+                (script "run-process calcurse")
+                "%date%"
+    wifi    = fullWrap "#EEAA00"
+                (script "run-process nmtui")
+                "<fn=2>\xf1eb</fn> %wlan0wi%"
+    cpu     = fullWrap "#E58030" htop " %cpu%"
+    mem     = fullWrap "#FF6050" htop " %memory%"
+    bell    = "<fn=2>\xf0f3</fn>"
+    volume  = fullWrap "#FF4C6B" mute "%volume%"
+    upd     = fullWrap "#C678DD" "st -e yay -Syu" update
+    update  = bell ++ "  %pacupdate%"
+    battery = "%battery%"
+    htop    = script "run-process htop"
+    mute    = "pactl set-sink-mute @DEFAULT_SINK@ toggle"
 
-    where lambda  = fullWrap "#DDDDDD" "" "`rofi -show run`"
-                    "<fn=2>\xf66e</fn>  "
-          time    = fullWrap "#DDBB20" "" 
-                    "`.local/bin/xmobar/run-process calcurse`"
-                    "%date%"
-          wifi    = fullWrap "#EEAA00" "" "`.local/bin/xmobar/run-process nmtui`" "%wlan0wi%"
-          cpu     = fullWrap "#E58030" "" htop " %cpu%"
-          mem     = fullWrap "#FF6050" "" htop " %memory%"
-          bell    = "<fn=2>\xf0f3</fn>"
-          volume  = fullWrap "#FF4C6B" "" mute "%volume%"
-          upd     = fullWrap "#C678DD" "" "`st -e yay -Syu`" update
-          update  = bell ++ "  %pacupdate%"
-          battery = "%battery%"
-          htop    = "`.local/bin/xmobar/run-process htop`"
-          mute    = "`pactl set-sink-mute @DEFAULT_SINK@ toggle`"
-          textColor = "#FFFFFF"
 
-
+config :: Config
 config = defaultConfig {
       font="xft:Roboto:size=12:weight=semibold:hinting=true"
     , additionalFonts = [

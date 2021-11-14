@@ -59,7 +59,8 @@ c.url.searchengines = {
     'DEFAULT': 'https://www.google.com/search?q={}',
     'y':       'https://www.youtube.com/results?search_query={}',
     'a':       'https://wiki.archlinux.org/index.php?search={}',
-    'r':       'https://www.reddit.com/r/{}/'
+    'r':       'https://www.reddit.com/r/{}/',
+    'd':       'https://duckduckgo.com/?q={}'
 }
 
 c.url.start_pages = 'https://google.com'
@@ -117,5 +118,7 @@ if not os.path.isfile('/var/local/change_theme/light_on.lck'):
     c.colors.webpage.preferred_color_scheme = "dark"
     c.colors.webpage.darkmode.enabled = True
     c.colors.webpage.bg = '#111111'
-    c.content.user_stylesheets = ['~/.config/qutebrowser/style.css']
+    c.content.user_stylesheets = [
+        '~/.config/qutebrowser/css/darculized/darculized-all-sites.css'
+    ]
 
