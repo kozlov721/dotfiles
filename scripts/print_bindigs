@@ -1,0 +1,35 @@
+#!/home/martin/anaconda3/envs/dev/bin/python
+
+import re
+from termcolor import colored
+
+
+file = open('/home/martin/.xmonad/xmonad.hs')
+conf = file.read()
+file.close()
+
+bindings = re.findall(
+    r'\(\(\s*([^\(]*)\s*\)\s*,\s*([^\(]*)\)',
+    conf
+)
+
+longest = 0
+formatted_bindings = []
+for (mods, cmd) in bindings:
+    mods = ' +'.join(
+        re.split(
+            r'(?: .\|.|,)',
+            mods.replace('0,', '')
+            .replace('xK_', '')
+            .replace('shiftMask', 'shift')
+            .replace('controlMask', 'ctrl')
+            .replace('altMask', 'alt')
+            .strip()))
+
+    longest = max(longest, len(mods))
+    formatted_bindings.append((f'{colored(mods, "cyan")}',
+                               f'{colored(f"<{cmd}>", "yellow")}'))
+longest += 8 # color escape sequences
+for mods, cmd in formatted_bindings:
+    print(f'{mods}{" " * (longest - len(mods) + 1)} :: {cmd}')
+

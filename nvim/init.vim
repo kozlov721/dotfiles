@@ -17,6 +17,9 @@ Plug 'nightsense/nemo'
 Plug 'ghifarit53/tokyonight-vim'
 Plug 'sainnhe/sonokai'
 Plug 'srcery-colors/srcery-vim'
+Plug 'jackiehluo/vim-material'
+Plug 'NLKNguyen/papercolor-theme'
+Plug 'gertjanreynaert/cobalt2-vim-theme'
 
 " Functionalities
 Plug 'github/copilot.vim'
@@ -44,7 +47,7 @@ Plug 'metakirby5/codi.vim'
 Plug 'dkarter/bullets.vim'
 Plug 'psliwka/vim-smoothie'
 Plug 'antoinemadec/FixCursorHold.nvim'
-" Plug 'alx741/vim-hindent'
+Plug 'drmingdrmer/xptemplate'
 
 call plug#end()
 
@@ -237,11 +240,14 @@ endfunction
 
 function! ColorDark()
     let g:airline_theme='dracula'
-    color dracula
+    let g:tokyonight_style = 'storm' " available: night, storm
+    let g:tokyonight_enable_italic = 1
+    colorscheme tokyonight
 endfunction
 
 function! ColorLight()
     let g:airline_theme='tomorrow'
+    let g:allow_italic=1
     color forgotten-light
 endfunction
 
@@ -252,7 +258,7 @@ function! SaveKittyTheme()
         let theme_path = $HOME . "/.config/kitty/dark.theme"
     endif
     silent execute "!cat <afile> " . " > " . theme_path
-    silent !fish -c "kill -s SIGUSR1 kitty"
+    silent !fish -c "refresh-kitty"
 endfunction
 
 """ Custom Mappings
@@ -282,10 +288,19 @@ nmap <S-Tab>      :bprevious<CR>
 nmap <leader>term <C-w>s<C-w>j:terminal<CR>:set nonumber<CR>:resize 12<CR><S-a>
 nmap <leader>Term <C-w>v<C-w>l:terminal<CR>:set nonumber<CR><S-a>
 
-" autocmd FileType python nmap <leader>x :0,$!~/.config/nvim/env/bin/python -m yapf<CR>
+" Special execution bindings
 
-autocmd FileType python nmap <leader>x :w<CR>:execute "!python " . expand("%:p")<CR>
-autocmd VimEnter *xmobar.hs nmap <leader>x :w<CR>:execute "!ghc " . expand("%:p") . " -dynamic -threaded && xmonad --restart"<CR>
+autocmd FileType python nmap <leader>x :w<CR>:execute 
+    \ "!python " . expand("%:p")<CR>
+
+autocmd VimEnter *xmobar/*.hs silent
+    \ nmap <leader>x :w<CR>:execute "!cd ~/.config/xmobar; ghc " .
+    \ expand("%:p") . " -dynamic -threaded && xmonad --restart"<CR>
+
+autocmd VimEnter *xmonad.hs silent
+    \ nmap <leader>x :w<CR>:execute
+    \ "!xmonad --recompile && xmonad --restart"<CR>
+
 " Custom settings
 
 set whichwrap+=<,>,h,l,[,],"<left>","<right>"
@@ -294,7 +309,6 @@ set nofoldenable
 autocmd VimEnter * RainbowParentheses
 autocmd VimEnter * ColorToggle
 autocmd BufWritePost *ma007*.tex silent !pdflatex <afile>
-" autocmd BufWritePost *xmobar.hs !ghc <afile> -dynamic -threaded && xmonad --restart
 autocmd BufWritePost *kitty/current.theme call SaveKittyTheme()
 autocmd BufWritePost *kitty.conf silent !fish -c 'refresh-kitty'
 let NERDSpaceDelims=1
@@ -306,8 +320,5 @@ else
 endif
 
 let g:tex_conceal = ""
-let g:python3_host_prog = $HOME."~/anaconda3/bin/python"
-let g:tokyonight_style = 'storm' " available: night, storm
-let g:tokyonight_enable_italic = 1
-colorscheme tokyonight
+let g:python3_host_prog = $HOME."~/anaconda3/envs/dev/bin/python"
 

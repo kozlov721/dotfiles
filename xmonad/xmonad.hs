@@ -1,4 +1,3 @@
--- import Control.Monad (void)
 import Data.List (zip4)
 import Data.Maybe
 import Data.Monoid
@@ -72,6 +71,7 @@ myNormalBorderColor = "#FFFFFF"
 myFocusedBorderColor = "#CE2D52"
 
 ----------------------------------------------------------------------
+-- BEGIN BINDINGS
 myKeys conf@(XConfig {XMonad.modMask = modm}) =
     M.fromList $
     -- function keys
@@ -83,8 +83,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
        , spawn "amixer -qD pulse sset Master 2%-")
     , ((0, xF86XK_AudioMute)
        , spawn "amixer -qD pulse sset Master toggle")
-    , ((modm, xK_F2), spawn "playerctl play-pause")
     , ((modm, xK_F1), spawn "playerctl previous")
+    , ((modm, xK_F2), spawn "playerctl play-pause")
     , ((modm, xK_F3), spawn "playerctl next")
     ]
     ++
@@ -216,6 +216,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
        , sequence_ [toggleWS, removeWorkspaceByTag "saver"])
     ]
 
+-- END BINDINGS
 ----------------------------------------------------------------------
 myMouseBindings (XConfig {XMonad.modMask = modm}) =
     M.fromList
@@ -250,10 +251,10 @@ myLayout = avoidStruts
 ----------------------------------------------------------------------
 myManageHook = composeAll
     $ let rect = W.RationalRect (1/6) (1/6) (2/3) (2/3) in
-        [ className =? "ImageJ"         --> doFloat
+        [ className =? "ij-ImageJ"      --> doFloat
+        , className =? "ImageJ"         --> doFloat
         , className =? "st-256color"    --> doRectFloat rect
         , className =? "Surf"           --> doRectFloat rect
-        , className =? "Gpick"          --> doRectFloat rect
         , className =? "Caprine"        --> doRectFloat rect
         , resource  =? "desktop_window" --> doIgnore
         ]
@@ -301,7 +302,7 @@ myLogHook proc = dynamicLogWithPP
         , ppTitle           = const ""
         , ppSep             = " <fc=#999999><fn=1>|</fn></fc>   "
         , ppWsSep           = " <fc=#555555><fn=1>|</fn></fc> "
-        , ppLayout          = wrap
+        , ppLayout          = xmobarColor "#FE4C6B" "" . wrap
             "<action=xdotool key super+space>" "</action>"
             . last . words
         , ppUrgent          = xmobarColor "#C45500" "" . wrap "!" "!"
