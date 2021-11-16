@@ -83,6 +83,7 @@ c.fonts.completion.category = 'bold default_size default_family'
 # ------------- Bindings ----------------
 
 config.unbind('d')
+config.unbind('D')
 config.unbind('u')
 
 config.bind('<Alt+j>', 'run-with-count 10 scroll down')

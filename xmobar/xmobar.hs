@@ -24,7 +24,7 @@ myCommands = [
 
     , Run $ Date "%A, %B %d, %Y  %T" "date" 10
 
-    , Run $ Wireless "wlan0" ["-t", "<ssid> <quality>"] 50
+    , Run $ Wireless "" ["-t", "<ssid> <quality>"] 50
 
     , Run UnsafeStdinReader
     ]
@@ -59,7 +59,7 @@ myTemplate =  "   "
                 "%date%"
     wifi    = fullWrap "#EEAA00"
                 (script "run-process nmtui")
-                "<fn=2>\xf1eb</fn> %wlan0wi%"
+                "<fn=2>\xf1eb</fn> %wi%"
     cpu     = fullWrap "#E58030" htop " %cpu%"
     mem     = fullWrap "#FF6050" htop " %memory%"
     bell    = "<fn=2>\xf0f3</fn>"

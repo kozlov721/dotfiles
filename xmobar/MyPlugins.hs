@@ -7,7 +7,7 @@ import Xmobar
 ---------------- Helper functions -------------------
 
 script :: String -> String
-script name = "/home/martin/.local/bin/xmobar_scripts/" ++ name
+script name = "~/.local/bin/xmobar_scripts/" ++ name
 
 actionWrap :: String -> String -> String
 actionWrap cmd str = open ++ str ++ close
@@ -73,6 +73,7 @@ data MyBattery = MyBattery String Int
 instance Exec MyBattery where
     alias (MyBattery a _) = a
     start (MyBattery _ r) = getBattery r
+
 getBattery :: Int -> (String -> IO ()) -> IO ()
 getBattery r callback = mapM
     readFile [capacityPath, statusPath]
@@ -99,3 +100,23 @@ getBattery r callback = mapM
     statusPath   = path ++ "status"
     path         = "/sys/class/power_supply/BAT0/"
 
+--------------- WiFi ------------------------
+
+data MyWiFi = MyWiFi String Int
+    deriving (Read, Show)
+
+instance Exec MyWiFi where
+    alias (MyWiFi a _) = a
+    start (MyWiFi _ r) = getWiFi r
+
+
+getWiFi :: Int -> (String -> IO ()) -> IO ()
+getWiFi r callback = return ()
+
+getQuality :: Double -> Integer
+getQuality = round . (/ 0.7) . (+ 110) . clamp (-110) (-40)
+  where
+    clamp l r v
+      | v < l = l
+      | v > r = r
+      | otherwise = v

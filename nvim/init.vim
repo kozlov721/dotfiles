@@ -321,4 +321,5 @@ endif
 
 let g:tex_conceal = ""
 let g:python3_host_prog = $HOME."~/anaconda3/envs/dev/bin/python"
-
+let g:haskell_indent_where = 2
+let g:haskell_indent_guard = 4
