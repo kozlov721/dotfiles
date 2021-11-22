@@ -294,8 +294,8 @@ autocmd FileType python nmap <leader>x :w<CR>:execute
     \ "!python " . expand("%:p")<CR>
 
 autocmd VimEnter *xmobar/*.hs silent
-    \ nmap <leader>x :w<CR>:execute "!cd ~/.config/xmobar; ghc " .
-    \ expand("%:p") . " -dynamic -threaded && xmonad --restart"<CR>
+    \ nmap <leader>x :w<CR>:execute "!cd ~/.config/xmobar; ghc "
+    \ . "xmobar.hs -dynamic -threaded && xmonad --restart"<CR>
 
 autocmd VimEnter *xmonad.hs silent
     \ nmap <leader>x :w<CR>:execute

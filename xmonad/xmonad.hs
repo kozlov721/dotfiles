@@ -178,6 +178,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
     , ((modm, xK_l), sendMessage Shrink)
     -- Push window back into tiling
     , ((modm, xK_t), withFocused $ windows . W.sink)
+    -- Toggle bluettoth
+    , ((modm .|. altMask, xK_b), spawn "bluetooth toggle")
     -- Quit xmonad
     , ((modm .|. shiftMask, xK_q), io exitSuccess)
     -- Restart xmonad

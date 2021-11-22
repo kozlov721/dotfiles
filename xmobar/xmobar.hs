@@ -20,7 +20,7 @@ myCommands = [
 
     , Run $ Bluetooth "bluetooth"
 
-    , Run $ Com (script "pacupdate") [] "pacupdate" 1800
+    , Run $ Pacman "pacupdate" 1800
 
     , Run $ Date "%A, %B %d, %Y  %T" "date" 10
 
@@ -37,7 +37,7 @@ str1 +|+ str2 = str1 ++ " " ++ sep ++ " " ++ str2
 
 
 myTemplate :: String
-myTemplate =  "   "
+myTemplate = "  "
     ++  lambda
     +|+  "%UnsafeStdinReader% "
     ++  "}"
@@ -48,8 +48,8 @@ myTemplate =  "   "
     +|+ mem
     +|+ volume
     +|+ upd
-    +|+  "%bluetooth%"
-    +|+ battery
+    +|+ "%bluetooth%"
+    +|+ "%battery%"
     ++  " "
   where
     lambda  = fullWrap "#35749F" "rofi -show run"
@@ -62,11 +62,8 @@ myTemplate =  "   "
                 "<fn=2>\xf1eb</fn> %wi%"
     cpu     = fullWrap "#E58030" htop " %cpu%"
     mem     = fullWrap "#FF6050" htop " %memory%"
-    bell    = "<fn=2>\xf0f3</fn>"
-    volume  = fullWrap "#FF4C6B" mute "%volume%"
-    upd     = fullWrap "#C678DD" "st -e yay -Syu" update
-    update  = bell ++ "  %pacupdate%"
-    battery = "%battery%"
+    volume  = actionWrap mute "%volume%"
+    upd     = actionWrap "st -e yay -Syu" "%pacupdate%"
     htop    = script "run-process htop"
     mute    = "pactl set-sink-mute @DEFAULT_SINK@ toggle"
 
@@ -87,7 +84,6 @@ config = defaultConfig {
     , lowerOnStart = True
     , hideOnStart  = False
     , persistent   = True
-    , iconRoot     = ".config/xmobar/icons"
     , sepChar      = "%"
     , alignSep     = "}{"
     , commands     = myCommands
