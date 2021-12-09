@@ -115,11 +115,11 @@ c.colors.webpage.darkmode.threshold.text = 150
 c.colors.webpage.darkmode.algorithm = 'lightness-hsl'
 
 # Conditional dark mode
-if not os.path.isfile('/var/local/change_theme/light_on.lck'):
-    c.colors.webpage.preferred_color_scheme = "dark"
-    c.colors.webpage.darkmode.enabled = True
-    c.colors.webpage.bg = '#111111'
-    c.content.user_stylesheets = [
-        '~/.config/qutebrowser/css/darculized/darculized-all-sites.css'
-    ]
+# if not os.path.isfile('/var/local/change_theme/light_on.lck'):
+    # c.colors.webpage.preferred_color_scheme = "dark"
+    # c.colors.webpage.darkmode.enabled = True
+    # c.colors.webpage.bg = '#111111'
+    # c.content.user_stylesheets = [
+        # '~/.config/qutebrowser/css/darculized/darculized-all-sites.css'
+    # ]
 

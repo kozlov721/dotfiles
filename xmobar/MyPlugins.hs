@@ -62,12 +62,15 @@ getVolume r callback = do
   where
     snd' (_, x, _) = x
     status unm vol = colorWrap (color unm)
-        $ icon unm ++ vol
-    color muted = if muted then "#FF4C6B" else "#90A050"
-    icon muted  = if muted then mIcon else unmIcon
-    mIcon       = "<fn=2>\xf6a9</fn> "
-    unmIcon     = "<fn=2>\xf6a8</fn> "
-
+        $ icon unm (read vol::Int) ++ vol
+    color muted     = if muted then "#FF4C6B" else "#90A050"
+    icon muted vol  = if muted then mIcon else unmIcon vol
+    unmIcon vol
+        | vol < 5   = "<fn=2>\xf026</fn> "
+        | vol < 30  = "<fn=2>\xf027</fn> "
+        | vol < 75  = "<fn=2>\xf6a8</fn> "
+        | otherwise = "<fn=2>\xf028</fn> "
+    mIcon           = "<fn=2>\xf6a9</fn> "
 ------------------ Battery --------------------------
 
 data MyBattery = MyBattery String Int

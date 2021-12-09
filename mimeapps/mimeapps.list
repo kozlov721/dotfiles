@@ -2,6 +2,7 @@
 x-scheme-handler/http=xfce4-web-browser.desktop
 x-scheme-handler/https=xfce4-web-browser.desktop
 image/jpeg=org.nomacs.ImageLounge.desktop
+x-scheme-handler/kite=kite-copilot.desktop
 
 [Added Associations]
 x-scheme-handler/http=xfce4-web-browser.desktop;

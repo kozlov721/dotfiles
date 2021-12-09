@@ -22,6 +22,7 @@ Plug 'NLKNguyen/papercolor-theme'
 Plug 'gertjanreynaert/cobalt2-vim-theme'
 
 " Functionalities
+Plug '907th/vim-auto-save'
 Plug 'github/copilot.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'chrisbra/unicode.vim'
@@ -265,6 +266,9 @@ endfunction
 
 let mapleader=","
 
+imap <C-s>        <ESC>:w<CR>i
+imap ii           <ESC>
+nmap <C-s>        :w<CR>
 nmap -            $
 xmap -            $
 nmap <leader>un   :UnicodeSearch!
@@ -277,7 +281,7 @@ nmap <leader>g    :Goyo<CR>
 nmap <leader>o    o<ESC>
 nmap <leader>p    <Plug>(pydocstring)
 nmap <leader>q    :NERDTreeToggle<CR>
-nmap <leader>r    :so ~/.config/nvim/init.vim<CR>
+nmap <leader>r    :so ~/.config/nvim/init.vim<CR><leader><leader>
 nmap <leader>s    :%s/
 nmap <leader>t    :call TrimWhitespace()<CR>
 nmap <leader>tt   :call TrimWhitespace()<CR>
@@ -285,13 +289,19 @@ nmap <leader>w    :TagbarToggle<CR>
 nmap <silent>     <leader><leader> :noh<CR>
 nmap <Tab>        :bnext<CR>
 nmap <S-Tab>      :bprevious<CR>
+nmap K            :bnext<CR>
+nmap J            :bprevious<CR>
 nmap <leader>term <C-w>s<C-w>j:terminal<CR>:set nonumber<CR>:resize 12<CR><S-a>
 nmap <leader>Term <C-w>v<C-w>l:terminal<CR>:set nonumber<CR><S-a>
 
 " Special execution bindings
 
-autocmd FileType python nmap <leader>x :w<CR>:execute 
+autocmd FileType python nmap <leader>x :w<CR>:execute
     \ "!python " . expand("%:p")<CR>
+autocmd FileType python nmap <leader>X :w<CR>:execute
+    \ "!flake8 "    . expand("%:p") .
+    \ " && mypy "   . expand("%:p") .
+    \ " && python " . expand("%:p")<CR>
 
 autocmd VimEnter *xmobar/*.hs silent
     \ nmap <leader>x :w<CR>:execute "!cd ~/.config/xmobar; ghc "
@@ -306,8 +316,9 @@ autocmd VimEnter *xmonad.hs silent
 set whichwrap+=<,>,h,l,[,],"<left>","<right>"
 set nofoldenable
 
-autocmd VimEnter * RainbowParentheses
-autocmd VimEnter * ColorToggle
+autocmd VimEnter     * RainbowParentheses
+autocmd VimEnter     * ColorToggle
+autocmd BufWritePre  * call TrimWhitespace()
 autocmd BufWritePost *ma007*.tex silent !pdflatex <afile>
 autocmd BufWritePost *kitty/current.theme call SaveKittyTheme()
 autocmd BufWritePost *kitty.conf silent !fish -c 'refresh-kitty'
@@ -323,3 +334,5 @@ let g:tex_conceal = ""
 let g:python3_host_prog = $HOME."~/anaconda3/envs/dev/bin/python"
 let g:haskell_indent_where = 2
 let g:haskell_indent_guard = 4
+let g:auto_save = 1
+let g:auto_save_silent = 1

@@ -22,7 +22,7 @@ myCommands = [
 
     , Run $ Pacman "pacupdate" 1800
 
-    , Run $ Date "%A, %B %d, %Y  %T" "date" 10
+    , Run $ Date "%A,  %B  %d,  %Y  %T" "date" 10
 
     , Run $ Wireless "" ["-t", "<ssid> <quality>"] 50
 
@@ -70,7 +70,8 @@ myTemplate = "  "
 
 config :: Config
 config = defaultConfig {
-      font="xft:Roboto:size=12:weight=semibold:hinting=true"
+      font="xft:Roboto:size=12:weight=semibold\
+           \:hinting=true:antialias=true"
     , additionalFonts = [
           "xft:Mononoki:size=12:antialias=true:hinting=true"
         , "xft:Font Awesome 5 Pro-Solid:size=12:weight=bold"
