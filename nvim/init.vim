@@ -23,7 +23,7 @@ Plug 'gertjanreynaert/cobalt2-vim-theme'
 
 " Functionalities
 Plug '907th/vim-auto-save'
-Plug 'github/copilot.vim'
+" Plug 'github/copilot.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'chrisbra/unicode.vim'
 Plug 'tpope/vim-sensible'

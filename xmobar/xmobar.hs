@@ -64,7 +64,7 @@ myTemplate = "  "
     mem     = fullWrap "#FF6050" htop " %memory%"
     volume  = actionWrap mute "%volume%"
     upd     = actionWrap "st -e yay -Syu" "%pacupdate%"
-    htop    = script "run-process htop"
+    htop    = script "run-process btop"
     mute    = "pactl set-sink-mute @DEFAULT_SINK@ toggle"
 
 

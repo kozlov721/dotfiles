@@ -184,7 +184,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
     , ((modm .|. shiftMask, xK_q), io exitSuccess)
     -- Restart xmonad
     , ((modm, xK_q), spawn "xmonad --recompile && xmonad --restart")
-    ] 
+    ]
     ++
     -- Rotate through workspaces using j and k
     -- Shift window on the way using h and l
@@ -200,7 +200,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
     -- mod-shift-[1..0], move client to workspace N
     let shiftAndFocus i = W.greedyView i . W.shift i in
     [ ((m .|. modm, k), f i)
-        | (i, k) <- zip 
+        | (i, k) <- zip
             (XMonad.workspaces conf)
             $ [xK_1 .. xK_9] ++ [xK_0]
         , (f, m) <-
@@ -208,7 +208,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
             , (windows . shiftAndFocus, shiftMask)
             , (windows . W.shift, controlMask)
             ]
-    ] 
+    ]
     ++
     -- Special bindings to run cbonsai as screensaver
     -- Not to be used by the user
@@ -234,9 +234,9 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) =
 
 ----------------------------------------------------------------------
 myLayout = avoidStruts
-    $ smartBorders 
+    $ smartBorders
     $ windowNavigation
-    $ mySpacing 8 
+    $ mySpacing 8
     $ toggleLayouts Full myTiled
         ||| toggleLayouts Full myMirrored
         ||| toggleLayouts Full Grid
@@ -252,7 +252,7 @@ myLayout = avoidStruts
 
 ----------------------------------------------------------------------
 myManageHook = composeAll
-    $ let rect = W.RationalRect (1/6) (1/6) (2/3) (2/3) in
+    $ let rect = W.RationalRect (1/14) (1/14) (12/14) (12/14) in
         [ className =? "ij-ImageJ"      --> doFloat
         , className =? "ImageJ"         --> doFloat
         , className =? "st-256color"    --> doRectFloat rect
