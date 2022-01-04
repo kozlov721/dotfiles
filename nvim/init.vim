@@ -1,10 +1,13 @@
+
+let g:polyglot_disabled = ['python', 'haskell']
+
 """ Vim-Plug
 call plug#begin()
 
 
 " Aesthetics
-Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'vim-airline/vim-airline'
+Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'vim-airline/vim-airline-themes'
 Plug 'bryanmylee/vim-colorscheme-icons'
 Plug 'mhinz/vim-startify'
@@ -15,15 +18,14 @@ Plug 'junegunn/rainbow_parentheses.vim'
 Plug 'nightsense/forgotten'
 Plug 'nightsense/nemo'
 Plug 'ghifarit53/tokyonight-vim'
-Plug 'sainnhe/sonokai'
 Plug 'srcery-colors/srcery-vim'
 Plug 'jackiehluo/vim-material'
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'gertjanreynaert/cobalt2-vim-theme'
 
 " Functionalities
+Plug 'sheerun/vim-polyglot'
 Plug '907th/vim-auto-save'
-" Plug 'github/copilot.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'chrisbra/unicode.vim'
 Plug 'tpope/vim-sensible'
@@ -40,7 +42,6 @@ Plug 'junegunn/vim-easy-align'
 Plug 'alvan/vim-closetag'
 Plug 'tpope/vim-abolish'
 Plug 'Yggdroot/indentLine'
-Plug 'sheerun/vim-polyglot'
 Plug 'chrisbra/Colorizer'
 Plug 'KabbAmine/vCoolor.vim'
 Plug 'heavenshell/vim-pydocstring', { 'do': 'make install' }
@@ -49,6 +50,15 @@ Plug 'dkarter/bullets.vim'
 Plug 'psliwka/vim-smoothie'
 Plug 'antoinemadec/FixCursorHold.nvim'
 Plug 'drmingdrmer/xptemplate'
+
+" Python
+Plug 'numirias/semshi', { 'do': ':UpdateRemotePlugins' }
+Plug 'vim-scripts/indentpython.vim'
+Plug 'deoplete-plugins/deoplete-jedi'
+
+" Haskell
+Plug 'neovimhaskell/haskell-vim'
+
 
 call plug#end()
 
@@ -241,7 +251,7 @@ endfunction
 
 function! ColorDark()
     let g:airline_theme='dracula'
-    let g:tokyonight_style = 'storm' " available: night, storm
+    let g:tokyonight_style = 'storm'
     let g:tokyonight_enable_italic = 1
     colorscheme tokyonight
 endfunction
@@ -302,11 +312,15 @@ autocmd FileType python nmap <leader>X :w<CR>:execute
     \ "!flake8 "    . expand("%:p") .
     \ " && mypy "   . expand("%:p") .
     \ " && python " . expand("%:p")<CR>
+autocmd FileType python nmap
+    \ <silent> <leader>rr :Semshi rename<CR>
+autocmd FileType python nmap
+    \ <silent> <leader><Tab> :Semshi goto name next<CR>
+autocmd FileType python nmap
+    \ <silent> <leader><S-Tab> :Semshi goto name prev<CR>
 
 autocmd VimEnter *xmobar/*.hs silent
-    \ nmap <leader>x :w<CR>:execute "!cd ~/.config/xmobar; ghc "
-    \ . "xmobar.hs -dynamic -threaded && xmonad --restart"<CR>
-
+    \ nmap <leader>x :w<CR>:execute "!cd ~/.config/xmobar && ./build && xmonad --restart"<CR>
 autocmd VimEnter *xmonad.hs silent
     \ nmap <leader>x :w<CR>:execute
     \ "!xmonad --recompile && xmonad --restart"<CR>
@@ -331,8 +345,11 @@ else
 endif
 
 let g:tex_conceal = ""
-let g:python3_host_prog = $HOME."~/anaconda3/envs/dev/bin/python"
+let g:python3_host_prog = $HOME."/anaconda3/envs/nvim/bin/python"
 let g:haskell_indent_where = 2
 let g:haskell_indent_guard = 4
 let g:auto_save = 1
 let g:auto_save_silent = 1
+
+let g:haskell_indent_before_where = 2
+let g:haskell_indent_after_bare_where = 2

@@ -78,7 +78,8 @@ config = defaultConfig {
         , "xft:Font Awesome 5 Pro-Regular:size=12"
         , "xft:Font Awesome 5 Brands:size=12"
     ]
-    , bgColor      = "#282C24"
+    -- , bgColor      = "#282C24"
+    , bgColor      = "#473042"
     , fgColor      = "#FF6C6B"
     , alpha        = 240
     , position     = Top

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-cd ~/Backup/dotfiles
+cd ~/Backup/dotfiles || exit 1
 ./gather-files
 git add --all
-git commit -a -m "Update: `date '+%F-%R'`"
+git commit -a -m "Update: $(date '+%F-%R')"
 git push
 

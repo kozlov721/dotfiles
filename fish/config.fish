@@ -38,5 +38,6 @@ eval /home/martin/anaconda3/bin/conda "shell.fish" "hook" $argv | source
 source /usr/share/doc/find-the-command/ftc.fish info > /dev/null
 
 fish_add_path -P $HOME/.local/bin
-
+fish_add_path -P $HOME/.ghcup/bin
+fish_add_path -P $HOME/.cabal/bin
 conda activate dev

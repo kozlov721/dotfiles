@@ -10,5 +10,5 @@ ranger         ~/.config/ranger/rifle.conf
 vim            ~/.config/nvim/init.vim
 xmobar         ~/.config/xmobar/xmobar.hs
 xmobar-plugins ~/.config/xmobar/MyPlugins.hs
-xmonad         ~/.xmonad/xmonad.hs
+xmonad         ~/.config/xmonad/xmonad.hs
 zathura        ~/.config/zathura/zathurarc

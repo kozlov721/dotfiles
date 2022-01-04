@@ -1,18 +1,18 @@
-#!/bin/sh
+#!/bin/bash
 
 getopts ":e" opt
 
-while IFS= read -r line; do
-    CONFIG_NAME=`echo $line | awk '{print $1}'`
-    CONFIG_PATH=`echo $line | awk '{print $2}'`
-    if [ $CONFIG_NAME = ${@: -1} ]; then break; fi
-done < $HOME/.config/confedit.list
+while IFS= read -r LINE; do
+    CONFIG_NAME=$(echo "$LINE" | awk '{print $1}')
+    CONFIG_PATH=$(echo "$LINE" | awk '{print $2}')
+    if [ "$CONFIG_NAME" = "${*: -1}" ]; then break; fi
+done < "$HOME"/.config/confedit.list
 
-SED_PATH=$(echo $CONFIG_PATH | sed "s/~/$(echo $HOME | sed 's/\//\\\//g')/g")
+SED_PATH=${CONFIG_PATH//\~/"$HOME"}
 
-if [[ $SHLVL > 1 && $opt != "e" ]]
+if [[ $SHLVL -gt 1 && $opt != "e" ]]
 then
-    nvim $SED_PATH
+    nvim "$SED_PATH"
 else
-    kitty -e nvim $SED_PATH
+    kitty -e nvim "$SED_PATH"
 fi

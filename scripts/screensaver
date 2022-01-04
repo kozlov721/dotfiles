@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 xdotool key super+shift+ctrl+s
-kitty -c $HOME/.config/kitty/cbonsaiTheme.conf -e cbonsai -S -w 2 -L 80 -M 15 -m "Enjoy your time off!"&
+kitty -c "$HOME"/.config/kitty/cbonsaiTheme.conf -e cbonsai -S -w 2 -L 80 -M 15 -m "Enjoy your time off!"&
 slock
-kill `ps ax | grep cbonsai | head -n 1 | awk '{print $1}'`
+kill "$(pgrep cbonsai | head -n 1 | awk '{print $1}')"
 xdotool key super+shift+ctrl+w
