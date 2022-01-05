@@ -1,11 +1,29 @@
 module MyPlugins where
 
-import Data.Functor
 import qualified Data.Bifunctor as Bi
-import System.Process
-import Xmobar
+import           Data.Functor
+import           System.Process
+import           Xmobar
 
 ---------------- Helper functions -------------------
+
+space = "<fn=5> </fn>" :: String
+doubleSpace = space ++ space :: String
+
+-- A little bit of custom operators hell, enjoy.
+
+-- | Concatenates two strings with a space between
+(<->) :: String -> String -> String
+str1 <-> str2 = str1 ++ space ++ str2
+
+-- | Concatenates two strings with two spaces in between
+(<-->) :: String -> String -> String
+str1 <--> str2 = str1 ++ doubleSpace ++ str2
+
+-- | Concatenates two strings with a bar separator in between
+(<|>) :: String -> String -> String
+str1 <|> str2 = str1 <-> sep <-> str2
+  where sep = colorWrap "#888888" "<fn=1>|</fn>"
 
 script :: String -> String
 script name = "/home/martin/.local/bin/xmobar_scripts/" ++ name
@@ -67,11 +85,11 @@ getVolume r callback = do
   where
     snd' (_, x, _) = x
     status unm vol = colorWrap (color unm)
-        $ icon unm ++ vol
+        $ icon unm <-> vol
     color muted = if muted then "#FF4C6B" else "#90A050"
     icon muted  = if muted then mIcon else unmIcon
-    mIcon       = "<fn=2>\xf6a9</fn> "
-    unmIcon     = "<fn=2>\xf6a8</fn> "
+    mIcon       = "<fn=2>\xf6a9</fn>"
+    unmIcon     = "<fn=2>\xf6a8</fn>"
 
 ------------------ Battery --------------------------
 
@@ -90,18 +108,18 @@ getBattery r callback = mapM
     >>  getBattery r callback
   where
     format [capacity, status] = colorWrap
-        color (icon ++ text capacity)
+        color (icon ++ capacity ++ "%")
       where
-        text capacity = capacity ++ "%"
-        (color, icon) = colorIcon (read capacity :: Int) status
+        (color, icon) = Bi.second (++space)
+            $ colorIcon (read capacity :: Int) status
     colorIcon cap status
-        | status == "Charging" = ("#DDCC00", "<fn=3>\xf376</fn> ")
-        | status == "Full"     = ("#BBBBBB", "<fn=3>\xf376</fn> ")
-        | cap    >= 90         = ("#B5DF10", "<fn=3>\xf240</fn> ")
-        | cap    >= 65         = ("#CDCD00", "<fn=3>\xf241</fn> ")
-        | cap    >= 35         = ("#E58030", "<fn=3>\xf242</fn> ")
-        | cap    >= 5          = ("#FF4C6B", "<fn=3>\xf243</fn> ")
-        | otherwise            = ("#FF2010", "<fn=3>\xf377</fn> ")
+        | status == "Charging" = ("#DDCC00", "<fn=3>\xf376</fn>")
+        | status == "Full"     = ("#BBBBBB", "<fn=3>\xf376</fn>")
+        | cap    >= 90         = ("#B5DF10", "<fn=3>\xf240</fn>")
+        | cap    >= 65         = ("#CDCD00", "<fn=3>\xf241</fn>")
+        | cap    >= 35         = ("#E58030", "<fn=3>\xf242</fn>")
+        | cap    >= 5          = ("#FF4C6B", "<fn=3>\xf243</fn>")
+        | otherwise            = ("#FF2010", "<fn=3>\xf377</fn>")
     capacityPath = path ++ "capacity"
     statusPath   = path ++ "status"
     path         = "/sys/class/power_supply/BAT0/"
@@ -124,11 +142,11 @@ getPacmanUpdates r callback =
   where
     status :: Int -> String
     status number = uncurry colorWrap
-        $ Bi.second (++show number) $ iconColor number
+        $ Bi.second (<->show number) $ iconColor number
     iconColor number
-        | number < 20  = ("#C678DD", "<fn=2>\xf0f3</fn> ")
-        | number < 100 = ("#FF38BB", "<fn=2>\xf8fa</fn> ")
-        | otherwise    = ("#FF2010", "<fn=2>\xf848</fn> ")
+        | number < 20  = ("#C678DD", "<fn=2>\xf0f3</fn>")
+        | number < 100 = ("#FF38BB", "<fn=2>\xf8fa</fn>")
+        | otherwise    = ("#FF2010", "<fn=2>\xf848</fn>")
     snd' (_, x, _) = x
 
 --------------- WiFi ------------------------

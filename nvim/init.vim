@@ -1,9 +1,7 @@
-
 let g:polyglot_disabled = ['python', 'haskell']
 
 """ Vim-Plug
 call plug#begin()
-
 
 " Aesthetics
 Plug 'vim-airline/vim-airline'
@@ -12,18 +10,13 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'bryanmylee/vim-colorscheme-icons'
 Plug 'mhinz/vim-startify'
 Plug 'junegunn/goyo.vim'
-Plug 'junegunn/limelight.vim'
 Plug 'junegunn/vim-journal'
 Plug 'junegunn/rainbow_parentheses.vim'
 Plug 'nightsense/forgotten'
-Plug 'nightsense/nemo'
 Plug 'ghifarit53/tokyonight-vim'
-Plug 'srcery-colors/srcery-vim'
-Plug 'jackiehluo/vim-material'
-Plug 'NLKNguyen/papercolor-theme'
-Plug 'gertjanreynaert/cobalt2-vim-theme'
 
 " Functionalities
+Plug 'mbbill/undotree'
 Plug 'sheerun/vim-polyglot'
 Plug '907th/vim-auto-save'
 Plug 'tpope/vim-fugitive'
@@ -50,15 +43,16 @@ Plug 'dkarter/bullets.vim'
 Plug 'psliwka/vim-smoothie'
 Plug 'antoinemadec/FixCursorHold.nvim'
 Plug 'drmingdrmer/xptemplate'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 
 " Python
 Plug 'numirias/semshi', { 'do': ':UpdateRemotePlugins' }
 Plug 'vim-scripts/indentpython.vim'
-Plug 'deoplete-plugins/deoplete-jedi'
 
 " Haskell
 Plug 'neovimhaskell/haskell-vim'
-
+Plug 'alx741/vim-stylishask'
 
 call plug#end()
 
@@ -94,7 +88,10 @@ set termguicolors
 let NERDTreeShowHidden=1
 
 " Exit Vim if NERDTree is the only window left.
-autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+autocmd BufEnter * if tabpagenr('$') == 1
+            \ && winnr('$') == 1
+            \ && exists('b:NERDTree')
+            \ && b:NERDTree.isTabTree() | quit | endif
 
 " Airline
 let g:airline_powerline_fonts = 1
@@ -131,9 +128,28 @@ let g:vim_markdown_conceal_code_blocks = 0
 " TagBar
 let g:tagbar_width = 30
 
-" Limelight
-let g:limelight_conceal_ctermfg = 'gray'
-let g:limelight_conceal_guifg = 'gray'
+" fzf-vim
+let g:fzf_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-s': 'split',
+  \ 'ctrl-v': 'vsplit' }
+
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'Type'],
+  \ 'border':  ['fg', 'Constant'],
+  \ 'prompt':  ['fg', 'Character'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
+
+let $BAT_THEME='base16'
 
 " Startify
 let g:startify_fortune_use_unicode = 1
@@ -175,11 +191,6 @@ else
   inoremap <silent><expr> <c-@> coc#refresh()
 endif
 
-" Make <CR> auto-select the first completion item and notify coc.nvim to
-" format on enter, <cr> could be remapped by other vim plugin
-inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
-                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-
 " Use `[g` and
 " Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
 nmap <silent> [g <Plug>(coc-diagnostic-prev)
@@ -192,7 +203,7 @@ nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 
 " Use K to show documentation in preview window.
-nnoremap <silent> K :call <SID>show_documentation()<CR>
+nnoremap <silent> H :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
@@ -239,8 +250,9 @@ autocmd FileType css      setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType xml      setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType markdown setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType journal  setlocal shiftwidth=2 tabstop=2 softtabstop=2
+autocmd FileType python   call
+            \ nerdcommenter#SwitchToAlternativeDelimiters(1)
 
-autocmd FileType python call nerdcommenter#SwitchToAlternativeDelimiters(1)
 """ Custom Functions
 
 function! TrimWhitespace()
@@ -296,13 +308,19 @@ nmap <leader>s    :%s/
 nmap <leader>t    :call TrimWhitespace()<CR>
 nmap <leader>tt   :call TrimWhitespace()<CR>
 nmap <leader>w    :TagbarToggle<CR>
+nmap <leader>e    :UndotreeToggle<CR>
 nmap <silent>     <leader><leader> :noh<CR>
 nmap <Tab>        :bnext<CR>
 nmap <S-Tab>      :bprevious<CR>
+nmap <leader>viw  viw<C-g>
+nmap <leader>vip  vip<C-g>
+nmap <leader>V    V<C-g>
 nmap K            :bnext<CR>
 nmap J            :bprevious<CR>
-nmap <leader>term <C-w>s<C-w>j:terminal<CR>:set nonumber<CR>:resize 12<CR><S-a>
-nmap <leader>Term <C-w>v<C-w>l:terminal<CR>:set nonumber<CR><S-a>
+nmap <leader>term <C-w>s<C-w>j:terminal
+            \ <CR>:set nonumber<CR>:resize 12<CR><S-a>
+nmap <leader>Term <C-w>v<C-w>l:terminal
+            \ <CR>:set nonumber<CR><S-a>
 
 " Special execution bindings
 
@@ -310,17 +328,17 @@ autocmd FileType python nmap <leader>x :w<CR>:execute
     \ "!python " . expand("%:p")<CR>
 autocmd FileType python nmap <leader>X :w<CR>:execute
     \ "!flake8 "    . expand("%:p") .
-    \ " && mypy "   . expand("%:p") .
-    \ " && python " . expand("%:p")<CR>
+    \ " && mypy "   . expand("%:p")<CR>
 autocmd FileType python nmap
-    \ <silent> <leader>rr :Semshi rename<CR>
+    \ <silent> <leader>rn :Semshi rename<CR>
 autocmd FileType python nmap
     \ <silent> <leader><Tab> :Semshi goto name next<CR>
 autocmd FileType python nmap
     \ <silent> <leader><S-Tab> :Semshi goto name prev<CR>
 
 autocmd VimEnter *xmobar/*.hs silent
-    \ nmap <leader>x :w<CR>:execute "!cd ~/.config/xmobar && ./build && xmonad --restart"<CR>
+    \ nmap <leader>x :w<CR>:execute
+    \ "!cd ~/.config/xmobar && ./build && xmonad --restart"<CR>
 autocmd VimEnter *xmonad.hs silent
     \ nmap <leader>x :w<CR>:execute
     \ "!xmonad --recompile && xmonad --restart"<CR>
@@ -346,10 +364,13 @@ endif
 
 let g:tex_conceal = ""
 let g:python3_host_prog = $HOME."/anaconda3/envs/nvim/bin/python"
-let g:haskell_indent_where = 2
-let g:haskell_indent_guard = 4
 let g:auto_save = 1
 let g:auto_save_silent = 1
 
 let g:haskell_indent_before_where = 2
 let g:haskell_indent_after_bare_where = 2
+let g:haskell_indent_guard = 4
+let g:haskell_indent_if = 0
+let g:haskell_indent_in = 0
+let g:haskell_indent_case_alternative = 1
+let g:stylishask_on_save = 0
