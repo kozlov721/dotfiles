@@ -48,7 +48,7 @@ Plug 'junegunn/fzf.vim'
 
 " Python
 Plug 'numirias/semshi', { 'do': ':UpdateRemotePlugins' }
-Plug 'vim-scripts/indentpython.vim'
+Plug 'Vimjas/vim-python-pep8-indent'
 
 " Haskell
 Plug 'neovimhaskell/haskell-vim'
@@ -342,6 +342,10 @@ autocmd VimEnter *xmobar/*.hs silent
 autocmd VimEnter *xmonad.hs silent
     \ nmap <leader>x :w<CR>:execute
     \ "!xmonad --recompile && xmonad --restart"<CR>
+autocmd vimEnter *kitty/current.theme silent
+    \ nmap <leader>x :w<CR>:call SaveKittyTheme()<CR>
+autocmd VimEnter *kitty.conf silent
+    \ nmap <leader>x :w<CR>:execute "!fish -c 'refresh-kitty'"<CR>
 
 " Custom settings
 
@@ -352,8 +356,6 @@ autocmd VimEnter     * RainbowParentheses
 autocmd VimEnter     * ColorToggle
 autocmd BufWritePre  * call TrimWhitespace()
 autocmd BufWritePost *ma007*.tex silent !pdflatex <afile>
-autocmd BufWritePost *kitty/current.theme call SaveKittyTheme()
-autocmd BufWritePost *kitty.conf silent !fish -c 'refresh-kitty'
 let NERDSpaceDelims=1
 
 if !empty(glob("/var/local/change_theme/light_on.lck"))

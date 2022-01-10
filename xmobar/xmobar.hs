@@ -1,12 +1,10 @@
-import           MyPlugins
-import           Xmobar
-
+import MyPlugins
+import Xmobar
 
 
 myCommands :: [Runnable]
 myCommands = [
       Run $ MyBattery "battery" 50
-
     , Run $ Cpu [ "-t"
                 , "<fn=2>\xf108</fn>" <--> "<total>%"
                 , "-H"
@@ -14,30 +12,22 @@ myCommands = [
                 , "--high"
                 , "red"
                 ] 20
-
     , Run $ Memory ["-t", "<fn=3>\xf538</fn>"
         ++ doubleSpace
         ++ "<usedratio>%"] 20
-
     , Run $ MyVolume "volume" 1
-
     , Run $ Bluetooth "bluetooth"
-
     , Run $ Pacman "pacupdate" 1800
-
     , Run $ Date
         (    "%A,"
         <--> "%B"
         <--> "%d,"
-        <--> "%Y"
+        -- <--> "%Y"
         <--> "%T"
         ) "date" 10
-
     , Run $ Wireless "" ["-t", "<ssid>" <-> "<quality>"] 50
-
     , Run UnsafeStdinReader
     ]
-
 
 myTemplate :: String
 myTemplate = doubleSpace
@@ -71,23 +61,24 @@ myTemplate = doubleSpace
     htop    = script "run-process btop"
     mute    = "pactl set-sink-mute @DEFAULT_SINK@ toggle"
 
-
 config :: Config
 config = defaultConfig {
-      font="xft:FiraCode:size=12:weight=semibold\
+      font="xft:FiraCode:size=13:weight=bold\
            \:hinting=true:antialias=true"
     , additionalFonts = [
+          -- useless, but removing would mean to renumber everything
           "xft:Mononoki:size=12:antialias=true:hinting=true"
+          -- for icons
         , "xft:Font Awesome 5 Pro-Solid:size=12:weight=bold"
         , "xft:Font Awesome 5 Pro-Regular:size=12"
         , "xft:Font Awesome 5 Brands:size=12"
+          -- for spaces
         , "xft:Roboto:size=12:weight=semibold\
            \:hinting=true:antialias=true"
     ]
-    -- , bgColor      = "#282C24"
     , bgColor      = "#473042"
     , fgColor      = "#FF6C6B"
-    -- , alpha        = 240
+    , alpha        = 240
     , position     = Top
     , lowerOnStart = True
     , hideOnStart  = False
@@ -97,7 +88,6 @@ config = defaultConfig {
     , commands     = myCommands
     , template     = myTemplate
 }
-
 
 main :: IO ()
 main = xmobar config

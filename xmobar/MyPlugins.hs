@@ -1,7 +1,6 @@
 module MyPlugins where
 
 import qualified Data.Bifunctor as Bi
-import           Data.Functor
 import           System.Process
 import           Xmobar
 
@@ -23,7 +22,7 @@ str1 <--> str2 = str1 ++ doubleSpace ++ str2
 -- | Concatenates two strings with a bar separator in between
 (<|>) :: String -> String -> String
 str1 <|> str2 = str1 <-> sep <-> str2
-  where sep = colorWrap "#888888" "<fn=1>|</fn>"
+  where sep = colorWrap "#888888" "<fn=0>|</fn>"
 
 script :: String -> String
 script name = "/home/martin/.local/bin/xmobar_scripts/" ++ name
@@ -101,8 +100,8 @@ instance Exec MyBattery where
     start (MyBattery _ r) = getBattery r
 
 getBattery :: Int -> (String -> IO ()) -> IO ()
-getBattery r callback = mapM
-    readFile [capacityPath, statusPath]
+getBattery r callback = mapM readFile
+    [capacityPath, statusPath]
     >>= callback . format . map init
     >>  tenthSeconds r
     >>  getBattery r callback
@@ -113,8 +112,8 @@ getBattery r callback = mapM
         (color, icon) = Bi.second (++space)
             $ colorIcon (read capacity :: Int) status
     colorIcon cap status
-        | status == "Charging" = ("#DDCC00", "<fn=3>\xf376</fn>")
         | status == "Full"     = ("#BBBBBB", "<fn=3>\xf376</fn>")
+        | status == "Charging" = ("#DDCC00", "<fn=3>\xf376</fn>")
         | cap    >= 90         = ("#B5DF10", "<fn=3>\xf240</fn>")
         | cap    >= 65         = ("#CDCD00", "<fn=3>\xf241</fn>")
         | cap    >= 35         = ("#E58030", "<fn=3>\xf242</fn>")
@@ -141,11 +140,11 @@ getPacmanUpdates r callback =
     >>  getPacmanUpdates r callback
   where
     status :: Int -> String
-    status number = uncurry colorWrap
-        $ Bi.second (<->show number) $ iconColor number
-    iconColor number
-        | number < 20  = ("#C678DD", "<fn=2>\xf0f3</fn>")
-        | number < 100 = ("#FF38BB", "<fn=2>\xf8fa</fn>")
+    status updates = uncurry colorWrap
+        $ Bi.second (<->show updates) $ iconColor updates
+    iconColor updates
+        | updates < 20  = ("#C678DD", "<fn=2>\xf0f3</fn>")
+        | updates < 100 = ("#FF38BB", "<fn=2>\xf8fa</fn>")
         | otherwise    = ("#FF2010", "<fn=2>\xf848</fn>")
     snd' (_, x, _) = x
 
@@ -165,7 +164,4 @@ getWiFi r callback = return ()
 getQuality :: Double -> Integer
 getQuality = round . (/ 0.7) . (+ 110) . clamp (-110) (-40)
   where
-    clamp l r v
-      | v < l = l
-      | v > r = r
-      | otherwise = v
+    clamp l r v = max l $ min r v

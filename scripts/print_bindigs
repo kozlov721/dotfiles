@@ -4,7 +4,7 @@ import re
 from termcolor import colored
 
 
-file = open('/home/martin/.xmonad/xmonad.hs')
+file = open('/home/martin/.config/xmonad/xmonad.hs')
 conf = file.read()
 file.close()
 
