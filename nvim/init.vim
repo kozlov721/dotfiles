@@ -89,9 +89,9 @@ let NERDTreeShowHidden=1
 
 " Exit Vim if NERDTree is the only window left.
 autocmd BufEnter * if tabpagenr('$') == 1
-            \ && winnr('$') == 1
-            \ && exists('b:NERDTree')
-            \ && b:NERDTree.isTabTree() | quit | endif
+    \ && winnr('$') == 1
+    \ && exists('b:NERDTree')
+    \ && b:NERDTree.isTabTree() | quit | endif
 
 " Airline
 let g:airline_powerline_fonts = 1
@@ -111,7 +111,7 @@ autocmd BufLeave term://* stopinsert
 let g:pydocstring_doq_path = '~/.config/nvim/env/bin/doq'
 
 " Supertab
-let g:SuperTabDefaultCompletionType = "<C-n>"
+let g:SuperTabDefaultCompletionType = '<C-n>'
 
 " EasyAlign
 xmap ga <Plug>(EasyAlign)
@@ -130,24 +130,24 @@ let g:tagbar_width = 30
 
 " fzf-vim
 let g:fzf_action = {
-  \ 'ctrl-t': 'tab split',
-  \ 'ctrl-s': 'split',
-  \ 'ctrl-v': 'vsplit' }
+    \ 'ctrl-t': 'tab split',
+    \ 'ctrl-s': 'split',
+    \ 'ctrl-v': 'vsplit' }
 
-let g:fzf_colors =
-\ { 'fg':      ['fg', 'Normal'],
-  \ 'bg':      ['bg', 'Normal'],
-  \ 'hl':      ['fg', 'Comment'],
-  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-  \ 'hl+':     ['fg', 'Statement'],
-  \ 'info':    ['fg', 'Type'],
-  \ 'border':  ['fg', 'Constant'],
-  \ 'prompt':  ['fg', 'Character'],
-  \ 'pointer': ['fg', 'Exception'],
-  \ 'marker':  ['fg', 'Keyword'],
-  \ 'spinner': ['fg', 'Label'],
-  \ 'header':  ['fg', 'Comment'] }
+let g:fzf_colors = {
+    \ 'fg':      ['fg', 'Normal'],
+    \ 'bg':      ['bg', 'Normal'],
+    \ 'hl':      ['fg', 'Comment'],
+    \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+    \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+    \ 'hl+':     ['fg', 'Statement'],
+    \ 'info':    ['fg', 'Type'],
+    \ 'border':  ['fg', 'Constant'],
+    \ 'prompt':  ['fg', 'Character'],
+    \ 'pointer': ['fg', 'Exception'],
+    \ 'marker':  ['fg', 'Keyword'],
+    \ 'spinner': ['fg', 'Label'],
+    \ 'header':  ['fg', 'Comment'] }
 
 let $BAT_THEME='base16'
 
@@ -163,7 +163,7 @@ set shortmess+=c
 
 " Always show the signcolumn, otherwise it would shift the text each time
 " diagnostics appear/become resolved.
-if has("nvim-0.5.0") || has("patch-8.1.1564")
+if has('nvim-0.5.0') || has('patch-8.1.1564')
   " Recently vim can merge signcolumn and number column into one
   set signcolumn=number
 else
@@ -174,10 +174,10 @@ endif
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config.
 inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+    \ pumvisible() ? "\<C-n>" :
+    \ <SID>check_back_space() ? "\<TAB>" :
+    \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? '\<C-p>' : '\<C-h>'
 
 function! s:check_back_space() abort
   let col = col('.') - 1
@@ -251,7 +251,7 @@ autocmd FileType xml      setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType markdown setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType journal  setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType python   call
-            \ nerdcommenter#SwitchToAlternativeDelimiters(1)
+    \ nerdcommenter#SwitchToAlternativeDelimiters(1)
 
 """ Custom Functions
 
@@ -261,32 +261,19 @@ function! TrimWhitespace()
     call winrestview(l:save)
 endfunction
 
-function! ColorDark()
-    let g:airline_theme='dracula'
-    let g:tokyonight_style = 'storm'
-    let g:tokyonight_enable_italic = 1
-    colorscheme tokyonight
-endfunction
-
-function! ColorLight()
-    let g:airline_theme='tomorrow'
-    let g:allow_italic=1
-    color forgotten-light
-endfunction
-
 function! SaveKittyTheme()
-    if !empty(glob("/var/local/change_theme/light_on.lck"))
-        let theme_path = $HOME . "/.config/kitty/light.theme"
+    if !empty(glob('/var/local/change_theme/light_on.lck'))
+        let theme_path = $HOME . '/.config/kitty/light.theme'
     else
-        let theme_path = $HOME . "/.config/kitty/dark.theme"
+        let theme_path = $HOME . '/.config/kitty/dark.theme'
     endif
-    silent execute "!cat <afile> " . " > " . theme_path
-    silent !fish -c "refresh-kitty"
+    silent execute '!cat <afile> ' . ' > ' . theme_path
+    silent !fish -c 'refresh-kitty'
 endfunction
 
 """ Custom Mappings
 
-let mapleader=","
+let mapleader=','
 
 imap <C-s>        <ESC>:w<CR>i
 imap ii           <ESC>
@@ -318,39 +305,39 @@ nmap <leader>V    V<C-g>
 nmap K            :bnext<CR>
 nmap J            :bprevious<CR>
 nmap <leader>term <C-w>s<C-w>j:terminal
-            \ <CR>:set nonumber<CR>:resize 12<CR><S-a>
+    \ <CR>:set nonumber<CR>:resize 12<CR><S-a>
 nmap <leader>pterm <C-w>s<C-w>j:terminal
-            \ <CR>:set nonumber<CR>:resize 12<CR><S-a>python<CR>
+    \ <CR>:set nonumber<CR>:resize 12<CR><S-a>python<CR>
 nmap <leader>hterm <C-w>s<C-w>j:terminal
-            \ <CR>:set nonumber<CR>:resize 12<CR><S-a>ghci<CR>
+    \ <CR>:set nonumber<CR>:resize 12<CR><S-a>ghci<CR>
 nmap <leader>Term <C-w>v<C-w>l:terminal
-            \ <CR>:set nonumber<CR><S-a>
+    \ <CR>:set nonumber<CR><S-a>
 
 " Special execution bindings
 
 autocmd FileType python nmap <leader>x :w<CR>:execute
-    \ "!python " . expand("%:p")<CR>
+    \ '!python ' . expand('%:p')<CR>
 autocmd FileType python nmap <leader>X :w<CR>:execute
-    \ "!flake8 "    . expand("%:p") .
-    \ " && mypy "   . expand("%:p")<CR>
+    \ '!flake8 '    . expand('%:p') .
+    \ ' && mypy '   . expand('%:p')<CR>
 autocmd FileType python let @p=@%
 autocmd FileType python nmap <leader>rn :Semshi rename<CR>
 autocmd FileType python nmap <leader><Tab> :Semshi goto name next<CR>
 autocmd FileType python nmap <leader><S-Tab> :Semshi goto name prev<CR>
 autocmd FileType python nmap <leader>pdeb <C-w>s<C-w>j:terminal
-            \ <CR>:set nonumber<CR>:resize 12<CR><S-a>
-            \ python -i <ESC>"ppi<CR>
+    \ <CR>:set nonumber<CR>:resize 12<CR><S-a>
+    \ python -i <ESC>'ppi<CR>
 
 autocmd VimEnter *xmobar/*.hs silent
     \ nmap <leader>x :w<CR>:execute
-    \ "!cd ~/.config/xmobar && ./build && xmonad --restart"<CR>
+    \ '!cd ~/.config/xmobar && ./build && xmonad --restart'<CR>
 autocmd VimEnter *xmonad.hs silent
     \ nmap <leader>x :w<CR>:execute
-    \ "!xmonad --recompile && xmonad --restart"<CR>
+    \ '!xmonad --recompile && xmonad --restart'<CR>
 autocmd vimEnter *kitty/current.theme silent
     \ nmap <leader>x :w<CR>:call SaveKittyTheme()<CR>
 autocmd VimEnter *kitty.conf silent
-    \ nmap <leader>x :w<CR>:execute "!fish -c 'refresh-kitty'"<CR>
+    \ nmap <leader>x :w<CR>:execute '!fish -c 'refresh-kitty''<CR>
 
 autocmd VimEnter *picom.conf silent let g:auto_save = 0
 
@@ -365,14 +352,13 @@ autocmd BufWritePre  * call TrimWhitespace()
 autocmd BufWritePost *ma007*.tex silent !pdflatex <afile>
 let NERDSpaceDelims=1
 
-if !empty(glob("/var/local/change_theme/light_on.lck"))
-    call ColorLight()
-else
-    call ColorDark()
-endif
+let g:airline_theme='dracula'
+let g:tokyonight_style = 'storm'
+let g:tokyonight_enable_italic = 1
+colorscheme tokyonight
 
-let g:tex_conceal = ""
-let g:python3_host_prog = $HOME."/anaconda3/envs/nvim/bin/python"
+let g:tex_conceal = ''
+let g:python3_host_prog = $HOME.'/anaconda3/envs/nvim/bin/python'
 let g:auto_save = 1
 let g:auto_save_silent = 1
 
