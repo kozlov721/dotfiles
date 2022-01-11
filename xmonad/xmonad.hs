@@ -1,20 +1,29 @@
-import Data.List (zip4)
-import Data.Maybe
-import Data.Monoid
-import Data.Text (isInfixOf, pack)
-import Graphics.X11.ExtraTypes.XF86
-import System.Exit
+{-# LANGUAGE LambdaCase #-}
 
+import Data.Function.Flippers
+import Data.List   ( zip4 )
+import Data.Maybe  ( fromJust )
+import System.Exit ( exitSuccess )
+import System.Environment ( setEnv )
+import Text.Format
 import XMonad
+
+import Graphics.X11.ExtraTypes.XF86
+
 import XMonad.Actions.CycleWS
 import XMonad.Actions.DynamicWorkspaces
+import XMonad.Actions.Search
+import XMonad.Actions.ShowText
 import XMonad.Actions.SpawnOn
 
-import XMonad.Config.Dmwit (altMask)
+import XMonad.Config.Dmwit ( altMask )
+
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers
+import XMonad.Hooks.WindowSwallowing
+
 import XMonad.Layout.Grid
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Reflect
@@ -23,19 +32,22 @@ import XMonad.Layout.ResizableTile
 import XMonad.Layout.Spacing
 import XMonad.Layout.ToggleLayouts
 import XMonad.Layout.WindowNavigation
-import XMonad.Util.EZConfig (additionalKeys, additionalKeysP)
+
+import XMonad.Prompt
+import XMonad.Prompt.ConfirmPrompt
+import XMonad.Prompt.Input
+import XMonad.Prompt.Man
+import XMonad.Prompt.OrgMode       ( orgPrompt )
+import XMonad.Prompt.Shell
+import XMonad.Prompt.Unicode
+
 import XMonad.Util.Run
 import XMonad.Util.SpawnOnce
 
-import qualified Data.Map as M
-import qualified XMonad.StackSet as W
+import qualified Data.Map          as M
+import qualified XMonad.StackSet   as W
 
 myTerminal = "kitty"
-
-myFocusFollowsMouse = False
-
-myClickJustFocuses = False
-
 myModMask = mod4Mask
 
 myWorkspaces =
@@ -51,6 +63,8 @@ myWorkspaces =
     , "dev"
     ]
 
+myWorkspaceIDs = M.fromList $ zip myWorkspaces $ [1..9] ++ [0]
+
 workspacesApps =
     [ myTerminal
     , "qutebrowser"
@@ -64,25 +78,71 @@ workspacesApps =
     , "code"
     ]
 
-myBorderWidth = 0
+mySHC = def
+    { st_font = "xft:FiraCode:size=30:weight=semibold"
+    , st_bg = "#24283B"
+    , st_fg = "#C9C1D6"
+    }
 
-myNormalBorderColor = "#FFFFFF"
+mySHCIcons = mySHC
+    { st_font = "xft:Font Awesome 5 Pro-Solid:size=60:weight=bold"
+    }
 
-myFocusedBorderColor = "#CE2D52"
+mySearchEngines = M.fromList
+    [ ("a", "https://wiki.archlinux.org/index.php?search={0}")
+    , ("y", "https://www.youtube.com/results?search_query={0}")
+    , ("r", "https://www.reddit.com/r/{0}/")
+    , ("d", "https://duckduckgo.com/?q={0}")
+    , ("w", "https://en.wikipedia.org/wiki/{0}")
+    , ("g", "https://www.google.com/search?q={0}")
+    , ("DEFAULT", "https://www.google.com/search?q={0}")
+    ]
+
+searchFunc :: String -> String
+searchFunc s
+    | "http://"  `isPrefixOf` s = s
+    | "https://" `isPrefixOf` s = s
+    | "www."     `isPrefixOf` s = s
+    | otherwise = format (mySearchEngines M.! prefix) [escape rest]
+  where
+    (prefix, rest) = case take 2 s of
+        [x, ' '] -> ([x], tail $ tail s)
+        _ -> ("DEFAULT", s)
+
+mySearchEngine = searchEngineF "" searchFunc
 
 ----------------------------------------------------------------------
 -- BEGIN BINDINGS
-myKeys conf@(XConfig {XMonad.modMask = modm}) =
+myKeys conf@XConfig { XMonad.modMask = modm } =
     M.fromList $
+    let flashText_ c str = flashText c (3/4) str
+        runProcessAndTrim p f i = trim <$> runProcessWithInput p f i
+    in
     -- function keys
-    [ ((0, xF86XK_MonBrightnessUp), spawn "lux -a 2%")
-    , ((0, xF86XK_MonBrightnessDown), spawn "lux -s 2%")
+    [ ((0, xF86XK_MonBrightnessUp)
+       , runProcessWithInput "lux" ["-a", "5%"] ""
+       >> runProcessAndTrim "lux" ["-G"] ""
+       >>= flashText_ mySHC . ("Brightness: "++))
+    , ((0, xF86XK_MonBrightnessDown)
+       , runProcessWithInput "lux" ["-s", "5%"] ""
+       >> runProcessAndTrim "lux" ["-G"] ""
+       >>= flashText_ mySHC . ("Brightness: "++))
     , ((0, xF86XK_AudioRaiseVolume)
-       , spawn "amixer -qD pulse sset Master 2%+")
+       , runProcessWithInput "amixer"
+       ["-qD", "pulse", "sset", "Master", "2%+"] ""
+       >> runProcessAndTrim "pamixer" ["--get-volume"] ""
+       >>= flashText_ mySHC . ("Volume: "++) . (++"%"))
     , ((0, xF86XK_AudioLowerVolume)
-       , spawn "amixer -qD pulse sset Master 2%-")
+       , runProcessWithInput "amixer"
+       ["-qD", "pulse", "sset", "Master", "2%-"] ""
+       >> runProcessAndTrim "pamixer" ["--get-volume"] ""
+       >>= flashText_ mySHC . ("Volume: "++) . (++"%"))
     , ((0, xF86XK_AudioMute)
-       , spawn "amixer -qD pulse sset Master toggle")
+       , runProcessAndTrim "pamixer" ["--get-mute"] ""
+       >>=  uncurry flashText_ . (\case
+           "false" -> (mySHCIcons { st_fg = "#FF4C6B" }, "\xf6a9")
+           _       -> (mySHCIcons { st_fg = "#90A050" }, "\xf6a8"))
+       >> spawn "amixer -qD pulse sset Master toggle")
     , ((modm, xK_F1), spawn "playerctl previous")
     , ((modm, xK_F2), spawn "playerctl play-pause")
     , ((modm, xK_F3), spawn "playerctl next")
@@ -107,7 +167,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
               [0, 0, 0, 0, 0, altMask, altMask, 0, 0, 0]
               (XMonad.workspaces conf)
               workspacesApps
-    ] ++
+    ]
+    ++
     -- With ctrl, spawn the app on current workspace
     [ ((modm .|. controlMask, k), spawn c)
     | (k, c) <-
@@ -124,21 +185,40 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
               , xK_b
               ]
               workspacesApps
-    ] ++
-    -- Toggle 1st workspace
-    [ ((0, xK_F12), toggleOrView "term")
-    -- Toggle light theme
-    , ( (modm .|. controlMask .|. shiftMask, xK_l)
-      , spawn "fish -c 'change_theme'")
+    ]
+    ++
+    -- Quick web search
+    [ ((modm .|. shiftMask, xK_o), promptSearchBrowser
+        myPromptConfig { showCompletionOnTab = True
+                       , defaultPrompter = const "Quick search: "}
+        "vimb_" mySearchEngine
+      )
+    , ((modm, xK_o), inputPrompt myPromptConfig "Web search"
+        ?+ \s -> windows
+                 (W.greedyView (XMonad.workspaces conf !! 1))
+                 >> liftIO getBrowser
+                 >>= flip3 search s searchFunc
+      )
+    , ((modm .|. shiftMask, xK_g), windows
+        (W.greedyView (XMonad.workspaces conf !! 1))
+        >> selectSearch mySearchEngine)
+    -- Open man prompt
+    , ((modm, xK_F1), manPrompt myPromptConfig)
+    -- Open shell prompt
+    , ((modm, xK_p), shellPrompt myPromptConfig)
+    -- Open org prompt
+    , ((modm .|. controlMask, xK_o), orgPrompt
+        myPromptConfig "TODO" "/home/martin/org/todo")
     -- Increase opacity
     , ((modm .|. controlMask, xK_Up), spawn "picom-trans -c -o -5")
+    -- Screenshot
     , ((0, xK_Print), spawn "flameshot gui")
     -- Decrease opacity
     , ((modm .|. controlMask, xK_Down), spawn "picom-trans -c -o +5")
     -- mod-F12 toggles 'free' workspace
     , ((modm, xK_F12), toggleOrView "free")
-    -- Launch dmenu
-    , ((modm, xK_p), spawn "rofi -show run")
+    -- Launch rofi
+    , ((modm .|. controlMask, xK_p), spawn "rofi -show run")
     -- Launch rofi window
     , ((modm .|. shiftMask, xK_p), spawn "rofi -show window")
     -- Close focused window
@@ -181,7 +261,12 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
     -- Toggle bluettoth
     , ((modm .|. altMask, xK_b), spawn "bluetooth toggle")
     -- Quit xmonad
-    , ((modm .|. shiftMask, xK_q), io exitSuccess)
+    , ((modm .|. shiftMask, xK_q)
+       , confirmPrompt myPromptConfig "exit?" $ io exitSuccess)
+    -- Shutdown
+    , ((modm .|. shiftMask .|. controlMask, xK_q)
+       , confirmPrompt myPromptConfig "shutdown?"
+       $ spawn "shutdown +0")
     -- Restart xmonad
     , ((modm, xK_q), spawn "xmonad --recompile && xmonad --restart")
     ]
@@ -189,11 +274,10 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
     -- Rotate through workspaces using j and k
     -- Shift window on the way using h and l
     [ ((modm .|. controlMask, k), sequence_ (f1 : f2))
-        | (k, f1, f2) <-
-            zip3
-                [xK_k, xK_j, xK_h, xK_l]
-                [nextWS, prevWS, shiftToPrev, shiftToNext]
-                [[], [], [prevWS], [nextWS]]
+        | (k, f1, f2) <- zip3
+            [xK_k, xK_j, xK_h, xK_l]
+            [nextWS, prevWS, shiftToPrev, shiftToNext]
+            [[], [], [prevWS], [nextWS]]
     ]
     ++
     -- mod-[1..0], toggles workspace N
@@ -202,12 +286,11 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
     [ ((m .|. modm, k), f i)
         | (i, k) <- zip
             (XMonad.workspaces conf)
-            $ [xK_1 .. xK_9] ++ [xK_0]
-        , (f, m) <-
-            [ (toggleOrView, 0)
-            , (windows . shiftAndFocus, shiftMask)
-            , (windows . W.shift, controlMask)
-            ]
+            $ [xK_1..xK_9] ++ [xK_0]
+        , (f, m) <- [ (toggleOrView, 0)
+                    , (windows . shiftAndFocus, shiftMask)
+                    , (windows . W.shift, controlMask)
+                    ]
     ]
     ++
     -- Special bindings to run cbonsai as screensaver
@@ -220,7 +303,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
 
 -- END BINDINGS
 ----------------------------------------------------------------------
-myMouseBindings (XConfig {XMonad.modMask = modm}) =
+myMouseBindings XConfig { XMonad.modMask = modm } =
     M.fromList
         [ ((modm, button1)
           , \w -> focus w
@@ -231,6 +314,17 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) =
                 >> mouseResizeWindow w
                 >> windows W.shiftMaster)
         ]
+
+----------------------------------------------------------------------
+myPromptConfig = def
+    { font              = "xft:FiraCode:size=12:weight=semibold"
+    , promptBorderWidth = 0
+    , height            = 36
+    , position          = Top
+    , bgColor           = "#24283B"
+    , fgColor           = "#C9C1D6"
+    }
+
 
 ----------------------------------------------------------------------
 myLayout = avoidStruts
@@ -247,93 +341,101 @@ myLayout = avoidStruts
     myMirrored = renamed [Replace "Mirr"]
         $ Mirror
         $ ResizableTall 1 (3/100) (1/2) []
-    mySpacing x =
-        spacingRaw False (Border x x x x) True (Border x x x x) True
+    mySpacing x = spacingRaw
+        False (Border x x x x) True (Border x x x x) True
 
 ----------------------------------------------------------------------
 myManageHook = composeAll
-    $ let rect = W.RationalRect (1/14) (1/14) (12/14) (12/14) in
-        [ className =? "ij-ImageJ"      --> doFloat
-        , className =? "ImageJ"         --> doFloat
-        , className =? "st-256color"    --> doRectFloat rect
-        , className =? "Surf"           --> doRectFloat rect
-        , className =? "Caprine"        --> doRectFloat rect
-        , resource  =? "desktop_window" --> doIgnore
-        ]
+    $ let rect x y = W.RationalRect x y (1 - 2 * x) (1 - 2 * y)
+      in  [ className =? "ij-ImageJ"      --> doFloat
+          , className =? "ImageJ"         --> doFloat
+          , className =? "Vimb_"          --> doRectFloat
+            (rect (1/10) (1/10))
+          , className =? "Surf"           --> doRectFloat
+            (rect (1/10) (1/10))
+          , className =? "st-256color"    --> doRectFloat
+            (rect (1/10) (1/10))
+          , className =? "Caprine"        --> doRectFloat
+            (rect (1/8) (1/8))
+          , resource  =? "desktop_window" --> doIgnore
+          ]
 
 ----------------------------------------------------------------------
 -- The rest is managed in ~/.xsession
-myStartupHook = do
-    spawnOnce "picom --experimental-backends &"
-    spawnOnce "xautolock -time 10 -locker 'screensaver' &"
-    spawnNOnOnce 2 "term" myTerminal
+myStartupHook = spawnOnce "picom --experimental-backends &"
+    >> spawnOnce "xautolock -time 10 -locker 'screensaver' &"
+    >> spawnNOnOnce 2 "term" myTerminal
 
 ----------------------------------------------------------------------
-getIcon :: String -> String
-getIcon str
-    | str == "term" = "<fn=2>\xf120</fn>"
-    | str == "www"  = "<fn=3>\xf719</fn>"
-    | str == "dir"  = "<fn=3>\xf660</fn>"
-    | str == "mus"  = "<fn=3>\xf001</fn>"
-    | str == "docs" = "<fn=3>\xf15b</fn>"
-    | str == "free" = "<fn=3>\xf78a</fn>"
-    | str == "mail" = "<fn=3>\xf0e0</fn>"
-    | str == "vid"  = "<fn=3>\xf03d</fn>"
-    | str == "chat" = "<fn=3>\xf086</fn>"
-    | str == "dev"  = "<fn=3>\xf126</fn>"
-    | otherwise     = ""
-
-
-clickable :: (String, String) -> String
-clickable (name, icon) = "<action=xdotool key super+"
-    ++ show index
-    ++ ">"
-    ++ icon
-    ++ "</action>"
-  where
-    index   = fromJust $ M.lookup name indices
-    indices = M.fromList $ zip myWorkspaces $ [1 .. 9] ++ [0]
-
-
 myLogHook proc = dynamicLogWithPP
     $ xmobarPP
         { ppOutput          = hPutStrLn proc
         , ppCurrent         = xmobarColor "#FFCC10" "" . prepareWS
-        , ppHidden          = xmobarColor "#C792EA" "" . prepareWS
-        , ppHiddenNoWindows = xmobarColor "#82AAFF" "" . prepareWS
+        , ppHidden          = xmobarColor "#CA65F9" "" . prepareWS
+        , ppHiddenNoWindows = xmobarColor "#4594BF" "" . prepareWS
         , ppTitle           = const ""
-        , ppSep             = " <fc=#999999><fn=1>|</fn></fc>   "
-        , ppWsSep           = " <fc=#555555><fn=1>|</fn></fc> "
-        , ppLayout          = xmobarColor "#FE4C6B" "" . wrap
-            "<action=xdotool key super+space>" "</action>"
-            . last . words
         , ppUrgent          = xmobarColor "#C45500" "" . wrap "!" "!"
-        , ppOrder           = \(ws:l:t:ex) -> [ws, l] ++ ex ++ [t]
+        , ppOrder           = \(ws:l:t:ex) -> (ws:l:ex) ++ [t]
+        , ppSep             = wrap space doubleSpace
+            $ xmobarColor "#999999" "" "|"
+        , ppWsSep           = wrap space space
+            $ xmobarColor "#555555" "" "|"
+        , ppLayout          = xmobarColor "#FF4854" ""
+            . wrap "<action=xdotool key super+space>" "</action>"
+            . last
+            . words
         }
   where
-    prepareWS str = clickable (str, getIcon str)
+    space = "<fn=5> </fn>"
+    doubleSpace = space ++ space
+    icons = M.fromList
+        [ ("term", "<fn=2>\xf120</fn>")
+        , ("www" , "<fn=2>\xf719</fn>")
+        , ("dir" , "<fn=2>\xf660</fn>")
+        , ("mus" , "<fn=2>\xf001</fn>")
+        , ("docs", "<fn=2>\xf15b</fn>")
+        , ("free", "<fn=2>\xf78a</fn>")
+        , ("mail", "<fn=2>\xf0e0</fn>")
+        , ("vid" , "<fn=2>\xf03d</fn>")
+        , ("chat", "<fn=2>\xf086</fn>")
+        , ("dev" , "<fn=2>\xf126</fn>")
+        ]
+    prepareWS name = "<action=xdotool key super+"
+        ++ show (myWorkspaceIDs M.! name)
+        ++ ">"
+        ++ icons M.! name
+        ++ "</action>"
+
+
+----------------------------------------------------------------------
+myHandleEventHook = handleTimerEvent <+> swallowEventHook
+    (    className =? "kitty"
+    <||> className =? "Alacritty"
+    <||> className =? "st-256color")
+    (pure True)
 
 ----------------------------------------------------------------------
 myConfig logHandle = def
     { terminal           = myTerminal
-    , focusFollowsMouse  = myFocusFollowsMouse
-    , clickJustFocuses   = myClickJustFocuses
-    , borderWidth        = myBorderWidth
+    , focusFollowsMouse  = False
+    , clickJustFocuses   = False
+    , borderWidth        = 0
     , modMask            = myModMask
     , workspaces         = myWorkspaces
-    , normalBorderColor  = myNormalBorderColor
-    , focusedBorderColor = myFocusedBorderColor
     , keys               = myKeys
     , mouseBindings      = myMouseBindings
     , layoutHook         = myLayout
-    , manageHook         = manageSpawn <+> myManageHook <+> manageDocks
+    , manageHook         = manageSpawn
+        <+> myManageHook
+        <+> manageDocks
     , logHook            = myLogHook logHandle
     , startupHook        = myStartupHook
-    , handleEventHook    = fullscreenEventHook
+    , handleEventHook    = myHandleEventHook
     }
 
 ----------------------------------------------------------------------
-main = do
-    xmproc <- spawnPipe "xmobar"
-    xmonad $ docks $ ewmh $ myConfig xmproc
+main = setEnv "BROWSER" "qutebrowser"
+    >> setEnv "EDITOR" "nvim"
+    >> spawnPipe "/home/martin/.config/xmobar/xmobar"
+    >>= xmonad . docks . ewmh . ewmhFullscreen . myConfig
 
