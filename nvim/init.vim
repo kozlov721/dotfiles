@@ -319,6 +319,10 @@ nmap K            :bnext<CR>
 nmap J            :bprevious<CR>
 nmap <leader>term <C-w>s<C-w>j:terminal
             \ <CR>:set nonumber<CR>:resize 12<CR><S-a>
+nmap <leader>pterm <C-w>s<C-w>j:terminal
+            \ <CR>:set nonumber<CR>:resize 12<CR><S-a>python<CR>
+nmap <leader>hterm <C-w>s<C-w>j:terminal
+            \ <CR>:set nonumber<CR>:resize 12<CR><S-a>ghci<CR>
 nmap <leader>Term <C-w>v<C-w>l:terminal
             \ <CR>:set nonumber<CR><S-a>
 
@@ -329,12 +333,13 @@ autocmd FileType python nmap <leader>x :w<CR>:execute
 autocmd FileType python nmap <leader>X :w<CR>:execute
     \ "!flake8 "    . expand("%:p") .
     \ " && mypy "   . expand("%:p")<CR>
-autocmd FileType python nmap
-    \ <silent> <leader>rn :Semshi rename<CR>
-autocmd FileType python nmap
-    \ <silent> <leader><Tab> :Semshi goto name next<CR>
-autocmd FileType python nmap
-    \ <silent> <leader><S-Tab> :Semshi goto name prev<CR>
+autocmd FileType python let @p=@%
+autocmd FileType python nmap <leader>rn :Semshi rename<CR>
+autocmd FileType python nmap <leader><Tab> :Semshi goto name next<CR>
+autocmd FileType python nmap <leader><S-Tab> :Semshi goto name prev<CR>
+autocmd FileType python nmap <leader>pdeb <C-w>s<C-w>j:terminal
+            \ <CR>:set nonumber<CR>:resize 12<CR><S-a>
+            \ python -i <ESC>"ppi<CR>
 
 autocmd VimEnter *xmobar/*.hs silent
     \ nmap <leader>x :w<CR>:execute
@@ -346,6 +351,8 @@ autocmd vimEnter *kitty/current.theme silent
     \ nmap <leader>x :w<CR>:call SaveKittyTheme()<CR>
 autocmd VimEnter *kitty.conf silent
     \ nmap <leader>x :w<CR>:execute "!fish -c 'refresh-kitty'"<CR>
+
+autocmd VimEnter *picom.conf silent let g:auto_save = 0
 
 " Custom settings
 

@@ -60,6 +60,7 @@ c.url.searchengines = {
     'y':       'https://www.youtube.com/results?search_query={}',
     'a':       'https://wiki.archlinux.org/index.php?search={}',
     'r':       'https://www.reddit.com/r/{}/',
+    'w':       'https://en.wikipedia.org/wiki/{}',
     'd':       'https://duckduckgo.com/?q={}'
 }
 
