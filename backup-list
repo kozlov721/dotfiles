@@ -3,9 +3,9 @@ fish        ~/.config/fish/completions
 fish        ~/.config/fish/config.fish
 fish        ~/.local/share/omf/themes/bira/functions/fish_prompt.fish
 kitty       ~/.config/kitty/cbonsaiTheme.conf
-kitty       ~/.config/kitty/dark.theme
+kitty       ~/.config/kitty/theme.conf
 kitty       ~/.config/kitty/kitty.conf
-kitty       ~/.config/kitty/light.theme
+kitty       ~/.config/kitty/open-actions.conf
 macchina    ~/.config/macchina/*
 mimeapps    ~/.config/mimeapps.list
 nvim        ~/.config/nvim/init.vim

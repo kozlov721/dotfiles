@@ -337,7 +337,7 @@ autocmd VimEnter *xmonad.hs silent
 autocmd vimEnter *kitty/current.theme silent
     \ nmap <leader>x :w<CR>:call SaveKittyTheme()<CR>
 autocmd VimEnter *kitty.conf silent
-    \ nmap <leader>x :w<CR>:execute '!fish -c 'refresh-kitty''<CR>
+    \ nmap <leader>x :w<CR>:execute "!fish -c 'refresh-kitty'"<CR>
 
 autocmd VimEnter *picom.conf silent let g:auto_save = 0
 
