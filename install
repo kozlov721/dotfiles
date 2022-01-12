@@ -1,0 +1,62 @@
+#!/bin/bash
+
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.cabal/bin:$PATH"
+export PATH="$HOME/.ghcup/bin:$PATH"
+
+yay -S kitty             \
+    fish                 \
+    rofi                 \
+    macchina             \
+    neovim               \
+    picom-jonaburg-git   \
+    ranger               \
+    discord              \
+    timeshift-autosnap   \
+    nomacs               \
+    xautolock            \
+    zathura              \
+    zathura-pdf-poppler  \
+    thunar               \
+    flameshot            \
+    find-the-command-git \
+    caprine              \
+    cbonsai              \
+    nvtop                \
+    htop                 \
+    btop                 \
+    ttf-fira-code        \
+    ghcup-hs-bin         \
+    imwheel
+
+CONFIGS="kitty nvim xmobar xmonad macchina picom fish confedit qutebrowser ranger rofi"
+
+for DIR in $CONFIGS; do
+    cp "$DIR" "$HOME/.config/"
+done
+
+cp -r ./scripts/* "$HOME/.local/bin/"
+cp ./xsession-pc/.xsession "$HOME/"
+cp ./mimeapps/mimeapps.list "$HOME/.config"
+
+cd "$HOME" || exit 1
+
+ghcup install ghc
+ghcup set ghc 8.10.7
+ghcup install cabal
+
+cabal install pandoc ShellCheck flippers stylish-haskell xmonad
+cabal install --lib xmonad xmonad-contrib
+cabal install xmobar --flags="all_extensions"
+
+cd "$HOME/Downloads/" || exit 1
+
+curl -O "https://repo.anaconda.com/archive/Anaconda3-2021.11-Linux-x86_64.sh"
+
+bash ./Anaconda*
+
+conda create --name dev
+conda create --name nvim
+
+conda install -c conda-forge -n nvim neovim2
+conda install -n dev python=3.10
