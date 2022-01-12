@@ -150,6 +150,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
     , ((0, xF86XK_AudioPlay), spawn "playerctl play-pause")
     , ((0, xF86XK_AudioPause), spawn "playerctl play-pause")
     , ((0, xF86XK_AudioNext), spawn "playerctl next")
+    , ((0, xF86XK_AudioStop), spawn "playerctl stop")
     , ((modm, xK_F1), spawn "playerctl previous")
     , ((modm, xK_F2), spawn "playerctl play-pause")
     , ((modm, xK_F3), spawn "playerctl next")

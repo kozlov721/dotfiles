@@ -36,6 +36,8 @@ yay -S --noconfirm       \
     libsecret            \
     calcurse             \
     trash                \
+    xdotool              \
+    xorg-xwinifo         \
     imwheel
 
 yay -S picom-jonaburg-git
