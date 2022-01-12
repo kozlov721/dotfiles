@@ -1,10 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
-while read -r line; do
-    FOLDER=`echo $line | awk '{print $1}'`
-    CONFIG_PATH=`echo $line | awk '{print $2}'`
-    CONFIG_PATH=$(echo $CONFIG_PATH | sed "s/~/$(echo $HOME | sed 's/\//\\\//g')/g")
+while read -r LINE; do
+    FOLDER=$(echo "$LINE" | awk '{print $1}')
+    CONFIG_PATH=$(echo "$LINE" | awk '{print $2}')
+    CONFIG_PATH=${CONFIG_PATH//\~/$HOME}
     COPY_PATH="$HOME/Backup/dotfiles/$FOLDER"
-    echo "Gathering" $CONFIG_PATH
-    mkdir -p $COPY_PATH && cp -r $CONFIG_PATH $COPY_PATH
-done < /home/martin/Backup/dotfiles/backup-list
+    echo "Gathering $CONFIG_PATH"
+    mkdir -p "$COPY_PATH" && cp -r $CONFIG_PATH "$COPY_PATH"
+done < ./backup-list
