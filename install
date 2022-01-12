@@ -4,13 +4,16 @@ PATH="$HOME/.local/bin:$PATH"
 PATH="$HOME/.cabal/bin:$PATH"
 PATH="$HOME/.ghcup/bin:$PATH"
 
-yay -S kitty             \
+yay -S --noconfirm       \
+    kitty                \
+    vlc                  \
     fish                 \
     rofi                 \
     macchina             \
     neovim               \
     ranger               \
     discord              \
+    qutebrowser          \
     timeshift-autosnap   \
     nomacs               \
     xautolock            \
@@ -25,11 +28,13 @@ yay -S kitty             \
     htop                 \
     btop                 \
     ttf-fira-code        \
+    ttf-roboto           \
     ttf-font-awesome     \
     ghcup-hs-bin         \
     dropbox              \
     gnome-keyring        \
     libsecret            \
+    trash                \
     imwheel
 
 yay -S picom-jonaburg-git
