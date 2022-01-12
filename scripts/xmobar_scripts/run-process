@@ -1,9 +1,10 @@
 #!/bin/bash
 
-X=$(ps ax | grep "st -e $1" | wc -l)
-PID=$(ps ax | grep "st -e $1" | awk '{print $1}' | head -n 1)
+TERM="kitty --class=kitty-float"
+X=$(ps ax | grep "$TERM -e $1" | wc -l)
+PID=$(ps ax | grep "$TERM -e $1" | awk '{print $1}' | head -n 1)
 
 if [ "$X" -gt 1 ];
     then kill "$PID"
-    else st -e "$1"&
+    else $TERM -e "$1" &
 fi

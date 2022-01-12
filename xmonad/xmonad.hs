@@ -1,4 +1,5 @@
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE CPP #-}
 
 import Data.Function.Flippers
 import Data.List   ( zip4 )
@@ -57,7 +58,7 @@ myWorkspaces =
     , "mus"
     , "docs"
     , "free"
-    , "mail"
+    , "call"
     , "vid"
     , "chat"
     , "dev"
@@ -70,12 +71,12 @@ workspacesApps =
     , "qutebrowser"
     , myTerminal ++ " -e ranger"
     , "spotify"
-    , "onlyoffice-desktopeditors"
+    , "zathura"
     , myTerminal
-    , myTerminal ++ " -e neomutt"
+    , "skypeforlinux"
     , "vlc"
     , "discord"
-    , "code"
+    , myTerminal ++ " -e nvim"
     ]
 
 mySHC = def
@@ -106,7 +107,9 @@ searchFunc s
     | otherwise = format (mySearchEngines M.! prefix) [escape rest]
   where
     (prefix, rest) = case take 2 s of
-        [x, ' '] -> ([x], tail $ tail s)
+        [x, ' '] -> if [x] `M.member` mySearchEngines
+                    then ([x], tail $ tail s)
+                    else ("DEFAULT", s)
         _ -> ("DEFAULT", s)
 
 mySearchEngine = searchEngineF "" searchFunc
@@ -143,6 +146,10 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
            "false" -> (mySHCIcons { st_fg = "#FF4C6B" }, "\xf6a9")
            _       -> (mySHCIcons { st_fg = "#90A050" }, "\xf6a8"))
        >> spawn "amixer -qD pulse sset Master toggle")
+    , ((0, xF86XK_AudioPrev), spawn "playerctl previous")
+    , ((0, xF86XK_AudioPlay), spawn "playerctl play-pause")
+    , ((0, xF86XK_AudioPause), spawn "playerctl play-pause")
+    , ((0, xF86XK_AudioNext), spawn "playerctl next")
     , ((modm, xK_F1), spawn "playerctl previous")
     , ((modm, xK_F2), spawn "playerctl play-pause")
     , ((modm, xK_F3), spawn "playerctl next")
@@ -150,23 +157,22 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
     ++
     -- Spawn certain apps on certain workspaces
     [ ( (modm .|. m, k)
-      , sequence_ [spawnOn w c, windows (W.greedyView w)])
-    | (k, m, w, c) <-
-          zip4
-              [ xK_Return
-              , xK_w
-              , xK_r
-              , xK_s
-              , xK_o
-              , xK_Return
-              , xK_m
-              , xK_v
-              , xK_d
-              , xK_b
-              ]
-              [0, 0, 0, 0, 0, altMask, altMask, 0, 0, 0]
-              (XMonad.workspaces conf)
-              workspacesApps
+      , sequence_ [spawnOn w c, windows (W.greedyView w)]
+      )
+    | ((m, k), w, c) <- zip3
+        [ (0, xK_Return)       -- term
+        , (0, xK_w)            -- web
+        , (0, xK_r)            -- files
+        , (0, xK_s)            -- music
+        , (altMask, xK_o)      -- documents
+        , (altMask, xK_Return) -- free
+        , (altMask, xK_s)      -- calls
+        , (0, xK_v)            -- video
+        , (0, xK_d)            -- chat
+        , (0, xK_b)            -- development
+        ]
+        (XMonad.workspaces conf)
+        workspacesApps
     ]
     ++
     -- With ctrl, spawn the app on current workspace
@@ -191,7 +197,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
     [ ((modm .|. shiftMask, xK_o), promptSearchBrowser
         myPromptConfig { showCompletionOnTab = True
                        , defaultPrompter = const "Quick search: "}
-        "vimb_" mySearchEngine
+        "vimb" mySearchEngine
       )
     , ((modm, xK_o), inputPrompt myPromptConfig "Web search"
         ?+ \s -> windows
@@ -346,19 +352,21 @@ myLayout = avoidStruts
 
 ----------------------------------------------------------------------
 myManageHook = composeAll
-    $ let rect x y = W.RationalRect x y (1 - 2 * x) (1 - 2 * y)
-      in  [ className =? "ij-ImageJ"      --> doFloat
-          , className =? "ImageJ"         --> doFloat
-          , className =? "Vimb_"          --> doRectFloat
-            (rect (1/10) (1/10))
-          , className =? "Surf"           --> doRectFloat
-            (rect (1/10) (1/10))
-          , className =? "st-256color"    --> doRectFloat
-            (rect (1/10) (1/10))
-          , className =? "Caprine"        --> doRectFloat
-            (rect (1/8) (1/8))
-          , resource  =? "desktop_window" --> doIgnore
-          ]
+    $ let
+        doCenter = doRectFloat
+            $ W.RationalRect p p (1 - 2 * p) (1 - 2 * p)
+#ifdef PC
+        p = (1/5)
+#else
+        p = (1/8)
+#endif
+        centered = ["Vimb", "Skype", "Caprine", "kitty-float"]
+        floating = ["ij-ImageJ", "ImageJ"]
+        ignored  = ["desktop_window"]
+
+    in [className =? cls --> doFloat  | cls <- floating]
+    ++ [className =? cls --> doCenter | cls <- centered]
+    ++ [className =? cls --> doIgnore | cls <- ignored ]
 
 ----------------------------------------------------------------------
 -- The rest is managed in ~/.xsession
@@ -395,7 +403,7 @@ myLogHook proc = dynamicLogWithPP
         , ("mus" , "<fn=2>\xf001</fn>")
         , ("docs", "<fn=2>\xf15b</fn>")
         , ("free", "<fn=2>\xf78a</fn>")
-        , ("mail", "<fn=2>\xf0e0</fn>")
+        , ("call", "<fn=2>\xf095</fn>")
         , ("vid" , "<fn=2>\xf03d</fn>")
         , ("chat", "<fn=2>\xf086</fn>")
         , ("dev" , "<fn=2>\xf126</fn>")
@@ -405,7 +413,6 @@ myLogHook proc = dynamicLogWithPP
         ++ ">"
         ++ icons M.! name
         ++ "</action>"
-
 
 ----------------------------------------------------------------------
 myHandleEventHook = handleTimerEvent <+> swallowEventHook

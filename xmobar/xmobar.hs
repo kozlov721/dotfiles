@@ -1,6 +1,7 @@
+{-# LANGUAGE CPP #-}
+
 import MyPlugins
 import Xmobar
-
 
 myCommands :: [Runnable]
 myCommands = [
@@ -22,7 +23,9 @@ myCommands = [
         (    "%A,"
         <--> "%B"
         <--> "%d,"
-        -- <--> "%Y"
+#ifdef PC
+        <--> "%Y"
+#endif
         <--> "%T"
         ) "date" 10
     , Run $ Wireless "" ["-t", "<ssid>" <-> "<quality>"] 50
@@ -31,6 +34,9 @@ myCommands = [
 
 myTemplate :: String
 myTemplate = doubleSpace
+#ifdef PC
+    ++ space
+#endif
     ++  lambda
     ++  space
     <|> "%UnsafeStdinReader%"
@@ -42,9 +48,13 @@ myTemplate = doubleSpace
     <|> mem
     <|> volume
     <|> upd
+#ifndef PC
     <|> "%bluetooth%"
     <|> "%battery%"
     ++  space
+#else
+    ++ doubleSpace
+#endif
   where
     lambda  = fullWrap "#35749F" "rofi -show run"
                "<fn=2>\xf66e</fn>"
@@ -57,14 +67,15 @@ myTemplate = doubleSpace
     cpu     = fullWrap "#E58030" htop $ space ++ "%cpu%"
     mem     = fullWrap "#FF6050" htop $ space ++ "%memory%"
     volume  = actionWrap mute "%volume%"
-    upd     = actionWrap "st -e yay -Syu" "%pacupdate%"
+    upd     = actionWrap "kitty --class=kitty-float -e yay -Syu"
+                "%pacupdate%"
     htop    = script "run-process btop"
     mute    = "pactl set-sink-mute @DEFAULT_SINK@ toggle"
 
 config :: Config
 config = defaultConfig {
-      font="xft:FiraCode:size=13:weight=bold\
-           \:hinting=true:antialias=true"
+      font="xft:FiraCode:size=13:weight=bold"
+        ++ ":hinting=true:antialias=true"
     , additionalFonts = [
           -- useless, but removing would mean to renumber everything
           "xft:Mononoki:size=12:antialias=true:hinting=true"
@@ -73,8 +84,8 @@ config = defaultConfig {
         , "xft:Font Awesome 5 Pro-Regular:size=12"
         , "xft:Font Awesome 5 Brands:size=12"
           -- for spaces
-        , "xft:Roboto:size=12:weight=semibold\
-           \:hinting=true:antialias=true"
+        , "xft:Roboto:size=12:weight=semibold"
+          ++ ":hinting=true:antialias=true"
     ]
     , bgColor      = "#473042"
     , fgColor      = "#FF6C6B"
