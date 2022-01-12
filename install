@@ -1,15 +1,14 @@
 #!/bin/bash
 
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/.cabal/bin:$PATH"
-export PATH="$HOME/.ghcup/bin:$PATH"
+PATH="$HOME/.local/bin:$PATH"
+PATH="$HOME/.cabal/bin:$PATH"
+PATH="$HOME/.ghcup/bin:$PATH"
 
 yay -S kitty             \
     fish                 \
     rofi                 \
     macchina             \
     neovim               \
-    picom-jonaburg-git   \
     ranger               \
     discord              \
     timeshift-autosnap   \
@@ -26,17 +25,26 @@ yay -S kitty             \
     htop                 \
     btop                 \
     ttf-fira-code        \
+    ttf-font-awesome     \
     ghcup-hs-bin         \
+    dropbox              \
+    gnome-keyring        \
+    libsecret            \
     imwheel
 
+yay -S picom-jonaburg-git
 chsh -s $(which fish)
 
 CONFIGS="kitty nvim xmobar xmonad macchina picom fish confedit qutebrowser ranger rofi"
 
 for DIR in $CONFIGS; do
-    cp "$DIR" "$HOME/.config/"
+    cp -r "$DIR" "$HOME/.config/"
 done
 
+# Install vim-plug
+sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+
+mkdir "$HOME/.local/bin" || echo "~/.local/bin already exists"
 cp -r ./scripts/* "$HOME/.local/bin/"
 cp ./xsession-pc/.xsession "$HOME/"
 cp ./mimeapps/mimeapps.list "$HOME/.config"
@@ -47,7 +55,15 @@ ghcup install ghc
 ghcup set ghc 8.10.7
 ghcup install cabal
 
-cabal install pandoc ShellCheck flippers stylish-haskell xmonad
+cabal update
+
+cabal install pandoc   \
+    ShellCheck         \
+    flippers           \
+    stylish-haskell    \
+    text-format-simple \
+    xmonad
+
 cabal install --lib xmonad xmonad-contrib
 cabal install xmobar --flags="all_extensions"
 
@@ -57,8 +73,9 @@ curl -O "https://repo.anaconda.com/archive/Anaconda3-2021.11-Linux-x86_64.sh"
 
 bash ./Anaconda*
 
+conda update conda
+
 conda create --name dev
 conda create --name nvim
 
 conda install -c conda-forge -n nvim neovim2
-conda install -n dev python=3.10

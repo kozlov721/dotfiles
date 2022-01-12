@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Xmonad
+Comment=Lightweight X11 tiled window manager written in Haskell
+Exec=/home/martin/.cache/xmonad/xmonad-x86_64-linux
+Icon=xmonad
+Terminal=false
+StartupNotify=false
+Categories=Application;
