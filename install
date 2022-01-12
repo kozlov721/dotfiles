@@ -29,6 +29,8 @@ yay -S kitty             \
     ghcup-hs-bin         \
     imwheel
 
+chsh -s $(which fish)
+
 CONFIGS="kitty nvim xmobar xmonad macchina picom fish confedit qutebrowser ranger rofi"
 
 for DIR in $CONFIGS; do
