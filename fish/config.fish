@@ -36,7 +36,7 @@ end
 
 eval /home/martin/anaconda3/bin/conda "shell.fish" "hook" $argv | source
 
-source /usr/share/doc/find-the-command/ftc.fish info > /dev/null
+source /usr/share/doc/find-the-command/ftc.fish info su > /dev/null
 source $HOME/.config/fish/fish_prompt.fish
 
 fish_add_path -P $HOME/.local/bin

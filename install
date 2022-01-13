@@ -11,6 +11,7 @@ yay -S --noconfirm       \
     rofi                 \
     npm                  \
     yarn                 \
+    pdfjs                \
     macchina             \
     neovim               \
     ranger               \
