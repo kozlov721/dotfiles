@@ -19,7 +19,5 @@ rofi        ~/.config/rofi/*
 scripts     ~/.local/bin/*
 xmobar      ~/.config/xmobar/xmobar.hs
 xmobar      ~/.config/xmobar/MyPlugins.hs
-xmobar      ~/.config/xmobar/build
 xmonad      ~/.config/xmonad/xmonad.hs
-xmonad      ~/.config/xmonad/build
 xsession    ~/.xsession

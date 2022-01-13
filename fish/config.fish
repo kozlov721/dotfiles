@@ -16,7 +16,6 @@ alias ssh="kitty +kitten ssh"
 alias refresh-kitty 'kill -s SIGUSR1 (ps ax | awk \'/kitty/ {print $1 " " $5}\' | awk \'/kitty/ {print $1}\')'
 alias mclear 'clear && macchina'
 alias ls 'ls --hyperlink=auto --color=auto'
-# alias vimb 'tabbed -c vimb -e'
 alias .. 'cd ..'
 alias ... 'cd ../..'
 alias .... 'cd ../../..'
