@@ -372,7 +372,9 @@ myManageHook = composeAll
 ----------------------------------------------------------------------
 -- The rest is managed in ~/.xsession
 myStartupHook = spawnOnce "picom --experimental-backends &"
+#ifndef PC
     >> spawnOnce "xautolock -time 10 -locker 'screensaver' &"
+#endif
     >> spawnNOnOnce 2 "term" myTerminal
 
 ----------------------------------------------------------------------

@@ -13,9 +13,10 @@ Plug 'junegunn/goyo.vim'
 Plug 'junegunn/vim-journal'
 Plug 'junegunn/rainbow_parentheses.vim'
 Plug 'nightsense/forgotten'
-Plug 'ghifarit53/tokyonight-vim'
+Plug 'xkozlov1/cassiopeia-vim'
 
 " Functionalities
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'mbbill/undotree'
 Plug 'sheerun/vim-polyglot'
 Plug '907th/vim-auto-save'
@@ -353,9 +354,8 @@ autocmd BufWritePost *ma007*.tex silent !pdflatex <afile>
 let NERDSpaceDelims=1
 
 let g:airline_theme='dracula'
-let g:tokyonight_style = 'storm'
-let g:tokyonight_enable_italic = 1
-colorscheme tokyonight
+let g:cassiopeia_enable_italic = 1
+colorscheme cassiopeia
 
 let g:tex_conceal = ''
 let g:python3_host_prog = $HOME.'/anaconda3/envs/nvim/bin/python'

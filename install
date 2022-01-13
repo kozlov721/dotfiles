@@ -38,6 +38,9 @@ yay -S --noconfirm       \
     trash                \
     xdotool              \
     xorg-xwinifo         \
+    bluez                \
+    playerctl            \
+    tlp                  \
     imwheel
 
 yay -S picom-jonaburg-git
