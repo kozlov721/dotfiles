@@ -70,11 +70,12 @@ ghcup install cabal
 
 cabal update
 
-cabal install pandoc   \
-    ShellCheck         \
-    flippers           \
-    stylish-haskell    \
-    text-format-simple \
+cabal install pandoc        \
+    ShellCheck              \
+    flippers                \
+    haskell-language-server \
+    stylish-haskell         \
+    text-format-simple      \
     xmonad
 
 cabal install --lib xmonad xmonad-contrib
