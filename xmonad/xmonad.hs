@@ -11,6 +11,7 @@ import XMonad
 
 import Graphics.X11.ExtraTypes.XF86
 
+import XMonad.Actions.CopyWindow
 import XMonad.Actions.CycleWS
 import XMonad.Actions.DynamicWorkspaces
 import XMonad.Actions.Search
@@ -81,8 +82,8 @@ workspacesApps =
 
 mySHC = def
     { st_font = "xft:FiraCode:size=30:weight=semibold"
-    , st_bg = "#24283B"
-    , st_fg = "#C9C1D6"
+    , st_bg   = "#24283B"
+    , st_fg   = "#C9C1D6"
     }
 
 mySHCIcons = mySHC
@@ -183,20 +184,19 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
     ++
     -- With ctrl, spawn the app on current workspace
     [ ((modm .|. controlMask, k), spawn c)
-    | (k, c) <-
-          zip
-              [ xK_Return
-              , xK_w
-              , xK_r
-              , xK_s
-              , xK_o
-              , xK_Return
-              , xK_m
-              , xK_v
-              , xK_d
-              , xK_b
-              ]
-              workspacesApps
+    | (k, c) <- zip
+        [ xK_Return
+        , xK_w
+        , xK_r
+        , xK_s
+        , xK_o
+        , xK_Return
+        , xK_m
+        , xK_v
+        , xK_d
+        , xK_b
+        ]
+        workspacesApps
     ]
     ++
     -- Quick web search
@@ -236,6 +236,8 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
     , ((modm .|. shiftMask, xK_p), spawn "rofi -show window")
     -- Close focused window
     , ((modm, xK_c), kill)
+    -- Close focused window
+    , ((modm .|. altMask, xK_c), windows copyToAll)
     -- Rotate through the available layout algorithms
     , ((modm, xK_space), sendMessage NextLayout)
     -- Toggle fullscreen
@@ -258,7 +260,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
     -- Move focus to the master window
     , ((modm, xK_m), windows W.focusMaster)
     -- Spawn floating terminal
-    , ((modm .|. shiftMask, xK_Return), spawn "st")
+    , ((modm .|. shiftMask, xK_Return), spawn "kitty --class=kitty-float")
     -- Spawn floating facebook messenger
     , ((modm .|. shiftMask, xK_m), spawn "caprine")
     -- Swap the focused window with the next window
@@ -330,20 +332,28 @@ myMouseBindings XConfig { XMonad.modMask = modm } =
 
 ----------------------------------------------------------------------
 myPromptConfig = def
-    { font              = "xft:FiraCode:size=12:weight=semibold"
-    , promptBorderWidth = 0
+    { promptBorderWidth = 0
+#ifdef PC
+    , height            = 46
+    , font              = "xft:FiraCode:size=14:weight=semibold"
+#else
     , height            = 36
+    , font              = "xft:FiraCode:size=12:weight=semibold"
+#endif
     , position          = Top
     , bgColor           = "#24283B"
     , fgColor           = "#C9C1D6"
     }
 
-
 ----------------------------------------------------------------------
 myLayout = avoidStruts
     $ smartBorders
     $ windowNavigation
+#ifdef PC
+    $ mySpacing 16
+#else
     $ mySpacing 8
+#endif
     $ toggleLayouts Full myTiled
         ||| toggleLayouts Full myMirrored
         ||| toggleLayouts Full Grid

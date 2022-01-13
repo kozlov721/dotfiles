@@ -16,6 +16,7 @@ yay -S --noconfirm       \
     neovim               \
     ranger               \
     discord              \
+    fzf                  \
     qutebrowser          \
     timeshift-autosnap   \
     nomacs               \
