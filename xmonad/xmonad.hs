@@ -126,26 +126,31 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , runProcessWithInput "lux" ["-a", "5%"] ""
        >> runProcessAndTrim "lux" ["-G"] ""
        >>= flashText_ mySHC . ("Brightness: "++))
+
     , ((0, xF86XK_MonBrightnessDown)
        , runProcessWithInput "lux" ["-s", "5%"] ""
        >> runProcessAndTrim "lux" ["-G"] ""
        >>= flashText_ mySHC . ("Brightness: "++))
+
     , ((0, xF86XK_AudioRaiseVolume)
        , runProcessWithInput "amixer"
        ["-qD", "pulse", "sset", "Master", "2%+"] ""
        >> runProcessAndTrim "pamixer" ["--get-volume"] ""
        >>= flashText_ mySHC . ("Volume: "++) . (++"%"))
+
     , ((0, xF86XK_AudioLowerVolume)
        , runProcessWithInput "amixer"
        ["-qD", "pulse", "sset", "Master", "2%-"] ""
        >> runProcessAndTrim "pamixer" ["--get-volume"] ""
        >>= flashText_ mySHC . ("Volume: "++) . (++"%"))
+
     , ((0, xF86XK_AudioMute)
        , runProcessAndTrim "pamixer" ["--get-mute"] ""
        >>=  uncurry flashText_ . (\case
            "false" -> (mySHCIcons { st_fg = "#FF4C6B" }, "\xf6a9")
            _       -> (mySHCIcons { st_fg = "#90A050" }, "\xf6a8"))
        >> spawn "amixer -qD pulse sset Master toggle")
+
     , ((0, xF86XK_AudioPrev), spawn "playerctl previous")
     , ((0, xF86XK_AudioPlay), spawn "playerctl play-pause")
     , ((0, xF86XK_AudioPause), spawn "playerctl play-pause")
@@ -197,7 +202,8 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
     -- Quick web search
     [ ((modm .|. shiftMask, xK_o), promptSearchBrowser
         myPromptConfig { showCompletionOnTab = True
-                       , defaultPrompter = const "Quick search: "}
+                       , defaultPrompter = const "Quick search: "
+                       }
         "vimb" mySearchEngine
       )
     , ((modm, xK_o), inputPrompt myPromptConfig "Web search"
@@ -355,11 +361,11 @@ myLayout = avoidStruts
 myManageHook = composeAll
     $ let
         doCenter = doRectFloat
-            $ W.RationalRect p p (1 - 2 * p) (1 - 2 * p)
+            $ W.RationalRect x x (1 - 2 * x) (1 - 2 * x)
 #ifdef PC
-        p = (1/5)
+        x = (1/5)
 #else
-        p = (1/8)
+        x = (1/8)
 #endif
         centered = ["Vimb", "Skype", "Caprine", "kitty-float"]
         floating = ["ij-ImageJ", "ImageJ"]
