@@ -4,8 +4,8 @@
 import Data.Function.Flippers
 import Data.List   ( zip4 )
 import Data.Maybe  ( fromJust )
-import System.Exit ( exitSuccess )
 import System.Environment ( setEnv )
+import System.Exit ( exitSuccess )
 import Text.Format
 import XMonad
 
@@ -368,6 +368,9 @@ myManageHook = composeAll
         x = (1/8)
 #endif
         centered = ["Vimb", "Skype", "Caprine", "kitty-float"]
+#ifdef PC
+            ++ ["Spotify", "discord", "Thunar"]
+#endif
         floating = ["ij-ImageJ", "ImageJ"]
         ignored  = ["desktop_window"]
 
