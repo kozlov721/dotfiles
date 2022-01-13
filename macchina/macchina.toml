@@ -18,7 +18,7 @@ current_shell = true
 #  if theme path is /home/foo/.config/macchina/themes/Sodium.toml
 #  theme should be uncommented and set to "Sodium"
 #
-theme = "Lithium"
+theme = "Aurum"
 
 # Displays only the specified readouts.
 # Accepted values (case-sensitive):
