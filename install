@@ -9,6 +9,8 @@ yay -S --noconfirm       \
     vlc                  \
     fish                 \
     rofi                 \
+    npm                  \
+    yarn                 \
     macchina             \
     neovim               \
     ranger               \
