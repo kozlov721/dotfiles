@@ -403,19 +403,19 @@ myLogHook proc = dynamicLogWithPP
             . words
         }
   where
-    space = "<fn=5> </fn>"
+    space = "<fn=4> </fn>"
     doubleSpace = space ++ space
     icons = M.fromList
-        [ ("term", "<fn=2>\xf120</fn>")
-        , ("www" , "<fn=2>\xf719</fn>")
-        , ("dir" , "<fn=2>\xf660</fn>")
-        , ("mus" , "<fn=2>\xf001</fn>")
-        , ("docs", "<fn=2>\xf15b</fn>")
-        , ("free", "<fn=2>\xf78a</fn>")
-        , ("call", "<fn=2>\xf095</fn>")
-        , ("vid" , "<fn=2>\xf03d</fn>")
-        , ("chat", "<fn=2>\xf086</fn>")
-        , ("dev" , "<fn=2>\xf126</fn>")
+        [ ("term", "<fn=1>\xf120</fn>")
+        , ("www" , "<fn=1>\xf719</fn>")
+        , ("dir" , "<fn=1>\xf660</fn>")
+        , ("mus" , "<fn=1>\xf001</fn>")
+        , ("docs", "<fn=1>\xf15b</fn>")
+        , ("free", "<fn=1>\xf78a</fn>")
+        , ("call", "<fn=1>\xf095</fn>")
+        , ("vid" , "<fn=1>\xf03d</fn>")
+        , ("chat", "<fn=1>\xf086</fn>")
+        , ("dev" , "<fn=1>\xf126</fn>")
         ]
     prepareWS name = "<action=xdotool key super+"
         ++ show (myWorkspaceIDs M.! name)

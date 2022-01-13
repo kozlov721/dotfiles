@@ -6,7 +6,7 @@ import           Xmobar
 
 ---------------- Helper functions -------------------
 
-space = "<fn=5> </fn>" :: String
+space = "<fn=4> </fn>" :: String
 doubleSpace = space ++ space :: String
 
 -- A little bit of custom operators hell, enjoy.
@@ -60,7 +60,7 @@ bluetooth = makeIcon
   where
     makeIcon isOn = fullWrap (color isOn) cmd icon
     color isOn    = if isOn then "#90A050" else "#F6389D"
-    icon          = "<fn=4>\xf293</fn>"
+    icon          = "<fn=3>\xf293</fn>"
     cmd           = "bluetooth toggle"
 
 ------------------ Volume ---------------------------
@@ -87,8 +87,8 @@ getVolume r callback = do
         $ icon unm <-> vol
     color muted = if muted then "#FF4C6B" else "#90A050"
     icon muted  = if muted then mIcon else unmIcon
-    mIcon       = "<fn=2>\xf6a9</fn>"
-    unmIcon     = "<fn=2>\xf6a8</fn>"
+    mIcon       = "<fn=1>\xf6a9</fn>"
+    unmIcon     = "<fn=1>\xf6a8</fn>"
 
 ------------------ Battery --------------------------
 
@@ -112,13 +112,13 @@ getBattery r callback = mapM readFile
         (color, icon) = Bi.second (++space)
             $ colorIcon (read capacity :: Int) status
     colorIcon cap status
-        | status == "Full"     = ("#BBBBBB", "<fn=3>\xf376</fn>")
-        | status == "Charging" = ("#DDCC00", "<fn=3>\xf376</fn>")
-        | cap    >= 90         = ("#B5DF10", "<fn=3>\xf240</fn>")
-        | cap    >= 65         = ("#CDCD00", "<fn=3>\xf241</fn>")
-        | cap    >= 35         = ("#E58030", "<fn=3>\xf242</fn>")
-        | cap    >= 5          = ("#FF4C6B", "<fn=3>\xf243</fn>")
-        | otherwise            = ("#FF2010", "<fn=3>\xf377</fn>")
+        | status == "Full"     = ("#BBBBBB", "<fn=2>\xf376</fn>")
+        | status == "Charging" = ("#DDCC00", "<fn=2>\xf376</fn>")
+        | cap    >= 90         = ("#B5DF10", "<fn=2>\xf240</fn>")
+        | cap    >= 65         = ("#CDCD00", "<fn=2>\xf241</fn>")
+        | cap    >= 35         = ("#E58030", "<fn=2>\xf242</fn>")
+        | cap    >= 5          = ("#FF4C6B", "<fn=2>\xf243</fn>")
+        | otherwise            = ("#FF2010", "<fn=2>\xf377</fn>")
     capacityPath = path ++ "capacity"
     statusPath   = path ++ "status"
     path         = "/sys/class/power_supply/BAT0/"
@@ -143,9 +143,9 @@ getPacmanUpdates r callback =
     status updates = uncurry colorWrap
         $ Bi.second (<->show updates) $ iconColor updates
     iconColor updates
-        | updates < 20  = ("#C678DD", "<fn=2>\xf0f3</fn>")
-        | updates < 100 = ("#FF38BB", "<fn=2>\xf8fa</fn>")
-        | otherwise    = ("#FF2010", "<fn=2>\xf848</fn>")
+        | updates < 20  = ("#C678DD", "<fn=1>\xf0f3</fn>")
+        | updates < 100 = ("#FF38BB", "<fn=1>\xf8fa</fn>")
+        | otherwise    = ("#FF2010", "<fn=1>\xf848</fn>")
     snd' (_, x, _) = x
 
 --------------- WiFi ------------------------

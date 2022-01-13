@@ -59,6 +59,8 @@ call plug#end()
 
 """ Main Configurations
 filetype plugin indent on
+set spelllang=en_us,cs
+set nospell
 set tabstop=4 softtabstop=4 shiftwidth=4
 set expandtab smarttab autoindent
 set incsearch ignorecase smartcase hlsearch
@@ -262,16 +264,6 @@ function! TrimWhitespace()
     call winrestview(l:save)
 endfunction
 
-function! SaveKittyTheme()
-    if !empty(glob('/var/local/change_theme/light_on.lck'))
-        let theme_path = $HOME . '/.config/kitty/light.theme'
-    else
-        let theme_path = $HOME . '/.config/kitty/dark.theme'
-    endif
-    silent execute '!cat <afile> ' . ' > ' . theme_path
-    silent !fish -c 'refresh-kitty'
-endfunction
-
 """ Custom Mappings
 
 let mapleader=','
@@ -293,7 +285,6 @@ nmap <leader>p    <Plug>(pydocstring)
 nmap <leader>q    :NERDTreeToggle<CR>
 nmap <leader>r    :so ~/.config/nvim/init.vim<CR><leader><leader>
 nmap <leader>s    :%s/
-nmap <leader>t    :call TrimWhitespace()<CR>
 nmap <leader>tt   :call TrimWhitespace()<CR>
 nmap <leader>w    :TagbarToggle<CR>
 nmap <leader>e    :UndotreeToggle<CR>
@@ -303,6 +294,7 @@ nmap <S-Tab>      :bprevious<CR>
 nmap <leader>viw  viw<C-g>
 nmap <leader>vip  vip<C-g>
 nmap <leader>V    V<C-g>
+nmap <leader>ts   :set nospell!<CR>
 nmap K            :bnext<CR>
 nmap J            :bprevious<CR>
 nmap <leader>term <C-w>s<C-w>j:terminal
@@ -335,9 +327,7 @@ autocmd VimEnter *xmobar/*.hs silent
 autocmd VimEnter *xmonad.hs silent
     \ nmap <leader>x :w<CR>:execute
     \ '!xmonad --recompile && xmonad --restart'<CR>
-autocmd vimEnter *kitty/current.theme silent
-    \ nmap <leader>x :w<CR>:call SaveKittyTheme()<CR>
-autocmd VimEnter *kitty.conf silent
+autocmd VimEnter *kitty/*.conf silent
     \ nmap <leader>x :w<CR>:execute "!fish -c 'refresh-kitty'"<CR>
 
 autocmd VimEnter *picom.conf silent let g:auto_save = 0
