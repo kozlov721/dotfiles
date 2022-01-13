@@ -9,6 +9,7 @@ kitty       ~/.config/kitty/open-actions.conf
 macchina    ~/.config/macchina/*
 mimeapps    ~/.config/mimeapps.list
 nvim        ~/.config/nvim/init.vim
+nvim        ~/.config/nvim/coc-settings.json
 picom       ~/.config/picom/picom.conf
 qutebrowser ~/.config/qutebrowser/config.py
 qutebrowser ~/.config/qutebrowser/quickmarks
