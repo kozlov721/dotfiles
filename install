@@ -41,6 +41,7 @@ yay -S --noconfirm       \
     bluez                \
     playerctl            \
     tlp                  \
+    spotify              \
     imwheel
 
 yay -S picom-jonaburg-git
