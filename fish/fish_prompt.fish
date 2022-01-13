@@ -2,7 +2,7 @@
 # Some code stolen from oh-my-fish clearance theme: https://github.com/bpinto/oh-my-fish/blob/master/themes/clearance/
 
 function __user_host
-  set -l content 
+  set -l content
   if [ (id -u) = "0" ];
     echo -n (set_color --bold red)
   else
@@ -12,7 +12,7 @@ function __user_host
 end
 
 function __current_path
-  echo -n (set_color --bold brblue) (prompt_pwd) (set_color normal) 
+  echo -n (set_color --bold brblue) (prompt_pwd) (set_color normal)
 end
 
 function _git_branch_name
@@ -33,7 +33,7 @@ function __git_status
       set git_color 'green'
     end
 
-    echo -n (set_color $git_color) '<'$git_branch'>' (set_color normal) 
+    echo -n (set_color $git_color) '<'$git_branch'>' (set_color normal)
   end
 end
 
@@ -75,5 +75,6 @@ function fish_prompt
 end
 
 function fish_right_prompt
+  echo $CONDA_PROMPT_MODIFIER
   __fish_mode_prompt
 end

@@ -1,7 +1,7 @@
 confedit    ~/.config/confedit.list
 fish        ~/.config/fish/completions
 fish        ~/.config/fish/config.fish
-fish        ~/.local/share/omf/themes/bira/functions/fish_prompt.fish
+fish        ~/.config/fish/fish_prompt.fish
 kitty       ~/.config/kitty/cbonsaiTheme.conf
 kitty       ~/.config/kitty/theme.conf
 kitty       ~/.config/kitty/kitty.conf
