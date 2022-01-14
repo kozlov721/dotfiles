@@ -87,17 +87,20 @@ config.unbind('d')
 config.unbind('D')
 config.unbind('u')
 
-config.bind('<Alt+j>', 'run-with-count 10 scroll down')
-config.bind('<Alt+k>', 'run-with-count 10 scroll up')
-config.bind('J',       'tab-prev')
-config.bind('K',       'tab-next')
-config.bind('X',       'undo')
-config.bind('x',       'tab-close')
-config.bind('<Alt-h>', 'back -t')
-config.bind('<Alt-l>', 'forward -t')
-config.bind('do',      'download-open')
-config.bind('dc',      'download-clear')
-config.bind('dr',      'download-retry')
+config.bind('<Alt-j>',  'run-with-count 10 scroll down')
+config.bind('<Alt-k>',  'run-with-count 10 scroll up')
+config.bind('<Ctrl-d>', 'run-with-count 12 scroll down')
+config.bind('<Ctrl-u>', 'run-with-count 12 scroll up')
+config.bind('J',        'tab-prev')
+config.bind('K',        'tab-next')
+config.bind('X',        'undo')
+config.bind('x',        'tab-close')
+config.bind('<Alt-h>',  'back -t')
+config.bind('<Alt-l>',  'forward -t')
+config.bind('do',       'download-open')
+config.bind('dc',       'download-clear')
+config.bind('dr',       'download-retry')
+config.bind(',r',       'config-source')
 
 # --------------- Theme ----------------
 
@@ -107,8 +110,8 @@ selected_bg_color = '#cccccc'
 
 c.colors.tabs.selected.even.bg = selected_bg_color
 c.colors.tabs.selected.even.fg = selected_fg_color
-c.colors.tabs.selected.odd.bg = selected_bg_color
-c.colors.tabs.selected.odd.fg = selected_fg_color
+c.colors.tabs.selected.odd.bg  = selected_bg_color
+c.colors.tabs.selected.odd.fg  = selected_fg_color
 
 c.colors.webpage.darkmode.enabled = False
 c.colors.webpage.darkmode.threshold.background = 205

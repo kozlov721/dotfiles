@@ -37,6 +37,7 @@ import XMonad.Layout.WindowNavigation
 
 import XMonad.Prompt
 import XMonad.Prompt.ConfirmPrompt
+import XMonad.Prompt.FuzzyMatch
 import XMonad.Prompt.Input
 import XMonad.Prompt.Man
 import XMonad.Prompt.OrgMode       ( orgPrompt )
@@ -343,6 +344,8 @@ myPromptConfig = def
     , position          = Top
     , bgColor           = "#24283B"
     , fgColor           = "#C9C1D6"
+    , searchPredicate   = fuzzyMatch
+    , sorter            = fuzzySort
     }
 
 ----------------------------------------------------------------------
@@ -377,7 +380,7 @@ myManageHook = composeAll
 #else
         x = (1/8)
 #endif
-        centered = ["Vimb", "Skype", "Caprine", "kitty-float"]
+        centered = ["Vimb", "Skype", "Caprine", "kitty-float", "qBittorrent"]
 #ifdef PC
             ++ ["Spotify", "discord", "Thunar"]
 #endif

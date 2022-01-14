@@ -1,8 +1,10 @@
 module MyPlugins where
 
-import qualified Data.Bifunctor as Bi
+import           Data.List.Extra (trim)
 import           System.Process
 import           Xmobar
+
+import qualified Data.Bifunctor  as Bi
 
 ---------------- Helper functions -------------------
 
@@ -74,9 +76,9 @@ instance Exec MyVolume where
 
 getVolume :: Int -> (String -> IO ()) -> IO ()
 getVolume r callback = do
-    volume <- init . snd'
+    volume <- trim . snd'
         <$> readProcessWithExitCode "pamixer" ["--get-volume"] ""
-    mute   <- (=="true") . init . snd'
+    mute   <- (=="true") . trim . snd'
         <$> readProcessWithExitCode "pamixer" ["--get-mute"] ""
     callback $ status mute volume
     tenthSeconds r
@@ -102,7 +104,7 @@ instance Exec MyBattery where
 getBattery :: Int -> (String -> IO ()) -> IO ()
 getBattery r callback = mapM readFile
     [capacityPath, statusPath]
-    >>= callback . format . map init
+    >>= callback . format . map trim
     >>  tenthSeconds r
     >>  getBattery r callback
   where
