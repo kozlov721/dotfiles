@@ -71,7 +71,11 @@ myWorkspaceIDs = M.fromList $ zip myWorkspaces $ [1..9] ++ [0]
 workspacesApps =
     [ myTerminal
     , "qutebrowser"
+#ifdef PC
+    , "thunar"
+#else
     , myTerminal ++ " -e ranger"
+#endif
     , "spotify"
     , "zathura"
     , myTerminal
