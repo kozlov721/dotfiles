@@ -124,7 +124,7 @@ mySearchEngine = searchEngineF "" searchFunc
 -- BEGIN BINDINGS
 myKeys conf@XConfig { XMonad.modMask = modm } =
     M.fromList $
-    let flashText_ c str = flashText c (3/4) str
+    let flashText_ c = flashText c (3/4)
         runProcessAndTrim p f i = trim <$> runProcessWithInput p f i
     in
     -- function keys

@@ -11,21 +11,28 @@ Plug 'mhinz/vim-startify'
 Plug 'nvim-lualine/lualine.nvim'
 Plug 'Pocco81/TrueZen.nvim'
 Plug 'junegunn/vim-journal'
+Plug 'ellisonleao/glow.nvim'
 Plug 'junegunn/rainbow_parentheses.vim'
 Plug 'xkozlov1/cassiopeia-vim'
+Plug 'lukas-reineke/indent-blankline.nvim'
 Plug('folke/tokyonight.nvim', { branch = 'main' })
 
 -- Functionalities
 Plug 'akinsho/toggleterm.nvim'
+Plug 'rmagatti/goto-preview'
+Plug 'winston0410/range-highlight.nvim'
+Plug 'winston0410/cmd-parser.nvim'
 Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate' })
 Plug 'famiu/nvim-reload'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'mbbill/undotree'
-Plug 'sheerun/vim-polyglot'
+Plug 'mfussenegger/nvim-lint'
+Plug 'kosayoda/nvim-lightbulb'
+-- Plug 'sheerun/vim-polyglot'
 Plug 'tpope/vim-fugitive'
 Plug 'chrisbra/unicode.vim'
 Plug 'tpope/vim-sensible'
-Plug 'tpope/vim-surround'
+Plug 'blackcauldron7/surround.nvim'
 Plug 'majutsushi/tagbar'
 Plug('ms-jpq/chadtree', { branch = 'chad', ['do'] = 'python3 -m chadtree deps' })
 Plug 'scrooloose/nerdcommenter'
@@ -37,7 +44,6 @@ Plug 'mhinz/vim-signify'
 Plug 'windwp/nvim-autopairs'
 Plug 'junegunn/vim-easy-align'
 Plug 'alvan/vim-closetag'
-Plug 'Yggdroot/indentLine'
 Plug 'weilbith/nvim-code-action-menu'
 Plug 'chrisbra/Colorizer'
 Plug('heavenshell/vim-pydocstring', { ['do'] = 'make install', ['for'] = 'python'})
@@ -46,8 +52,10 @@ Plug('tversteeg/registers.nvim', { branch = 'main'})
 Plug 'karb94/neoscroll.nvim'
 Plug 'Pocco81/AutoSave.nvim'
 Plug 'antoinemadec/FixCursorHold.nvim'
-Plug('junegunn/fzf', { ['do'] = '{ -> fzf#install() }' })
-Plug 'junegunn/fzf.vim'
+Plug 'ibhagwan/fzf-lua'
+Plug 'kyazdani42/nvim-web-devicons'
+Plug 'bryanmylee/vim-colorscheme-icons'
+Plug 'inkarkat/vim-SyntaxRange'
 
 -- Python
 Plug('numirias/semshi', { ['do'] = ':UpdateRemotePlugins' })
@@ -57,18 +65,29 @@ Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'neovimhaskell/haskell-vim'
 Plug 'alx741/vim-stylishask'
 
-Plug 'ibhagwan/fzf-lua'
-Plug 'kyazdani42/nvim-web-devicons'
-Plug 'bryanmylee/vim-colorscheme-icons'
-Plug 'inkarkat/vim-SyntaxRange'
 
 vim.call('plug#end')
 
-
+require('nvim-autopairs').setup{}
+require('neoscroll').setup{}
+require('goto-preview').setup{
+  default_mappings = true
+}
+require('surround').setup{
+  map_insert_mode       = false,
+  space_on_closing_char = true
+}
+require("indent_blankline").setup {}
+require('range-highlight').setup{}
+require('autosave').setup{execution_message=''}
 require("toggleterm").setup{
-  direction = 'float',
-  open_mapping = [[<c-\>]],
+  direction     = 'float',
+  open_mapping  = [[<c-\>]],
   close_on_exit = false
+}
+require('lint').linters_by_ft = {
+  python = {'flake8'},
+  haskell = {'hlint'}
 }
 local reload = require('nvim-reload')
 reload.vim_reload_dirs = {
@@ -95,11 +114,6 @@ local map = function(key)
   end
 end
 
-
-require('nvim-autopairs').setup()
-require('neoscroll').setup()
-require('autosave').setup{execution_message=''}
-
 local on_attach = function(client, bufnr)
   map {'n', '<C-k>',      '<cmd>lua vim.lsp.buf.signature_help()<CR>', buffer = bufnr }
   map {'n', '<leader>b',  '<cmd>CodeActionMenu<CR>',                   buffer = bufnr }
@@ -114,8 +128,14 @@ local on_attach = function(client, bufnr)
   map {'n', 'gr',         '<cmd>lua vim.lsp.buf.references()<CR>',     buffer = bufnr }
 
   vim.diagnostic.config({ virtual_text=false })
-  vim.cmd[[autocmd CursorHold   * silent lua vim.lsp.buf.document_highlight()]]
-  vim.cmd[[autocmd CursorMoved  * silent lua vim.lsp.buf.clear_references()]]
+
+  if vim.fn.expand('%') ~= 'init.lua' then
+    vim.cmd[[
+      autocmd CursorHold   * silent lua vim.lsp.buf.document_highlight()
+      autocmd CursorMoved  * silent lua vim.lsp.buf.clear_references()
+      autocmd CursorHold   * lua require'nvim-lightbulb'.update_lightbulb()
+    ]]
+  end
 end
 
 local lsp = require'lspconfig'
@@ -133,8 +153,8 @@ for _, server in ipairs(servers) do
 end
 
 require('lualine').setup{
-  options  = {theme=require'cassiopeia'},
-  sections = {lualine_x={'encoding', 'filetype'}},
+  options  = {theme = require'cassiopeia'},
+  sections = {lualine_x = {'encoding', 'filetype'}},
   tabline  = {
     lualine_a = {'buffers'},
     lualine_b = {},
@@ -186,15 +206,9 @@ vim.opt.fillchars:append('vert: ')
 
 vim.cmd('filetype plugin indent on')
 vim.cmd('colorscheme cassiopeia')
---[[
-@begin=vim@
-int i = 42;
-@end=vim@
---]]
+
 vim.g.coq_settings                     = { auto_start = 'shut-up' }
 vim.g.code_action_menu_show_details    = false
-vim.g.indentLine_char                  = '▏'
-vim.g.indentLine_defaultGroup          = 'NonText'
 vim.g.vim_json_syntax_conceal          = 0
 vim.g.vim_markdown_conceal             = 0
 vim.g.vim_markdown_conceal_code_blocks = 0
@@ -222,7 +236,6 @@ map {'i', '<C-s>',           '<ESC>:w<CR>i' }
 map {'i', 'ii',              '<ESC>' }
 
 map {'n', '-',               '$' }
-map {'n', '<C-s>',           ':w<CR>' }
 map {'n', '<S-Tab>',         ':bprevious<CR>' }
 map {'n', '<Tab>',           ':bnext<CR>' }
 map {'n', '<leader><space>', 'vip<space>',        noremap = false}
@@ -232,11 +245,9 @@ map {'n', '<leader>V',       'V<C-g>' }
 map {'n', '<leader>a',       'gaip*' }
 map {'n', '<leader>b',       '<Plug>(coc-codeaction)' }
 map {'n', '<leader>e',       ':UndotreeToggle<CR>' }
-map {'n', '<leader>g',       ':TZAtaraxis l8 r8 t1 b1<CR>' }
-map {'n', '<leader>hterm',   '<C-w>s<C-w>j:terminal<CR>:set nonumber<CR>:resize 12<CR><S-a>ghci<CR>' }
+map {'n', '<leader>g',       ':TZAtaraxis l10 r10 t2 b2<CR>' }
 map {'n', '<leader>o',       'o<ESC>' }
 map {'n', '<leader>p',       '<Plug>(pydocstring)' }
-map {'n', '<leader>pterm',   '<C-w>s<C-w>j:terminal<CR>:set nonumber<CR>:resize 12<CR><S-a>python<CR>' }
 map {'n', '<leader>q',       ':CHADopen<CR>' }
 map {'n', '<leader>r',       ':Restart<CR><leader><leader>', noremap = false }
 map {'n', '<leader>s',       ':%s/' }
@@ -253,21 +264,13 @@ map {'n', 'J',               ':bprevious<CR>' }
 map {'n', 'K',               ':bnext<CR>' }
 map {'n', 'ga',              '<Plug>(EasyAlign)', noremap = false }
 
-map {'t', '<C-d>', '<Esc>:q<CR>' }
-map {'t', '<C-w>', '<Esc><C-w>' }
-map {'t', '<Esc>', '<C-\\><C-n>' }
-
 map {'x', '<space>',   'zf' }
 map {'x', '-',         '$' }
-map {'x', '<leader>a', 'gaip*' }
-map {'x', '<leader>b', '<Plug>(coc-codeaction)', noremap = false }
+map {'x', '<leader>a', 'gaip*', noremap = false }
 map {'x', 'ga',        '<Plug>(EasyAlign)',      noremap = false }
 
---[[
-@begin=vim@
-" Neovim :Terminal
-autocmd BufWinEnter,WinEnter term://* startinsert
-autocmd BufLeave term://* stopinsert
+vim.cmd[[
+" @begin=vim@
 
 " Filetype-Specific Configurations
 
@@ -280,8 +283,6 @@ autocmd FileType journal  setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType python   call
     \ nerdcommenter#SwitchToAlternativeDelimiters(1)
 
-""" Custom Functions
-
 function! TrimWhitespace()
     let l:save = winsaveview()
     %s/\\\@<!\s\+$//e
@@ -293,15 +294,10 @@ endfunction
 autocmd FileType python nmap <leader>x :w<CR>:execute
     \ '!python ' . expand('%:p')<CR>
 autocmd FileType python nmap <leader>X :w<CR>:execute
-    \ '!flake8 '    . expand('%:p') .
-    \ ' && mypy '   . expand('%:p')<CR>
-autocmd FileType python let @p=@%
-autocmd FileType python nmap <leader>rn :Semshi rename<CR>
-autocmd FileType python nmap <leader><Tab> :Semshi goto name next<CR>
-autocmd FileType python nmap <leader><S-Tab> :Semshi goto name prev<CR>
-autocmd FileType python nmap <leader>pdeb <C-w>s<C-w>j:terminal
-    \ <CR>:set nonumber<CR>:resize 12<CR><S-a>
-    \ python -i <ESC>'ppi<CR>
+    \ '!flake8 ' . expand('%:p')
+autocmd FileType python nmap <leader>rn:      Semshi rename<CR>
+autocmd FileType python nmap <leader><Tab>:   Semshi goto name next<CR>
+autocmd FileType python nmap <leader><S-Tab>: Semshi goto name prev<CR>
 
 autocmd VimEnter *xmobar/*.hs silent
     \ nmap <leader>x :w<CR>:execute
@@ -314,16 +310,16 @@ autocmd VimEnter *kitty/*.conf silent
 
 autocmd VimEnter *picom.conf silent let g:auto_save = 0
 
-" Custom settings
-
 set whichwrap+=<,>,h,l,[,],"<left>","<right>"
+set foldexpr=nvim_treesitter#foldexpr()
 
 autocmd BufEnter     * ColorHighlight
 autocmd BufWritePre  * call TrimWhitespace()
 autocmd BufWritePost *ma007*.tex silent !pdflatex <afile>
+autocmd BufWritePost <buffer> lua require('lint').try_lint()
 autocmd CursorHold   * lua vim.diagnostic.open_float()
 autocmd VimEnter     * RainbowParentheses
+autocmd VimEnter init.lua call SyntaxRange#Include('@begin=vim@', '@end=vim@', 'vim', 'NonText')
 
-set foldexpr=nvim_treesitter#foldexpr()
-@end=vim@
---]]
+" @end=vim@
+]]
