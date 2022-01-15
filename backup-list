@@ -9,7 +9,6 @@ kitty       ~/.config/kitty/open-actions.conf
 macchina    ~/.config/macchina/*
 mimeapps    ~/.config/mimeapps.list
 nvim        ~/.config/nvim/init.lua
-nvim        ~/.config/nvim/coc-settings.json
 picom       ~/.config/picom/picom.conf
 qutebrowser ~/.config/qutebrowser/config.py
 qutebrowser ~/.config/qutebrowser/quickmarks
@@ -17,7 +16,11 @@ qutebrowser ~/.config/qutebrowser/style.css
 qutebrowser ~/.config/qutebrowser/themes
 ranger      ~/.config/ranger/rc.conf
 rofi        ~/.config/rofi/*
-scripts     ~/.local/bin/*
+scripts     ~/.local/bin/backup_configs
+scripts     ~/.local/bin/confedit
+scripts     ~/.local/bin/print_bindings
+scripts     ~/.local/bin/screensaver
+scripts     ~/.local/bin/xmobar_scripts
 xmobar      ~/.config/xmobar/xmobar.hs
 xmobar      ~/.config/xmobar/MyPlugins.hs
 xmonad      ~/.config/xmonad/xmonad.hs
