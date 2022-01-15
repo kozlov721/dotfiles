@@ -1,7 +1,3 @@
-# pylint: disable=E0602
-
-import os
-
 # Documentation:
 #   qute://help/configuring.html
 #   qute://help/settings.html
@@ -11,7 +7,7 @@ config.load_autoconfig(False)
 c.auto_save.session = True
 
 config.set('content.cookies.accept', 'all', 'chrome-devtools://*')
-
+config.set('content.cookies.accept', 'all', '*')
 config.set('content.cookies.accept', 'all', 'devtools://*')
 
 config.set('content.headers.accept_language', '',

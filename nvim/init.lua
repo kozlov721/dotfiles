@@ -65,8 +65,10 @@ Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'neovimhaskell/haskell-vim'
 Plug 'alx741/vim-stylishask'
 
-
 vim.call('plug#end')
+
+
+vim.g.coq_settings = { auto_start = 'shut-up' }
 
 require('nvim-autopairs').setup{}
 require('neoscroll').setup{}
@@ -207,7 +209,6 @@ vim.opt.fillchars:append('vert: ')
 vim.cmd('filetype plugin indent on')
 vim.cmd('colorscheme cassiopeia')
 
-vim.g.coq_settings                     = { auto_start = 'shut-up' }
 vim.g.code_action_menu_show_details    = false
 vim.g.vim_json_syntax_conceal          = 0
 vim.g.vim_markdown_conceal             = 0

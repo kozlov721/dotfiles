@@ -17,8 +17,7 @@ import XMonad.Actions.DynamicWorkspaces
 import XMonad.Actions.Search
 import XMonad.Actions.ShowText
 import XMonad.Actions.SpawnOn
-
-import XMonad.Config.Dmwit ( altMask )
+import XMonad.Actions.WindowGo
 
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.EwmhDesktops
@@ -51,7 +50,8 @@ import qualified Data.Map          as M
 import qualified XMonad.StackSet   as W
 
 myTerminal = "kitty"
-myModMask = mod4Mask
+myModMask  = mod4Mask
+altMask    = mod1Mask
 
 myWorkspaces =
     [ "term"
@@ -289,6 +289,15 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        $ spawn "shutdown +0")
     -- Restart xmonad
     , ((modm, xK_q), spawn "xmonad --recompile && xmonad --restart")
+    -- Simulates drop-down terminal
+    , ((modm, xK_backslash), ifWindow (className =? "kitty-float")
+        ( doF
+        . (\a s -> if a `elem` W.index s
+                   then W.shiftWin "free" a s
+                   else W.shiftWin (W.currentTag s) a s
+          ) =<< ask
+        )
+        (spawnHere "kitty --class=kitty-float"))
     ]
     ++
     -- Rotate through workspaces using j and k
@@ -436,6 +445,7 @@ myLogHook proc = dynamicLogWithPP
         , ("vid" , "<fn=1>\xf03d</fn>")
         , ("chat", "<fn=1>\xf086</fn>")
         , ("dev" , "<fn=1>\xf126</fn>")
+        , ("hid", "")
         ]
     prepareWS name = "<action=xdotool key super+"
         ++ show (myWorkspaceIDs M.! name)
