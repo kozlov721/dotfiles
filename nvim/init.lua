@@ -39,7 +39,7 @@ Plug 'scrooloose/nerdcommenter'
 Plug 'neovim/nvim-lspconfig'
 Plug('ms-jpq/coq_nvim', { branch = 'coq' })
 Plug('ms-jpq/coq.thirdparty', { branch = '3p' })
-Plug('ms-jpq/coq.artifacts', { branch = 'artifacts' })
+-- Plug('ms-jpq/coq.artifacts', { branch = 'artifacts' })
 Plug 'mhinz/vim-signify'
 Plug 'windwp/nvim-autopairs'
 Plug 'junegunn/vim-easy-align'

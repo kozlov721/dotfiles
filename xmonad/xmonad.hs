@@ -64,6 +64,7 @@ myWorkspaces =
     , "vid"
     , "chat"
     , "dev"
+    , "hid" -- always hidden, this is for dropdown terminal
     ]
 
 myWorkspaceIDs = M.fromList $ zip myWorkspaces $ [1..9] ++ [0]
@@ -290,12 +291,13 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
     -- Restart xmonad
     , ((modm, xK_q), spawn "xmonad --recompile && xmonad --restart")
     -- Simulates drop-down terminal
-    , ((modm, xK_backslash), ifWindow (className =? "kitty-float")
-        ( doF
+    , ((modm, xK_backslash), ifWindow
+        (className =? "kitty-float")
+        (ask >>= doF
         . (\a s -> if a `elem` W.index s
-                   then W.shiftWin "free" a s
+                   then W.shiftWin "hid" a s
                    else W.shiftWin (W.currentTag s) a s
-          ) =<< ask
+          )
         )
         (spawnHere "kitty --class=kitty-float"))
     ]
@@ -316,7 +318,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
         | (i, k) <- zip
             (XMonad.workspaces conf)
             $ [xK_1..xK_9] ++ [xK_0]
-        , (f, m) <- [ (toggleOrView, 0)
+        , (f, m) <- [ (toggleOrDoSkip ["hid"] W.greedyView, 0)
                     , (windows . shiftAndFocus, shiftMask)
                     , (windows . W.shift, controlMask)
                     ]
@@ -419,7 +421,7 @@ myLogHook proc = dynamicLogWithPP
         , ppCurrent         = xmobarColor "#FFCC10" "" . prepareWS
         , ppHidden          = xmobarColor "#CA65F9" "" . prepareWS
         , ppHiddenNoWindows = xmobarColor "#4594BF" "" . prepareWS
-        , ppTitle           = const ""
+        , ppTitle           = mempty
         , ppUrgent          = xmobarColor "#C45500" "" . wrap "!" "!"
         , ppOrder           = \(ws:l:t:ex) -> (ws:l:ex) ++ [t]
         , ppSep             = wrap space doubleSpace
@@ -445,13 +447,14 @@ myLogHook proc = dynamicLogWithPP
         , ("vid" , "<fn=1>\xf03d</fn>")
         , ("chat", "<fn=1>\xf086</fn>")
         , ("dev" , "<fn=1>\xf126</fn>")
-        , ("hid", "")
         ]
-    prepareWS name = "<action=xdotool key super+"
-        ++ show (myWorkspaceIDs M.! name)
-        ++ ">"
-        ++ icons M.! name
-        ++ "</action>"
+    prepareWS name
+        | name `M.notMember` icons = mempty
+        | otherwise = "<action=xdotool key super+"
+            ++ show (myWorkspaceIDs M.! name)
+            ++ ">"
+            ++ icons M.! name
+            ++ "</action>"
 
 ----------------------------------------------------------------------
 myHandleEventHook = handleTimerEvent <+> swallowEventHook
