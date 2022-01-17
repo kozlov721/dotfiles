@@ -1,9 +1,9 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE CPP #-}
 
-import Data.Function.Flippers
 import Data.List   ( zip4, mapAccumL )
 import Data.Maybe  ( fromJust )
+import Data.Function.Flippers
 import System.Environment ( setEnv )
 import System.Exit ( exitSuccess )
 import Text.Format
@@ -481,6 +481,6 @@ myConfig logHandle = def
 ----------------------------------------------------------------------
 main = setEnv "BROWSER" "qutebrowser"
     >> setEnv "EDITOR" "nvim"
-    >> spawnPipe "/home/martin/.config/xmobar/xmobar"
+    >> spawnPipe "/home/martin/.local/bin/xmobar"
     >>= xmonad . docks . ewmh . ewmhFullscreen . myConfig
 
