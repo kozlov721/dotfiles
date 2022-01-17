@@ -19,6 +19,7 @@ Plug('folke/tokyonight.nvim', { branch = 'main' })
 
 -- Functionalities
 Plug 'akinsho/toggleterm.nvim'
+Plug 'rcarriga/nvim-notify'
 Plug 'rmagatti/goto-preview'
 Plug 'winston0410/range-highlight.nvim'
 Plug 'winston0410/cmd-parser.nvim'
@@ -67,6 +68,7 @@ Plug 'alx741/vim-stylishask'
 
 vim.call('plug#end')
 
+vim.notify = require("notify")
 
 vim.g.coq_settings = { auto_start = 'shut-up' }
 
@@ -155,7 +157,7 @@ for _, server in ipairs(servers) do
 end
 
 require('lualine').setup{
-  options  = {theme = require'cassiopeia'},
+  options  = {theme = require('cassiopeia')},
   sections = {lualine_x = {'encoding', 'filetype'}},
   tabline  = {
     lualine_a = {'buffers'},

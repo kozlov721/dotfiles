@@ -2,7 +2,7 @@
 {-# LANGUAGE CPP #-}
 
 import Data.Function.Flippers
-import Data.List   ( zip4 )
+import Data.List   ( zip4, mapAccumL )
 import Data.Maybe  ( fromJust )
 import System.Environment ( setEnv )
 import System.Exit ( exitSuccess )
@@ -69,21 +69,21 @@ myWorkspaces =
 
 myWorkspaceIDs = M.fromList $ zip myWorkspaces $ [1..9] ++ [0]
 
-workspacesApps =
-    [ myTerminal
+getWorkspacesApps term =
+    [ term
     , "qutebrowser"
 #ifdef PC
     , "thunar"
 #else
-    , myTerminal ++ " -e ranger"
+    , term ++ " -e ranger"
 #endif
     , "spotify"
     , "zathura"
-    , myTerminal
+    , term
     , "skypeforlinux"
     , "vlc"
     , "discord"
-    , myTerminal ++ " -e nvim"
+    , term ++ " -e nvim"
     ]
 
 mySHC = def
@@ -123,10 +123,12 @@ mySearchEngine = searchEngineF "" searchFunc
 
 ----------------------------------------------------------------------
 -- BEGIN BINDINGS
-myKeys conf@XConfig { XMonad.modMask = modm } =
-    M.fromList $
+myKeys conf@XConfig { XMonad.modMask  = modm
+                    , XMonad.terminal = term
+                    } = M.fromList $
     let flashText_ c = flashText c (3/4)
         runProcessAndTrim p f i = trim <$> runProcessWithInput p f i
+        workspacesApps = getWorkspacesApps term
     in
     -- function keys
     [ ((0, xF86XK_MonBrightnessUp)
@@ -221,13 +223,8 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
     , ((modm .|. shiftMask, xK_g), windows
         (W.greedyView (XMonad.workspaces conf !! 1))
         >> selectSearch mySearchEngine)
-    -- Open man prompt
-    , ((modm, xK_F1), manPrompt myPromptConfig)
     -- Open shell prompt
     , ((modm, xK_p), shellPrompt myPromptConfig)
-    -- Open org prompt
-    , ((modm .|. controlMask, xK_o), orgPrompt
-        myPromptConfig "TODO" "/home/martin/org/todo")
     -- Increase opacity
     , ((modm .|. controlMask, xK_Up), spawn "picom-trans -c -o -5")
     -- Screenshot
@@ -242,7 +239,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
     , ((modm .|. shiftMask, xK_p), spawn "rofi -show window")
     -- Close focused window
     , ((modm, xK_c), kill)
-    -- Close focused window
+    -- Copy window to all workspaces (for floating skype window)
     , ((modm .|. altMask, xK_c), windows copyToAll)
     -- Rotate through the available layout algorithms
     , ((modm, xK_space), sendMessage NextLayout)
@@ -252,19 +249,16 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
     , ((modm, xK_a), sendMessage MirrorShrink)
     -- Grow window
     , ((modm, xK_z), sendMessage MirrorExpand)
-    --  Reset the layouts on the current workspace to default
-    , ((modm .|. shiftMask, xK_space)
-       , setLayout $ XMonad.layoutHook conf)
-    -- Resize viewed windows to the correct size
-    , ((modm, xK_n), refresh)
+    -- Shrink the master area
+    , ((modm, xK_h), sendMessage Expand)
+    -- Expand the master area
+    , ((modm, xK_l), sendMessage Shrink)
     -- Move focus to the next window
     , ((modm, xK_Tab), windows W.focusDown)
     -- Move focus to the next window
     , ((modm, xK_j), windows W.focusDown)
     -- Move focus to the previous window
     , ((modm, xK_k), windows W.focusUp)
-    -- Move focus to the master window
-    , ((modm, xK_m), windows W.focusMaster)
     -- Spawn floating terminal
     , ((modm .|. shiftMask, xK_Return), spawn "kitty --class=kitty-float")
     -- Spawn floating facebook messenger
@@ -273,10 +267,6 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
     , ((modm .|. shiftMask, xK_j), windows W.swapDown)
     -- Swap the focused window with the previous window
     , ((modm .|. shiftMask, xK_k), windows W.swapUp)
-    -- Shrink the master area
-    , ((modm, xK_h), sendMessage Expand)
-    -- Expand the master area
-    , ((modm, xK_l), sendMessage Shrink)
     -- Push window back into tiling
     , ((modm, xK_t), withFocused $ windows . W.sink)
     -- Toggle bluettoth
@@ -345,6 +335,7 @@ myMouseBindings XConfig { XMonad.modMask = modm } =
                 >> mouseResizeWindow w
                 >> windows W.shiftMaster)
         ]
+
 
 ----------------------------------------------------------------------
 myPromptConfig = def

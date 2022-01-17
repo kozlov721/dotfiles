@@ -1,7 +1,3 @@
-# Documentation:
-#   qute://help/configuring.html
-#   qute://help/settings.html
-
 config.load_autoconfig(False)
 
 c.auto_save.session = True
@@ -64,11 +60,12 @@ c.url.start_pages = 'https://google.com'
 
 c.zoom.default = '150%'
 c.fonts.default_size = '11pt'
-c.zoom.levels = ['25%', '33%', '50%', '67%', '75%',
-                 '90%', '100%', '110%', '125%', '135%',
-                 '140%', '150%', '175%', '200%', '250%',
-                 '300%', '400%', '500%'
-]
+c.zoom.levels = [
+    '25%', '33%', '50%', '67%', '75%',
+    '90%', '100%', '110%', '125%', '135%',
+    '140%', '150%', '175%', '200%', '250%',
+    '300%', '400%', '500%'
+    ]
 
 c.content.blocking.whitelist = ['https://www.googleadservices.com/*']
 
@@ -83,20 +80,20 @@ config.unbind('d')
 config.unbind('D')
 config.unbind('u')
 
-config.bind('<Alt-j>',  'run-with-count 10 scroll down')
-config.bind('<Alt-k>',  'run-with-count 10 scroll up')
-config.bind('<Ctrl-d>', 'run-with-count 12 scroll down')
-config.bind('<Ctrl-u>', 'run-with-count 12 scroll up')
-config.bind('J',        'tab-prev')
-config.bind('K',        'tab-next')
-config.bind('X',        'undo')
-config.bind('x',        'tab-close')
-config.bind('<Alt-h>',  'back -t')
-config.bind('<Alt-l>',  'forward -t')
-config.bind('do',       'download-open')
-config.bind('dc',       'download-clear')
-config.bind('dr',       'download-retry')
-config.bind(',r',       'config-source')
+config.bind('<Alt-j>',     'run-with-count 10 scroll down')
+config.bind('<Alt-k>',     'run-with-count 10 scroll up')
+config.bind('<Ctrl-d>',    'run-with-count 12 scroll down')
+config.bind('<Ctrl-u>',    'run-with-count 12 scroll up')
+config.bind('J',           'tab-prev')
+config.bind('K',           'tab-next')
+config.bind('X',           'undo')
+config.bind('x',           'tab-close')
+config.bind('<Alt-h>',     'back -t')
+config.bind('<Alt-l>',     'forward -t')
+config.bind('do',          'download-open')
+config.bind('dc',          'download-clear')
+config.bind('dr',          'download-retry')
+config.bind(',r',          'config-source')
 
 # --------------- Theme ----------------
 
@@ -106,8 +103,8 @@ selected_bg_color = '#cccccc'
 
 c.colors.tabs.selected.even.bg = selected_bg_color
 c.colors.tabs.selected.even.fg = selected_fg_color
-c.colors.tabs.selected.odd.bg  = selected_bg_color
-c.colors.tabs.selected.odd.fg  = selected_fg_color
+c.colors.tabs.selected.odd.bg = selected_bg_color
+c.colors.tabs.selected.odd.fg = selected_fg_color
 
 c.colors.webpage.darkmode.enabled = False
 c.colors.webpage.darkmode.threshold.background = 205
@@ -118,6 +115,5 @@ c.colors.webpage.darkmode.algorithm = 'lightness-hsl'
 # c.colors.webpage.darkmode.enabled = True
 # c.colors.webpage.bg = '#111111'
 # c.content.user_stylesheets = [
-    # '~/.config/qutebrowser/css/darculized/darculized-all-sites.css'
+# '~/.config/qutebrowser/css/darculized/darculized-all-sites.css'
 # ]
-
