@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global
 
-vim.g.polyglot_disabled = {'python', 'haskell'}
+vim.g.polyglot_disabled = {'python', 'haskell', 'markdown'}
 
 local Plug = vim.fn['plug#']
 
@@ -29,7 +29,7 @@ Plug 'nvim-lua/plenary.nvim'
 Plug 'mbbill/undotree'
 Plug 'mfussenegger/nvim-lint'
 Plug 'kosayoda/nvim-lightbulb'
--- Plug 'sheerun/vim-polyglot'
+Plug 'sheerun/vim-polyglot'
 Plug 'tpope/vim-fugitive'
 Plug 'chrisbra/unicode.vim'
 Plug 'tpope/vim-sensible'
@@ -157,7 +157,7 @@ for _, server in ipairs(servers) do
 end
 
 require('lualine').setup{
- -- options  = {theme = require('cassiopeia')},
+  options  = {theme = require('cassiopeia')},
   sections = {lualine_x = {'encoding', 'filetype'}},
   tabline  = {
     lualine_a = {'buffers'},

@@ -1,5 +1,6 @@
 confedit    ~/.config/confedit/confedit.list
 fish        ~/.config/fish/completions
+fish        ~/.config/fish/ftc.fish
 fish        ~/.config/fish/config.fish
 fish        ~/.config/fish/fish_prompt.fish
 kitty       ~/.config/kitty/cbonsaiTheme.conf
