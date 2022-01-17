@@ -1,8 +1,8 @@
 module MyPlugins where
 
-import           Data.List.Extra (trim)
-import           System.Process
-import           Xmobar
+import Data.List.Extra (trim)
+import System.Process
+import Xmobar
 
 import qualified Data.Bifunctor  as Bi
 
@@ -147,7 +147,7 @@ getPacmanUpdates r callback =
     iconColor updates
         | updates < 20  = ("#C678DD", "<fn=1>\xf0f3</fn>")
         | updates < 100 = ("#FF38BB", "<fn=1>\xf8fa</fn>")
-        | otherwise    = ("#FF2010", "<fn=1>\xf848</fn>")
+        | otherwise     = ("#FF2010", "<fn=1>\xf848</fn>")
     snd' (_, x, _) = x
 
 --------------- WiFi ------------------------

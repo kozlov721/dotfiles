@@ -282,14 +282,14 @@ myKeys conf@XConfig { XMonad.modMask  = modm
     , ((modm, xK_q), spawn "xmonad --recompile && xmonad --restart")
     -- Simulates drop-down terminal
     , ((modm, xK_backslash), ifWindow
-        (className =? "kitty-float")
+        (className =? "kitty-dropdown")
         (ask >>= doF
         . (\a s -> if a `elem` W.index s
                    then W.shiftWin "hid" a s
                    else W.shiftWin (W.currentTag s) a s
           )
         )
-        (spawnHere "kitty --class=kitty-float"))
+        (spawnHere "kitty --class=kitty-dropdown"))
     ]
     ++
     -- Rotate through workspaces using j and k
@@ -382,13 +382,15 @@ myManageHook = composeAll
         doCenter = doRectFloat
             $ W.RationalRect x x (1 - 2 * x) (1 - 2 * x)
 #ifdef PC
-        x = (1/5)
+        x = (1/4)
 #else
         x = (1/8)
 #endif
         centered = ["Vimb", "Skype", "Caprine", "kitty-float", "qBittorrent"]
 #ifdef PC
             ++ ["Spotify", "discord", "Thunar"]
+#else
+            ++ ["kitty-dropdown"]
 #endif
         floating = ["ij-ImageJ", "ImageJ"]
         ignored  = ["desktop_window"]
@@ -396,6 +398,9 @@ myManageHook = composeAll
     in [className =? cls --> doFloat  | cls <- floating]
     ++ [className =? cls --> doCenter | cls <- centered]
     ++ [className =? cls --> doIgnore | cls <- ignored ]
+#ifdef PC
+    ++ [className =? "kitty-dropdown" --> doRectFloat (W.RationalRect (1/14) (1/3) (3/8) (4/9))]
+#endif
 
 ----------------------------------------------------------------------
 -- The rest is managed in ~/.xsession

@@ -23,7 +23,7 @@ Plug 'rcarriga/nvim-notify'
 Plug 'rmagatti/goto-preview'
 Plug 'winston0410/range-highlight.nvim'
 Plug 'winston0410/cmd-parser.nvim'
-Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate' })
+-- Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate' })
 Plug 'famiu/nvim-reload'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'mbbill/undotree'
@@ -169,11 +169,11 @@ require('lualine').setup{
   }
 }
 
-require'nvim-treesitter.configs'.setup{
-  ensure_installed = "maintained",
-  sync_install = false,
-  highlight = { enable = false }
-}
+--require'nvim-treesitter.configs'.setup{
+--  ensure_installed = "maintained",
+--  sync_install = false,
+--  highlight = { enable = false }
+--}
 
 vim.o.foldmethod    = 'expr'
 vim.o.spelllang     = 'en_us,cs'
