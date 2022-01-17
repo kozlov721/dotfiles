@@ -1,10 +1,10 @@
 #!/bin/bash
 
 
-CONFIGS="kitty nvim xmobar xmonad macchina picom fish confedit qutebrowser ranger rofi"
+# CONFIGS="kitty nvim xmobar xmonad macchina picom fish confedit qutebrowser ranger rofi"
 
-for DIR in $CONFIGS; do
-    cp -r "$DIR" "$HOME/.config/"
+for DIR in $@; do
+    cp -r "$DIR" "$HOME/.config/" || echo "$1 not found"
 done
 
 cp -r ./scripts/* "$HOME/.local/bin/"
