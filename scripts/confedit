@@ -6,7 +6,7 @@ while IFS= read -r LINE; do
     CONFIG_NAME=$(echo "$LINE" | awk '{print $1}')
     CONFIG_PATH=$(echo "$LINE" | awk '{print $2}')
     if [ "$CONFIG_NAME" = "${*: -1}" ]; then break; fi
-done < "$HOME"/.config/confedit.list
+done < "$HOME"/.config/confedit/confedit.list
 
 SED_PATH=${CONFIG_PATH//\~/"$HOME"}
 

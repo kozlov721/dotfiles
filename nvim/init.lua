@@ -157,7 +157,7 @@ for _, server in ipairs(servers) do
 end
 
 require('lualine').setup{
-  options  = {theme = require('cassiopeia')},
+ -- options  = {theme = require('cassiopeia')},
   sections = {lualine_x = {'encoding', 'filetype'}},
   tabline  = {
     lualine_a = {'buffers'},
