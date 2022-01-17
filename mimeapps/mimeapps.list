@@ -9,3 +9,5 @@ x-scheme-handler/http=xfce4-web-browser.desktop;
 x-scheme-handler/https=xfce4-web-browser.desktop;
 image/jpeg=org.kde.gwenview.desktop;org.nomacs.ImageLounge.desktop;
 application/pdf=org.pwmt.zathura.desktop;org.qutebrowser.qutebrowser.desktop;
+video/x-matroska=vlc.desktop;
+video/mp4=vlc.desktop;

@@ -1,9 +1,9 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE CPP #-}
 
+import Data.Function.Flippers
 import Data.List   ( zip4, mapAccumL )
 import Data.Maybe  ( fromJust )
-import Data.Function.Flippers
 import System.Environment ( setEnv )
 import System.Exit ( exitSuccess )
 import Text.Format

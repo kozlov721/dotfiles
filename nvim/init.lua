@@ -1,9 +1,5 @@
 ---@diagnostic disable: undefined-global, unused-local
 
-<<<<<<< HEAD
-=======
-vim.g.polyglot_disabled = {'python', 'haskell'}
->>>>>>> 9897914bd1c97c7bbc8b5693107a2bf40027ed0b
 
 local Plug = vim.fn['plug#']
 
@@ -32,10 +28,6 @@ Plug 'nvim-lua/plenary.nvim'
 Plug 'mbbill/undotree'
 Plug 'mfussenegger/nvim-lint'
 Plug 'kosayoda/nvim-lightbulb'
-<<<<<<< HEAD
-=======
--- Plug 'sheerun/vim-polyglot'
->>>>>>> 9897914bd1c97c7bbc8b5693107a2bf40027ed0b
 Plug 'tpope/vim-fugitive'
 Plug 'chrisbra/unicode.vim'
 Plug 'tpope/vim-sensible'
@@ -168,7 +160,7 @@ require'nvim-treesitter.configs'.setup{
 }
 
 require('lualine').setup{
- options  = {theme = require('cassiopeia')},
+  options  = {theme = require('cassiopeia')},
   sections = {lualine_x = {'encoding', 'filetype'}},
   tabline  = {
     lualine_a = {'buffers'},
@@ -180,15 +172,6 @@ require('lualine').setup{
   }
 }
 
-<<<<<<< HEAD
-=======
--- require'nvim-treesitter.configs'.setup{
-  -- ensure_installed = "maintained",
-  -- sync_install = false,
-  -- highlight = { enable = false }
--- }
-
->>>>>>> 9897914bd1c97c7bbc8b5693107a2bf40027ed0b
 vim.o.foldmethod    = 'expr'
 vim.o.spelllang     = 'en_us,cs'
 vim.o.wildmode      = 'longest,list,full'
