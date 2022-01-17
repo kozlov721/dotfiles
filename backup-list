@@ -24,6 +24,7 @@ scripts     ~/.local/bin/screensaver
 scripts     ~/.local/bin/xmobar_scripts
 xmobar      ~/.config/xmobar/xmobar.hs
 xmobar      ~/.config/xmobar/MyPlugins.hs
+xmobar      ~/.config/xmobar/build
 xmonad      ~/.config/xmonad/xmonad.hs
-xmonad      ~/.config/xmonad/xmonad.cabal
+xmonad      ~/.config/xmonad/build
 xsession    ~/.xsession

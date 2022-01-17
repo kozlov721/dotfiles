@@ -481,6 +481,6 @@ myConfig logHandle = def
 ----------------------------------------------------------------------
 main = setEnv "BROWSER" "qutebrowser"
     >> setEnv "EDITOR" "nvim"
-    >> spawnPipe "/home/martin/.config/xmobar/xmobar"
+    >> spawnPipe "/home/martin/.local/bin/xmobar"
     >>= xmonad . docks . ewmh . ewmhFullscreen . myConfig
 

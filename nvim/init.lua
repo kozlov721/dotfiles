@@ -1,6 +1,5 @@
----@diagnostic disable: undefined-global
+---@diagnostic disable: undefined-global, unused-local
 
-vim.g.polyglot_disabled = {'python', 'haskell', 'markdown'}
 
 local Plug = vim.fn['plug#']
 
@@ -23,13 +22,12 @@ Plug 'rcarriga/nvim-notify'
 Plug 'rmagatti/goto-preview'
 Plug 'winston0410/range-highlight.nvim'
 Plug 'winston0410/cmd-parser.nvim'
--- Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate' })
+Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate' })
 Plug 'famiu/nvim-reload'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'mbbill/undotree'
 Plug 'mfussenegger/nvim-lint'
 Plug 'kosayoda/nvim-lightbulb'
-Plug 'sheerun/vim-polyglot'
 Plug 'tpope/vim-fugitive'
 Plug 'chrisbra/unicode.vim'
 Plug 'tpope/vim-sensible'
@@ -40,7 +38,7 @@ Plug 'scrooloose/nerdcommenter'
 Plug 'neovim/nvim-lspconfig'
 Plug('ms-jpq/coq_nvim', { branch = 'coq' })
 Plug('ms-jpq/coq.thirdparty', { branch = '3p' })
--- Plug('ms-jpq/coq.artifacts', { branch = 'artifacts' })
+Plug('ms-jpq/coq.artifacts', { branch = 'artifacts' })
 Plug 'mhinz/vim-signify'
 Plug 'windwp/nvim-autopairs'
 Plug 'junegunn/vim-easy-align'
@@ -56,14 +54,13 @@ Plug 'antoinemadec/FixCursorHold.nvim'
 Plug 'ibhagwan/fzf-lua'
 Plug 'kyazdani42/nvim-web-devicons'
 Plug 'bryanmylee/vim-colorscheme-icons'
-Plug 'inkarkat/vim-SyntaxRange'
+Plug 'sbdchd/neoformat'
 
 -- Python
 Plug('numirias/semshi', { ['do'] = ':UpdateRemotePlugins' })
 Plug 'Vimjas/vim-python-pep8-indent'
 
 -- Haskell
-Plug 'neovimhaskell/haskell-vim'
 Plug 'alx741/vim-stylishask'
 
 vim.call('plug#end')
@@ -133,7 +130,7 @@ local on_attach = function(client, bufnr)
 
   vim.diagnostic.config({ virtual_text=false })
 
-  if vim.fn.expand('%') ~= 'init.lua' then
+  if vim.fn.expand('%:t') ~= 'init.lua' then
     vim.cmd[[
       autocmd CursorHold   * silent lua vim.lsp.buf.document_highlight()
       autocmd CursorMoved  * silent lua vim.lsp.buf.clear_references()
@@ -156,6 +153,12 @@ for _, server in ipairs(servers) do
   })
 end
 
+require'nvim-treesitter.configs'.setup{
+ ensure_installed = "maintained",
+ sync_install = false,
+ highlight = { enable = true }
+}
+
 require('lualine').setup{
   options  = {theme = require('cassiopeia')},
   sections = {lualine_x = {'encoding', 'filetype'}},
@@ -169,12 +172,6 @@ require('lualine').setup{
   }
 }
 
---require'nvim-treesitter.configs'.setup{
---  ensure_installed = "maintained",
---  sync_install = false,
---  highlight = { enable = false }
---}
-
 vim.o.foldmethod    = 'expr'
 vim.o.spelllang     = 'en_us,cs'
 vim.o.wildmode      = 'longest,list,full'
@@ -187,6 +184,8 @@ vim.o.laststatus    = 2
 vim.o.textwidth     = 0
 vim.o.spell         = false
 vim.o.foldenable    = false
+vim.o.undofile      = true
+vim.o.undodir       = [[/home/martin/.config/nvim/undodir]]
 vim.o.expandtab     = true
 vim.o.smarttab      = true
 vim.o.autoindent    = true
@@ -209,8 +208,9 @@ vim.opt.listchars   = {trail = '»', tab = '»-'}
 vim.opt.fillchars:append('vert: ')
 
 vim.cmd('filetype plugin indent on')
-vim.cmd('colorscheme cassiopeia')
 
+vim.g.undotree_WindowLayout            = 2
+vim.g.undotree_SetFocusWhenToggle      = 1
 vim.g.code_action_menu_show_details    = false
 vim.g.vim_json_syntax_conceal          = 0
 vim.g.vim_markdown_conceal             = 0
@@ -272,9 +272,15 @@ map {'x', '-',         '$' }
 map {'x', '<leader>a', 'gaip*', noremap = false }
 map {'x', 'ga',        '<Plug>(EasyAlign)',      noremap = false }
 
-vim.cmd[[
-" @begin=vim@
 
+TrimWhiteSpace = function()
+  local save = vim.fn.winsaveview()
+  vim.cmd[[%s/\\\@<!\s\+$//e]]
+  vim.fn.winrestview(save)
+end
+
+
+vim.cmd[[
 " Filetype-Specific Configurations
 
 autocmd FileType html     setlocal shiftwidth=2 tabstop=2 softtabstop=2
@@ -285,12 +291,6 @@ autocmd FileType markdown setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType journal  setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType python   call
     \ nerdcommenter#SwitchToAlternativeDelimiters(1)
-
-function! TrimWhitespace()
-    let l:save = winsaveview()
-    %s/\\\@<!\s\+$//e
-    call winrestview(l:save)
-endfunction
 
 " Special execution bindings
 
@@ -317,12 +317,12 @@ set whichwrap+=<,>,h,l,[,],"<left>","<right>"
 set foldexpr=nvim_treesitter#foldexpr()
 
 autocmd BufEnter     * ColorHighlight
-autocmd BufWritePre  * call TrimWhitespace()
+autocmd BufWritePre  * lua TrimWhiteSpace()
 autocmd BufWritePost *ma007*.tex silent !pdflatex <afile>
 autocmd BufWritePost <buffer> lua require('lint').try_lint()
 autocmd CursorHold   * lua vim.diagnostic.open_float()
 autocmd VimEnter     * RainbowParentheses
-autocmd VimEnter init.lua call SyntaxRange#Include('@begin=vim@', '@end=vim@', 'vim', 'NonText')
 
-" @end=vim@
+
+colorscheme cassiopeia
 ]]

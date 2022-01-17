@@ -1,8 +1,9 @@
 #!/bin/bash
 
 PATH="$HOME/.local/bin:$PATH"
-PATH="$HOME/.cabal/bin:$PATH"
 PATH="$HOME/.ghcup/bin:$PATH"
+
+echo "Installing dependencies"
 
 yay -S --noconfirm       \
     kitty                \
@@ -55,12 +56,18 @@ chsh -s $(which fish)
 
 CONFIGS="kitty nvim xmobar xmonad macchina picom fish confedit qutebrowser ranger rofi"
 
+echo "Repopulating dotfiles"
+
 for DIR in $CONFIGS; do
+    echo "$DIR"
     cp -r "$DIR" "$HOME/.config/"
 done
 
-# Install vim-plug
+echo "Installing vim-plug"
+
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+
+echo "Copying scripts"
 
 mkdir "$HOME/.local/bin" || echo "~/.local/bin already exists"
 cp -r ./scripts/* "$HOME/.local/bin/"
@@ -69,24 +76,19 @@ cp ./mimeapps/mimeapps.list "$HOME/.config"
 
 cd "$HOME" || exit 1
 
+echo "Installing (some) haskell programs"
+
 ghcup install ghc
 ghcup set ghc 8.10.7
-ghcup install cabal
+ghcup install hls
 
-cabal update
+curl -sSL https://get.haskellstack.org/ | sh
 
-cabal install pandoc        \
-    ShellCheck              \
-    flippers                \
-    haskell-language-server \
-    stylish-haskell         \
-    text-format-simple      \
-    xmonad
-
-cabal install --lib xmonad xmonad-contrib
-cabal install xmobar --flags="all_extensions"
+stack install ShellCheck
 
 cd "$HOME/Downloads/" || exit 1
+
+echo "Installing anaconda"
 
 curl -O "https://repo.anaconda.com/archive/Anaconda3-2021.11-Linux-x86_64.sh"
 

@@ -1,0 +1,11 @@
+#!/bin/sh
+# comment out '-DPC' on smaller screens
+exec stack ghc -- \
+  --make xmonad.hs \
+  -i \
+  -ilib \
+  -DPC \
+  -fforce-recomp \
+  -main-is main \
+  -v0 \
+  -o "$1"
