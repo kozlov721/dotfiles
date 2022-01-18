@@ -48,7 +48,7 @@ Plug 'Pocco81/AutoSave.nvim'
 Plug 'antoinemadec/FixCursorHold.nvim'
 Plug 'kyazdani42/nvim-web-devicons'
 Plug 'bryanmylee/vim-colorscheme-icons'
-Plug 'nvim-telescope/telescope.nvim'
+Plug 'ibhagwan/fzf-lua'
 
 -- Python
 Plug('numirias/semshi', {['do'] = ':UpdateRemotePlugins'})
@@ -67,6 +67,33 @@ vim.g.coq_settings = {
 require('neoscroll').setup{}
 require("indent_blankline").setup {}
 require('range-highlight').setup{}
+require('fzf-lua').setup{
+    preview = {
+    border         = 'border',
+    wrap           = 'nowrap',
+    hidden         = 'nohidden',
+    vertical       = 'down:45%',
+    horizontal     = 'right:60%',
+    layout         = 'vertical',
+    flip_columns   = 120,
+    title          = true,
+    scrollbar      = 'float',
+    scrolloff      = '-2',
+    scrollchars    = {'█', '' },
+    delay          = 100,
+    winopts = {
+      number            = true,
+      relativenumber    = false,
+      cursorline        = true,
+      cursorlineopt     = 'both',
+      cursorcolumn      = false,
+      signcolumn        = 'no',
+      list              = false,
+      foldenable        = false,
+      foldmethod        = 'manual',
+    },
+  },
+}
 
 require('nvim-autopairs').setup{
   check_ts          = true,
@@ -287,9 +314,9 @@ map {'n' , '<space>'          , 'za'                                          }
 map {'n' , 'J'                , ':bprevious<CR>'                              }
 map {'n' , 'K'                , ':bnext<CR>'                                  }
 map {'n' , 'ga'               , '<Plug>(EasyAlign)' , noremap = false         }
-map {'n' , '<leader>ff'       , ':Telescope find_files<CR>'                   }
-map {'n' , '<leader>fg'       , ':Telescope live_grep<CR>'                    }
-map {'n' , '<leader>fb'       , ':Telescope buffers<CR>'                      }
+map {'n' , '<leader>fl'       , ':FzfLua lines<CR>'                           }
+map {'n' , '<leader>fbl'      , ':FzfLua blines<CR>'                          }
+map {'n' , '<leader>fb'       , ':FzfLua buffers<CR>'                         }
 -------------------------------------------------------------------------------
 -----------------------------Visual-Mode---------------------------------------
 -------------------------------------------------------------------------------
@@ -323,6 +350,7 @@ autocmd FileType python nmap <leader>x :w<CR>:execute
 autocmd FileType python nmap <leader>rn:      Semshi rename<CR>
 autocmd FileType python nmap <leader><Tab>:   Semshi goto name next<CR>
 autocmd FileType python nmap <leader><S-Tab>: Semshi goto name prev<CR>
+autocmd FileType markdown nmap <leader>gg :Glow<CR>
 
 autocmd VimEnter *xmobar/*.hs silent
     \ nmap <leader>x :w<CR>:execute

@@ -28,8 +28,8 @@ if status --is-interactive
     macchina
 end
 
-function zathura
-    tabbed -c -n "Zathura" zathura $argv -e
+function mdv
+    pandoc $argv[1] | lynx -stdin
 end
 
 eval /home/martin/anaconda3/bin/conda "shell.fish" "hook" $argv | source
@@ -39,5 +39,3 @@ source $HOME/.config/fish/fish_prompt.fish
 
 fish_add_path -P $HOME/.local/bin
 fish_add_path -P $HOME/.ghcup/bin
-
-conda activate dev

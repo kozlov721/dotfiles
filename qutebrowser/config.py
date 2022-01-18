@@ -59,7 +59,7 @@ c.url.searchengines = {
 c.url.start_pages = 'https://google.com'
 
 c.zoom.default = '150%'
-c.fonts.default_size = '11pt'
+c.fonts.default_size = '12pt'
 c.zoom.levels = [
     '25%', '33%', '50%', '67%', '75%',
     '90%', '100%', '110%', '125%', '135%',
@@ -82,8 +82,8 @@ config.unbind('u')
 
 config.bind('<Alt-j>',     'run-with-count 10 scroll down')
 config.bind('<Alt-k>',     'run-with-count 10 scroll up')
-config.bind('<Ctrl-d>',    'run-with-count 12 scroll down')
-config.bind('<Ctrl-u>',    'run-with-count 12 scroll up')
+config.bind('<Ctrl-d>',    'run-with-count 20 scroll down')
+config.bind('<Ctrl-u>',    'run-with-count 20 scroll up')
 config.bind('J',           'tab-prev')
 config.bind('K',           'tab-next')
 config.bind('X',           'undo')
