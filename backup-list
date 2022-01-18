@@ -26,8 +26,4 @@ xmobar      ~/.config/xmobar/xmobar.hs
 xmobar      ~/.config/xmobar/MyPlugins.hs
 xmobar      ~/.config/xmobar/build
 xmonad      ~/.config/xmonad/xmonad.hs
-<<<<<<< HEAD
-xmonad      ~/.config/xmonad/build
-=======
->>>>>>> 9897914bd1c97c7bbc8b5693107a2bf40027ed0b
 xsession    ~/.xsession
