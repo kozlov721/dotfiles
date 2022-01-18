@@ -1,6 +1,5 @@
 ---@diagnostic disable: undefined-global, unused-local
 
-
 local Plug = vim.fn['plug#']
 
 vim.call('plug#begin')
@@ -8,22 +7,19 @@ vim.call('plug#begin')
 -- Aesthetics
 Plug 'mhinz/vim-startify'
 Plug 'nvim-lualine/lualine.nvim'
-Plug 'Pocco81/TrueZen.nvim'
 Plug 'junegunn/vim-journal'
-Plug 'ellisonleao/glow.nvim'
-Plug 'junegunn/rainbow_parentheses.vim'
+Plug 'p00f/nvim-ts-rainbow'
 Plug 'xkozlov1/cassiopeia-vim'
 Plug 'lukas-reineke/indent-blankline.nvim'
-Plug('folke/tokyonight.nvim', { branch = 'main' })
 
 -- Functionalities
+Plug 'ellisonleao/glow.nvim'
+Plug 'Pocco81/TrueZen.nvim'
 Plug 'akinsho/toggleterm.nvim'
-Plug 'rcarriga/nvim-notify'
 Plug 'rmagatti/goto-preview'
 Plug 'winston0410/range-highlight.nvim'
 Plug 'winston0410/cmd-parser.nvim'
-Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate' })
-Plug 'famiu/nvim-reload'
+Plug('nvim-treesitter/nvim-treesitter', {['do'] = ':TSUpdate'})
 Plug 'nvim-lua/plenary.nvim'
 Plug 'mbbill/undotree'
 Plug 'mfussenegger/nvim-lint'
@@ -33,70 +29,75 @@ Plug 'chrisbra/unicode.vim'
 Plug 'tpope/vim-sensible'
 Plug 'blackcauldron7/surround.nvim'
 Plug 'majutsushi/tagbar'
-Plug('ms-jpq/chadtree', { branch = 'chad', ['do'] = 'python3 -m chadtree deps' })
+Plug('ms-jpq/chadtree', {branch = 'chad', ['do'] = 'python3 -m chadtree deps'})
 Plug 'scrooloose/nerdcommenter'
 Plug 'neovim/nvim-lspconfig'
-Plug('ms-jpq/coq_nvim', { branch = 'coq' })
-Plug('ms-jpq/coq.thirdparty', { branch = '3p' })
-Plug('ms-jpq/coq.artifacts', { branch = 'artifacts' })
+Plug('ms-jpq/coq_nvim', {branch = 'coq'})
+Plug('ms-jpq/coq.thirdparty', {branch = '3p'})
+Plug('ms-jpq/coq.artifacts', {branch = 'artifacts'})
 Plug 'mhinz/vim-signify'
 Plug 'windwp/nvim-autopairs'
 Plug 'junegunn/vim-easy-align'
 Plug 'alvan/vim-closetag'
 Plug 'weilbith/nvim-code-action-menu'
 Plug 'chrisbra/Colorizer'
-Plug('heavenshell/vim-pydocstring', { ['do'] = 'make install', ['for'] = 'python'})
 Plug 'dkarter/bullets.vim'
-Plug('tversteeg/registers.nvim', { branch = 'main'})
+Plug('tversteeg/registers.nvim', {branch = 'main'})
 Plug 'karb94/neoscroll.nvim'
 Plug 'Pocco81/AutoSave.nvim'
 Plug 'antoinemadec/FixCursorHold.nvim'
-Plug 'ibhagwan/fzf-lua'
 Plug 'kyazdani42/nvim-web-devicons'
 Plug 'bryanmylee/vim-colorscheme-icons'
-Plug 'sbdchd/neoformat'
+Plug 'nvim-telescope/telescope.nvim'
 
 -- Python
-Plug('numirias/semshi', { ['do'] = ':UpdateRemotePlugins' })
+Plug('numirias/semshi', {['do'] = ':UpdateRemotePlugins'})
 Plug 'Vimjas/vim-python-pep8-indent'
 
 -- Haskell
 Plug 'alx741/vim-stylishask'
+Plug 'neovimhaskell/haskell-vim'
 
 vim.call('plug#end')
 
-vim.notify = require("notify")
+vim.g.coq_settings = {
+  auto_start = 'shut-up'
+}
 
-vim.g.coq_settings = { auto_start = 'shut-up' }
-
-require('nvim-autopairs').setup{}
 require('neoscroll').setup{}
+require("indent_blankline").setup {}
+require('range-highlight').setup{}
+
+require('nvim-autopairs').setup{
+  check_ts          = true,
+  ignored_next_char = '[%w%.]'
+}
+
 require('goto-preview').setup{
   default_mappings = true
 }
+
 require('surround').setup{
   map_insert_mode       = false,
   space_on_closing_char = true
 }
-require("indent_blankline").setup {}
-require('range-highlight').setup{}
-require('autosave').setup{execution_message=''}
-require("toggleterm").setup{
+
+require('autosave').setup{
+  execution_message = '',
+  conditions = {
+    filename_is_not = {'picom.conf'}
+  }
+}
+
+require('toggleterm').setup{
   direction     = 'float',
   open_mapping  = [[<c-\>]],
   close_on_exit = false
 }
-require('lint').linters_by_ft = {
-  python = {'flake8'},
-  haskell = {'hlint'}
-}
-local reload = require('nvim-reload')
-reload.vim_reload_dirs = {
-  vim.fn.stdpath('config')
-}
 
-reload.lua_reload_dirs = {
-  vim.fn.stdpath('config')
+require('lint').linters_by_ft = {
+  python  = {'flake8'},
+  haskell = {'hlint'}
 }
 
 local map = function(key)
@@ -116,19 +117,20 @@ local map = function(key)
 end
 
 local on_attach = function(client, bufnr)
-  map {'n', '<C-k>',      '<cmd>lua vim.lsp.buf.signature_help()<CR>', buffer = bufnr }
-  map {'n', '<leader>b',  '<cmd>CodeActionMenu<CR>',                   buffer = bufnr }
-  map {'n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>',         buffer = bufnr }
-  map {'n', '<leader>f',  '<cmd>lua vim.lsp.buf.formatting()<CR>',     buffer = bufnr }
-  map {'n', 'H',          '<cmd>lua vim.lsp.buf.hover()<CR>',          buffer = bufnr }
-  map {'n', '[d',         '<cmd>lua vim.diagnostic.goto_prev()<CR>',   buffer = bufnr }
-  map {'n', ']d',         '<cmd>lua vim.diagnostic.goto_next()<CR>',   buffer = bufnr }
-  map {'n', 'gD',         '<cmd>lua vim.lsp.buf.declaration()<CR>',    buffer = bufnr }
-  map {'n', 'gd',         '<cmd>lua vim.lsp.buf.definition()<CR>',     buffer = bufnr }
-  map {'n', 'gi',         '<cmd>lua vim.lsp.buf.implementation()<CR>', buffer = bufnr }
-  map {'n', 'gr',         '<cmd>lua vim.lsp.buf.references()<CR>',     buffer = bufnr }
 
-  vim.diagnostic.config({ virtual_text=false })
+  map { 'n' , '<C-k>'      , '<cmd>lua vim.lsp.buf.signature_help()<CR>' , buffer = bufnr }
+  map { 'n' , '<leader>b'  , '<cmd>CodeActionMenu<CR>'                   , buffer = bufnr }
+  map { 'n' , '<leader>rn' , '<cmd>lua vim.lsp.buf.rename()<CR>'         , buffer = bufnr }
+  map { 'n' , '<leader>f'  , '<cmd>lua vim.lsp.buf.formatting()<CR>'     , buffer = bufnr }
+  map { 'n' , 'H'          , '<cmd>lua vim.lsp.buf.hover()<CR>'          , buffer = bufnr }
+  map { 'n' , '[d'         , '<cmd>lua vim.diagnostic.goto_prev()<CR>'   , buffer = bufnr }
+  map { 'n' , ']d'         , '<cmd>lua vim.diagnostic.goto_next()<CR>'   , buffer = bufnr }
+  map { 'n' , 'gD'         , '<cmd>lua vim.lsp.buf.declaration()<CR>'    , buffer = bufnr }
+  map { 'n' , 'gd'         , '<cmd>lua vim.lsp.buf.definition()<CR>'     , buffer = bufnr }
+  map { 'n' , 'gi'         , '<cmd>lua vim.lsp.buf.implementation()<CR>' , buffer = bufnr }
+  map { 'n' , 'gr'         , '<cmd>lua vim.lsp.buf.references()<CR>'     , buffer = bufnr }
+
+  vim.diagnostic.config({virtual_text=false})
 
   if vim.fn.expand('%:t') ~= 'init.lua' then
     vim.cmd[[
@@ -139,10 +141,11 @@ local on_attach = function(client, bufnr)
   end
 end
 
-local lsp = require'lspconfig'
-local coq = require'coq'
 
-local servers = { 'pyright', 'hls', 'vimls', 'sourcekit', 'sumneko_lua' }
+local coq = require'coq'
+local lsp = require'lspconfig'
+
+local servers = {'pyright', 'hls', 'vimls', 'sourcekit', 'sumneko_lua' }
 
 for _, server in ipairs(servers) do
   lsp[server].setup(coq.lsp_ensure_capabilities{
@@ -154,9 +157,26 @@ for _, server in ipairs(servers) do
 end
 
 require'nvim-treesitter.configs'.setup{
- ensure_installed = "maintained",
- sync_install = false,
- highlight = { enable = true }
+  ensure_installed = 'maintained',
+  sync_install     = false,
+  highlight        = {
+    enable         = true,
+    disable        = {}
+  },
+  rainbow = {
+    enable         = true,
+    extended_mode  = true,
+    max_file_lines = nil,
+    colors = {
+        '#DC241D',
+        '#A8A9A4',
+        '#DC55F9',
+        '#D7DB11',
+        '#68BD6A',
+        '#E64D0E',
+        '#4585C7'
+    }
+  }
 }
 
 require('lualine').setup{
@@ -177,6 +197,7 @@ vim.o.spelllang     = 'en_us,cs'
 vim.o.wildmode      = 'longest,list,full'
 vim.o.signcolumn    = 'number'
 vim.o.encoding      = 'utf-8'
+vim.o.undodir       = [[/home/martin/.config/nvim/undodir]]
 vim.o.tabstop       = 4
 vim.o.softtabstop   = 4
 vim.o.shiftwidth    = 4
@@ -185,7 +206,6 @@ vim.o.textwidth     = 0
 vim.o.spell         = false
 vim.o.foldenable    = false
 vim.o.undofile      = true
-vim.o.undodir       = [[/home/martin/.config/nvim/undodir]]
 vim.o.expandtab     = true
 vim.o.smarttab      = true
 vim.o.autoindent    = true
@@ -204,73 +224,79 @@ vim.o.hidden        = true
 vim.o.number        = true
 vim.o.title         = true
 vim.o.termguicolors = true
+
 vim.opt.listchars   = {trail = '»', tab = '»-'}
 vim.opt.fillchars:append('vert: ')
 
 vim.cmd('filetype plugin indent on')
 
-vim.g.undotree_WindowLayout            = 2
-vim.g.undotree_SetFocusWhenToggle      = 1
+vim.g.pydocstring_doq_path             = vim.env.HOME .. '/anaconda3/envs/nvim/bin/doq'
+vim.g.python3_host_prog                = vim.env.HOME .. '/anaconda3/envs/nvim/bin/python'
+vim.g.cursorhold_updatetime            = 100
+vim.g.haskell_indent_guard             = 4
+vim.g.haskell_indent_after_bare_where  = 2
+vim.g.haskell_indent_before_where      = 2
+vim.g.haskell_indent_case_alternative  = 1
+vim.g.haskell_indent_if                = 0
+vim.g.haskell_indent_in                = 0
+vim.g.NERDSpaceDelims                  = 1
+vim.g.cassiopeia_enable_italic         = 1
 vim.g.code_action_menu_show_details    = false
+vim.g.startify_fortune_use_unicode     = 1
+vim.g.stylishask_on_save               = 0
+vim.g.undotree_SetFocusWhenToggle      = 1
+vim.g.undotree_WindowLayout            = 2
 vim.g.vim_json_syntax_conceal          = 0
 vim.g.vim_markdown_conceal             = 0
 vim.g.vim_markdown_conceal_code_blocks = 0
-vim.g.tagbar_width                     = 30
-vim.env.BAT_THEME                      = 'base16'
-vim.g.startify_fortune_use_unicode     = 1
-vim.g.cursorhold_updatetime            = 100
-vim.g.NERDSpaceDelims                  = 1
-vim.g.cassiopeia_enable_italic         = 1
 vim.g.tex_conceal                      = ''
-vim.g.python3_host_prog                = vim.env.HOME .. '/anaconda3/envs/nvim/bin/python'
-vim.g.pydocstring_doq_path             = vim.env.HOME .. '/anaconda3/envs/nvim/bin/doq'
-vim.g.auto_save                        = 1
-vim.g.auto_save_silent                 = 1
-vim.g.haskell_indent_before_where      = 2
-vim.g.haskell_indent_after_bare_where  = 2
-vim.g.haskell_indent_guard             = 4
-vim.g.haskell_indent_if                = 0
-vim.g.haskell_indent_in                = 0
-vim.g.haskell_indent_case_alternative  = 1
-vim.g.stylishask_on_save               = 0
 vim.g.mapleader                        = ','
 
-map {'i', '<C-s>',           '<ESC>:w<CR>i' }
-map {'i', 'ii',              '<ESC>' }
-
-map {'n', '-',               '$' }
-map {'n', '<S-Tab>',         ':bprevious<CR>' }
-map {'n', '<Tab>',           ':bnext<CR>' }
-map {'n', '<leader><space>', 'vip<space>',        noremap = false}
-map {'n', '<leader><leader>',':noh<CR>'}
-map {'n', '<leader>O',       'O<ESC>' }
-map {'n', '<leader>V',       'V<C-g>' }
-map {'n', '<leader>a',       'gaip*' }
-map {'n', '<leader>b',       '<Plug>(coc-codeaction)' }
-map {'n', '<leader>e',       ':UndotreeToggle<CR>' }
-map {'n', '<leader>g',       ':TZAtaraxis l10 r10 t2 b2<CR>' }
-map {'n', '<leader>o',       'o<ESC>' }
-map {'n', '<leader>p',       '<Plug>(pydocstring)' }
-map {'n', '<leader>q',       ':CHADopen<CR>' }
-map {'n', '<leader>r',       ':Restart<CR><leader><leader>', noremap = false }
-map {'n', '<leader>s',       ':%s/' }
-map {'n', '<leader>term',    '<C-w>s<C-w>j:terminal<CR>:set nonumber<CR>:resize 12<CR><S-a>' }
-map {'n', '<leader>ts',      ':set nospell!<CR>' }
-map {'n', '<leader>tt',      ':call TrimWhitespace()<CR>' }
-map {'n', '<leader>un',      ':UnicodeSearch!' }
-map {'n', '<leader>vip',     'vip<C-g>' }
-map {'n', '<leader>viw',     'viw<C-g>' }
-map {'n', '<leader>w',       ':TagbarToggle<CR>' }
-map {'n', '<silent>',        '<leader><leader> :noh<CR>' }
-map {'n', '<space>',         'za' }
-map {'n', 'J',               ':bprevious<CR>' }
-map {'n', 'K',               ':bnext<CR>' }
-map {'n', 'ga',              '<Plug>(EasyAlign)', noremap = false }
-
-map {'x', '<space>',   'zf' }
-map {'x', '-',         '$' }
-map {'x', '<leader>a', 'gaip*', noremap = false }
-map {'x', 'ga',        '<Plug>(EasyAlign)',      noremap = false }
+-------------------------------------------------------------------------------
+-----------------------------Insert-Mode---------------------------------------
+-------------------------------------------------------------------------------
+map {'i' , '<C-s>'            , '<ESC>:w<CR>i'                                }
+map {'i' , 'ii'               , '<ESC>'                                       }
+-------------------------------------------------------------------------------
+-----------------------------Normal-Mode---------------------------------------
+-------------------------------------------------------------------------------
+map {'n' , '-'                , '$'                                           }
+map {'n' , '<S-Tab>'          , ':bprevious<CR>'                              }
+map {'n' , '<Tab>'            , ':bnext<CR>'                                  }
+map {'n' , '<leader><space>'  , 'vipza'                                       }
+map {'n' , '<leader><leader>' , ':noh<CR>'                                    }
+map {'n' , '<leader>O'        , 'O<ESC>'                                      }
+map {'n' , '<leader>V'        , 'V<C-g>'                                      }
+map {'n' , '<leader>a'        , 'gaip*'                                       }
+map {'n' , '<leader>b'        , '<Plug>(coc-codeaction)'                      }
+map {'n' , '<leader>e'        , ':UndotreeToggle<CR>'                         }
+map {'n' , '<leader>g'        , ':TZAtaraxis l10 r10 t2 b2<CR>'               }
+map {'n' , '<leader>o'        , 'o<ESC>'                                      }
+map {'n' , '<leader>p'        , '<Plug>(pydocstring)'                         }
+map {'n' , '<leader>q'        , ':CHADopen<CR>'                               }
+map {'n' , '<leader>r'        , ':source ~/.config/nvim/init.lua<CR>:noh<CR>' }
+map {'n' , '<leader>s'        , ':%s/'                                        }
+map {'n' , '<leader>ts'       , ':set nospell!<CR>'                           }
+map {'n' , '<leader>tt'       , ':call TrimWhitespace()<CR>'                  }
+map {'n' , '<leader>un'       , ':UnicodeSearch!'                             }
+map {'n' , '<leader>vip'      , 'vip<C-g>'                                    }
+map {'n' , '<leader>viw'      , 'viw<C-g>'                                    }
+map {'n' , '<leader>w'        , ':TagbarToggle<CR>'                           }
+map {'n' , '<silent>'         , '<leader><leader> :noh<CR>'                   }
+map {'n' , '<space>'          , 'za'                                          }
+map {'n' , 'J'                , ':bprevious<CR>'                              }
+map {'n' , 'K'                , ':bnext<CR>'                                  }
+map {'n' , 'ga'               , '<Plug>(EasyAlign)' , noremap = false         }
+map {'n' , '<leader>ff'       , ':Telescope find_files<CR>'                   }
+map {'n' , '<leader>fg'       , ':Telescope live_grep<CR>'                    }
+map {'n' , '<leader>fb'       , ':Telescope buffers<CR>'                      }
+-------------------------------------------------------------------------------
+-----------------------------Visual-Mode---------------------------------------
+-------------------------------------------------------------------------------
+map {'x' , '<space>'          , 'zf'                                          }
+map {'x' , '-'                , '$'                                           }
+map {'x' , '<leader>a'        , 'gaip*'             , noremap = false         }
+map {'x' , 'ga'               , '<Plug>(EasyAlign)' , noremap = false         }
 
 
 TrimWhiteSpace = function()
@@ -279,9 +305,8 @@ TrimWhiteSpace = function()
   vim.fn.winrestview(save)
 end
 
-
+-- not happy about this
 vim.cmd[[
-" Filetype-Specific Configurations
 
 autocmd FileType html     setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType lua      setlocal shiftwidth=2 tabstop=2 softtabstop=2
@@ -292,12 +317,9 @@ autocmd FileType journal  setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType python   call
     \ nerdcommenter#SwitchToAlternativeDelimiters(1)
 
-" Special execution bindings
 
 autocmd FileType python nmap <leader>x :w<CR>:execute
     \ '!python ' . expand('%:p')<CR>
-autocmd FileType python nmap <leader>X :w<CR>:execute
-    \ '!flake8 ' . expand('%:p')
 autocmd FileType python nmap <leader>rn:      Semshi rename<CR>
 autocmd FileType python nmap <leader><Tab>:   Semshi goto name next<CR>
 autocmd FileType python nmap <leader><S-Tab>: Semshi goto name prev<CR>
@@ -316,13 +338,12 @@ autocmd VimEnter *picom.conf silent let g:auto_save = 0
 set whichwrap+=<,>,h,l,[,],"<left>","<right>"
 set foldexpr=nvim_treesitter#foldexpr()
 
-autocmd BufEnter     * ColorHighlight
+autocmd FileType     * ColorToggle
+autocmd FileType     * ColorSwapFgBg
 autocmd BufWritePre  * lua TrimWhiteSpace()
 autocmd BufWritePost *ma007*.tex silent !pdflatex <afile>
 autocmd BufWritePost <buffer> lua require('lint').try_lint()
 autocmd CursorHold   * lua vim.diagnostic.open_float()
-autocmd VimEnter     * RainbowParentheses
-
 
 colorscheme cassiopeia
 ]]

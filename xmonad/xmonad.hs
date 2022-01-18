@@ -386,9 +386,16 @@ myManageHook = composeAll
 #else
         x = (1/8)
 #endif
-        centered = ["Vimb", "Skype", "Caprine", "kitty-float", "qBittorrent"]
+        centered = [ "Vimb"
+                   , "Skype"
+                   , "Caprine"
+                   , "kitty-float"
+                   , "qBittorrent"
+                   , "Gpick"
+                   , "gpick"
+                   ]
 #ifdef PC
-            ++ ["Spotify", "discord", "Thunar"]
+            ++ ["Spotify", "spotify", "discord", "Thunar"]
 #else
             ++ ["kitty-dropdown"]
 #endif
