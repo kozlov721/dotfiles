@@ -1,5 +1,5 @@
 alacritty      ~/.config/alacritty/alacritty.yml
-confedit       ~/.config/confedit.list
+confedit       ~/.config/confedit/confedit.list
 fish           ~/.config/fish/config.fish
 kitty          ~/.config/kitty/kitty.conf
 kitty-theme    ~/.config/kitty/current.theme
@@ -7,7 +7,8 @@ neofetch       ~/.config/neofetch/config.conf
 picom          ~/.config/picom/picom.conf
 qutebrowser    ~/.config/qutebrowser/config.py
 ranger         ~/.config/ranger/rifle.conf
-vim            ~/.config/nvim/init.vim
+vim            ~/.config/nvim/init.lua
+nvim           ~/.config/nvim/init.lua
 xmobar         ~/.config/xmobar/xmobar.hs
 xmobar-plugins ~/.config/xmobar/MyPlugins.hs
 xmonad         ~/.config/xmonad/xmonad.hs
