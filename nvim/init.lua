@@ -13,6 +13,11 @@ Plug 'xkozlov1/cassiopeia-vim'
 Plug 'lukas-reineke/indent-blankline.nvim'
 
 -- Functionalities
+Plug 'wellle/targets.vim'
+Plug 'sbdchd/neoformat'
+-- Plug 'kana/vim-textobj-user'
+-- Plug 'sgur/vim-textobj-parameter'
+Plug 'AckslD/nvim-revJ.lua'
 Plug 'ellisonleao/glow.nvim'
 Plug 'Pocco81/TrueZen.nvim'
 Plug 'akinsho/toggleterm.nvim'
@@ -27,7 +32,7 @@ Plug 'kosayoda/nvim-lightbulb'
 Plug 'tpope/vim-fugitive'
 Plug 'chrisbra/unicode.vim'
 Plug 'tpope/vim-sensible'
-Plug 'blackcauldron7/surround.nvim'
+-- Plug 'blackcauldron7/surround.nvim'
 Plug 'majutsushi/tagbar'
 Plug('ms-jpq/chadtree', {branch = 'chad', ['do'] = 'python3 -m chadtree deps'})
 Plug 'scrooloose/nerdcommenter'
@@ -35,7 +40,7 @@ Plug 'neovim/nvim-lspconfig'
 Plug('ms-jpq/coq_nvim', {branch = 'coq'})
 Plug('ms-jpq/coq.thirdparty', {branch = '3p'})
 Plug('ms-jpq/coq.artifacts', {branch = 'artifacts'})
-Plug 'mhinz/vim-signify'
+-- Plug 'mhinz/vim-signify'
 Plug 'windwp/nvim-autopairs'
 Plug 'junegunn/vim-easy-align'
 Plug 'alvan/vim-closetag'
@@ -95,6 +100,16 @@ require('fzf-lua').setup{
   },
 }
 
+require("revj").setup{
+  add_seperator_for_last_parameter = false,
+  enable_default_keymaps = true,
+  keymaps = {
+        operator = '<leader>J', -- for operator (+motion)
+        line = '<leader>j', -- for formatting current line
+        visual = '<leader>j', -- for formatting visual selection
+    }
+}
+
 require('nvim-autopairs').setup{
   check_ts          = true,
   ignored_next_char = '[%w%.]'
@@ -104,10 +119,10 @@ require('goto-preview').setup{
   default_mappings = true
 }
 
-require('surround').setup{
-  map_insert_mode       = false,
-  space_on_closing_char = true
-}
+-- require('surround').setup{
+--  map_insert_mode       = false,
+--  space_on_closing_char = true
+-- }
 
 require('autosave').setup{
   execution_message = '',
@@ -219,7 +234,7 @@ require('lualine').setup{
   }
 }
 
-vim.o.foldmethod    = 'expr'
+vim.o.foldmethod    = 'manual'
 vim.o.spelllang     = 'en_us,cs'
 vim.o.wildmode      = 'longest,list,full'
 vim.o.signcolumn    = 'number'
@@ -259,6 +274,7 @@ vim.cmd('filetype plugin indent on')
 
 vim.g.pydocstring_doq_path             = vim.env.HOME .. '/anaconda3/envs/nvim/bin/doq'
 vim.g.python3_host_prog                = vim.env.HOME .. '/anaconda3/envs/nvim/bin/python'
+vim.g.neoformat_enabled_python         = {'yapf'}
 vim.g.cursorhold_updatetime            = 100
 vim.g.haskell_indent_guard             = 4
 vim.g.haskell_indent_after_bare_where  = 2
@@ -284,6 +300,8 @@ vim.g.mapleader                        = ','
 -------------------------------------------------------------------------------
 map {'i' , '<C-s>'            , '<ESC>:w<CR>i'                                }
 map {'i' , 'ii'               , '<ESC>'                                       }
+map {'i' , '<PageUp>'         , '<NOP>'                                       }
+map {'i' , '<PageDown>'       , '<NOP>'                                       }
 -------------------------------------------------------------------------------
 -----------------------------Normal-Mode---------------------------------------
 -------------------------------------------------------------------------------
@@ -317,9 +335,13 @@ map {'n' , 'ga'               , '<Plug>(EasyAlign)' , noremap = false         }
 map {'n' , '<leader>fl'       , ':FzfLua lines<CR>'                           }
 map {'n' , '<leader>fbl'      , ':FzfLua blines<CR>'                          }
 map {'n' , '<leader>fb'       , ':FzfLua buffers<CR>'                         }
+map {'n' , '<PageUp>'         , '<c-b>', noremap = false                      }
+map {'n' , '<PageDown>'       , '<c-f>', noremap = false                      }
 -------------------------------------------------------------------------------
 -----------------------------Visual-Mode---------------------------------------
 -------------------------------------------------------------------------------
+map {'x' , '<PageUp>'         , '<NOP>'                                       }
+map {'x' , '<PageDown>'       , '<NOP>'                                       }
 map {'x' , '<space>'          , 'zf'                                          }
 map {'x' , '-'                , '$'                                           }
 map {'x' , '<leader>a'        , 'gaip*'             , noremap = false         }

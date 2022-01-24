@@ -123,8 +123,9 @@ mySearchEngine = searchEngineF "" searchFunc
 
 ----------------------------------------------------------------------
 -- BEGIN BINDINGS
-myKeys conf@XConfig { XMonad.modMask  = modm
-                    , XMonad.terminal = term
+myKeys conf@XConfig { XMonad.modMask    = modm
+                    , XMonad.terminal   = term
+                    , XMonad.workspaces = workspaces
                     } = M.fromList $
     let flashText_ c = flashText c (3/4)
         runProcessAndTrim p f i = trim <$> runProcessWithInput p f i
@@ -171,22 +172,26 @@ myKeys conf@XConfig { XMonad.modMask  = modm
     ]
     ++
     -- Spawn certain apps on certain workspaces
+    let runAndShift w c = sequence_ [spawnOn w c, windows (W.greedyView w)]
+    in
     [ ( (modm .|. m, k)
-      , sequence_ [spawnOn w c, windows (W.greedyView w)]
+      , case q of
+          Nothing -> runAndShift w c
+          Just q -> raiseMaybe (runAndShift w c) (className =? q)
       )
-    | ((m, k), w, c) <- zip3
-        [ (0, xK_Return)       -- term
-        , (0, xK_w)            -- web
-        , (0, xK_r)            -- files
-        , (0, xK_s)            -- music
-        , (altMask, xK_o)      -- documents
-        , (altMask, xK_Return) -- free
-        , (altMask, xK_s)      -- calls
-        , (0, xK_v)            -- video
-        , (0, xK_d)            -- chat
-        , (0, xK_b)            -- development
+    | ((m, k, q), w, c) <- zip3
+        [ (0,       xK_Return, Nothing           ) -- term
+        , (0,       xK_w,      Just "qutebrowser") -- web
+        , (0,       xK_r,      Just "Thunar"     ) -- files
+        , (0,       xK_s,      Just "Spotify"    ) -- music
+        , (altMask, xK_o,      Nothing           ) -- documents
+        , (altMask, xK_Return, Nothing           ) -- free
+        , (altMask, xK_s,      Just "Skype"      ) -- calls
+        , (0,       xK_v,      Just "vlc"        ) -- video
+        , (0,       xK_d,      Just "discord"    ) -- chat
+        , (0,       xK_b,      Nothing           ) -- development
         ]
-        (XMonad.workspaces conf)
+        workspaces
         workspacesApps
     ]
     ++
@@ -216,12 +221,12 @@ myKeys conf@XConfig { XMonad.modMask  = modm
       )
     , ((modm, xK_o), inputPrompt myPromptConfig "Web search"
         ?+ \s -> windows
-                 (W.greedyView (XMonad.workspaces conf !! 1))
+                 (W.greedyView (workspaces !! 1))
                  >> liftIO getBrowser
                  >>= flip3 search s searchFunc
       )
     , ((modm .|. shiftMask, xK_g), windows
-        (W.greedyView (XMonad.workspaces conf !! 1))
+        (W.greedyView (workspaces !! 1))
         >> selectSearch mySearchEngine)
     -- Open shell prompt
     , ((modm, xK_p), shellPrompt myPromptConfig)
@@ -305,9 +310,7 @@ myKeys conf@XConfig { XMonad.modMask  = modm
     -- mod-shift-[1..0], move client to workspace N
     let shiftAndFocus i = W.greedyView i . W.shift i in
     [ ((m .|. modm, k), f i)
-        | (i, k) <- zip
-            (XMonad.workspaces conf)
-            $ [xK_1..xK_9] ++ [xK_0]
+        | (i, k) <- zip workspaces $ [xK_1..xK_9] ++ [xK_0]
         , (f, m) <- [ (toggleOrDoSkip ["hid"] W.greedyView, 0)
                     , (windows . shiftAndFocus, shiftMask)
                     , (windows . W.shift, controlMask)
