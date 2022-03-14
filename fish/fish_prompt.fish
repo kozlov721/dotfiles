@@ -62,7 +62,7 @@ end
 
 function fish_prompt
   set -l st $status
-  set prompt_symbol "\$"
+  set prompt_symbol "λ"
   if [ $st -ne 0 ]
       set prompt_symbol (set_color red)"✘"(set_color normal)
   end
