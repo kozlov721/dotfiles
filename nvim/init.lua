@@ -1,136 +1,193 @@
 ---@diagnostic disable: undefined-global, unused-local
-
-local Plug = vim.fn['plug#']
-
-vim.call('plug#begin')
-
--- Aesthetics
-Plug 'mhinz/vim-startify'
-Plug 'nvim-lualine/lualine.nvim'
-Plug 'junegunn/vim-journal'
-Plug 'p00f/nvim-ts-rainbow'
-Plug 'kozlov721/cassiopeia-vim'
-Plug 'lukas-reineke/indent-blankline.nvim'
-
--- Functionalities
-Plug 'jesseleite/vim-noh'
-Plug 'ellisonleao/glow.nvim'
-Plug 'akinsho/toggleterm.nvim'
-Plug 'rmagatti/goto-preview'
-Plug 'winston0410/range-highlight.nvim'
-Plug 'winston0410/cmd-parser.nvim'
-Plug('nvim-treesitter/nvim-treesitter', {['do'] = ':TSUpdate'})
-Plug 'nvim-lua/plenary.nvim'
-Plug 'mbbill/undotree'
-Plug 'mfussenegger/nvim-lint'
-Plug 'kosayoda/nvim-lightbulb'
-Plug 'tpope/vim-fugitive'
-Plug 'chrisbra/unicode.vim'
-Plug 'tpope/vim-sensible'
-Plug 'blackcauldron7/surround.nvim'
-Plug('ms-jpq/chadtree', {branch = 'chad', ['do'] = 'python3 -m chadtree deps'})
-Plug 'scrooloose/nerdcommenter'
-Plug 'neovim/nvim-lspconfig'
-Plug('ms-jpq/coq_nvim', {branch = 'coq'})
-Plug('ms-jpq/coq.thirdparty', {branch = '3p'})
-Plug('ms-jpq/coq.artifacts', {branch = 'artifacts'})
-Plug 'mhinz/vim-signify'
-Plug 'windwp/nvim-autopairs'
-Plug 'junegunn/vim-easy-align'
-Plug 'alvan/vim-closetag'
-Plug 'weilbith/nvim-code-action-menu'
-Plug 'norcalli/nvim-colorizer.lua'
-Plug 'dkarter/bullets.vim'
-Plug('tversteeg/registers.nvim', {branch = 'main'})
-Plug 'Pocco81/AutoSave.nvim'
-Plug 'antoinemadec/FixCursorHold.nvim'
-Plug 'kyazdani42/nvim-web-devicons'
-Plug 'bryanmylee/vim-colorscheme-icons'
-Plug 'ibhagwan/fzf-lua'
-Plug 'karb94/neoscroll.nvim'
-Plug 'max397574/better-escape.nvim'
-Plug 'echasnovski/mini.nvim'
-
--- Python
-Plug('numirias/semshi', {['do'] = ':UpdateRemotePlugins'})
-Plug 'Vimjas/vim-python-pep8-indent'
-
--- Haskell
-Plug 'alx741/vim-stylishask'
-Plug 'neovimhaskell/haskell-vim'
-
-vim.call('plug#end')
-
-vim.g.coq_settings = {
-  auto_start = 'shut-up'
-}
-
 vim.o.termguicolors = true
 
-require('mini.surround').setup{}
-require('colorizer').setup{}
-require('neoscroll').setup{}
-require("indent_blankline").setup{}
-require('range-highlight').setup{}
-require('fzf-lua').setup{
-    preview = {
-    border         = 'border',
-    wrap           = 'nowrap',
-    hidden         = 'nohidden',
-    vertical       = 'down:45%',
-    horizontal     = 'right:60%',
-    layout         = 'vertical',
-    flip_columns   = 120,
-    title          = true,
-    scrollbar      = 'float',
-    scrolloff      = '-2',
-    scrollchars    = {'█', '' },
-    delay          = 100,
-    winopts = {
-      number            = true,
-      relativenumber    = false,
-      cursorline        = true,
-      cursorlineopt     = 'both',
-      cursorcolumn      = false,
-      signcolumn        = 'no',
-      list              = false,
-      foldenable        = false,
-      foldmethod        = 'manual',
-    },
-  },
-}
+local setup = function(name, opts)
+  opts = opts or {}
+  require(name).setup(opts)
+end
 
-require('better_escape').setup{
-  mapping = {'jk', 'ii'}
-}
+require('packer').startup(
+  function()
+    use {'mhinz/vim-startify'}
+    use {'nvim-lualine/lualine.nvim',
+      config = setup('lualine', {
+          options  = {theme = require('cassiopeia')},
+          sections = {lualine_x = {'filetype'}},
+          tabline  = {
+            lualine_a = {'buffers'},
+            lualine_b = {},
+            lualine_c = {'branch'},
+            lualine_x = {},
+            lualine_y = {},
+            lualine_z = {}
+          }
+        })
+    }
+    use {'phaazon/hop.nvim',
+      branch = 'v1',
+      config = setup('hop', {keys = 'etovxqpdygfblzhckisuran'})
+    }
+    use {'junegunn/vim-journal'}
+    use {'p00f/nvim-ts-rainbow'}
+    use {'kozlov721/cassiopeia-vim'}
+    use {'lukas-reineke/indent-blankline.nvim',
+      config = setup('indent_blankline')
+    }
+    use {'michaelb/sniprun', run = 'bash ./install.sh'}
+    use {'jesseleite/vim-noh'}
+    use {'ellisonleao/glow.nvim', ft = {'markdown'}}
+    use {'akinsho/toggleterm.nvim',
+      config = setup('toggleterm', {
+          direction     = 'float',
+          open_mapping  = [[<c-\>]],
+          close_on_exit = false
+        })
+    }
+    use {'rmagatti/goto-preview',
+      config = setup('goto-preview', {
+          default_mappings = true
+        })
+    }
+    use {'winston0410/range-highlight.nvim',
+      config = setup('range-highlight')
+    }
+    use {'winston0410/cmd-parser.nvim'}
+    use {'nvim-treesitter/nvim-treesitter',
+      run = ':TSUpdate',
+      config = setup('nvim-treesitter.configs', {
+          ensure_installed = 'maintained',
+          sync_install     = false,
+          highlight        = {
+            enable  = true,
+            disable = {}
+          },
+          rainbow = {
+            enable         = true,
+            extended_mode  = true,
+            max_file_lines = nil,
+            colors = {
+                '#DC241D',
+                '#DC55F9',
+                '#D7DB11',
+                '#68BD6A',
+                '#E64D0E',
+                '#4585C7',
+                '#A8A9A4',
+            }
+          }
+        })
+    }
+    use {'chentau/marks.nvim',
+      config = setup('marks')
+    }
+    use {'nvim-lua/plenary.nvim'}
+    use {'mbbill/undotree'}
 
-require('goto-preview').setup{
-  default_mappings = true
-}
+    use {'mfussenegger/nvim-lint',
+      config = function()
+        require('lint').linters_by_ft = {
+          python  = {'flake8'},
+          haskell = {'hlint'},
+          c       = {'cppcheck'},
+          sh      = {'shellcheck'},
+        }
+      end
+    }
+    use {'kosayoda/nvim-lightbulb'}
+    use {'tpope/vim-fugitive'}
+    use {'chrisbra/unicode.vim'}
+    use {'tpope/vim-sensible'}
+    use {'ms-jpq/chadtree',
+      branch = 'chad',
+      run = 'python3 -m chadtree deps'
+    }
+    use {'scrooloose/nerdcommenter'}
+    use {'neovim/nvim-lspconfig'}
+    use {'ms-jpq/coq_nvim', branch = 'coq'}
+    use {'ms-jpq/coq.thirdparty', branch = '3p'}
+    use {'ms-jpq/coq.artifacts', branch = 'artifacts'}
+    use {'mhinz/vim-signify'}
+    use {'windwp/nvim-autopairs',
+     config = setup('nvim-autopairs', {
+         map_c             = false,
+         check_ts          = true,
+         ignored_next_char = '[%w%.]',
+       })
+    }
+    use {'junegunn/vim-easy-align'}
+    use {'alvan/vim-closetag'}
+    use {'weilbith/nvim-code-action-menu'}
+    use {'norcalli/nvim-colorizer.lua',
+      config = setup('colorizer')
+    }
+    use {'dkarter/bullets.vim'}
+    use {'tversteeg/registers.nvim', branch = 'main'}
+    use {'Pocco81/AutoSave.nvim',
+      config = setup('autosave', {
+          execution_message = '',
+          conditions = {
+            filename_is_not = {'picom.conf'}
+          }
+        })
+    }
+    use {'antoinemadec/FixCursorHold.nvim'}
+    use {'kyazdani42/nvim-web-devicons'}
+    use {'bryanmylee/vim-colorscheme-icons'}
+    use {'ibhagwan/fzf-lua',
+      requires = {'kyazdani42/nvim-web-devicons'},
+      config = setup('fzf-lua', {
+            preview = {
+            border         = 'border',
+            wrap           = 'nowrap',
+            hidden         = 'nohidden',
+            vertical       = 'down:45%',
+            horizontal     = 'right:60%',
+            layout         = 'vertical',
+            flip_columns   = 120,
+            title          = true,
+            scrollbar      = 'float',
+            scrolloff      = '-2',
+            scrollchars    = {'█', '' },
+            delay          = 100,
+            winopts = {
+              number            = true,
+              relativenumber    = false,
+              cursorline        = true,
+              cursorlineopt     = 'both',
+              cursorcolumn      = false,
+              signcolumn        = 'no',
+              list              = false,
+              foldenable        = false,
+              foldmethod        = 'manual',
+            },
+          },
+        })
+    }
+    use {'karb94/neoscroll.nvim',
+      config = setup('neoscroll')
+    }
+    use {'max397574/better-escape.nvim',
+      config = setup('better_escape', {
+          mapping = {'jk'}
+        })
+    }
+    use {'echasnovski/mini.nvim',
+      config = setup('mini.surround')
+    }
+    use {'lewis6991/spellsitter.nvim',
+      config = setup('spellsitter')
+    }
+    -- Python
+    use {'numirias/semshi', run = ':UpdateRemotePlugins'}
+    use {'Vimjas/vim-python-pep8-indent'}
+    -- Haskell
+    use {'alx741/vim-stylishask'}
+    use {'neovimhaskell/haskell-vim'}
+  end
+)
 
-require('surround').setup{
-  map_insert_mode       = false,
-  space_on_closing_char = true
-}
-
-require('autosave').setup{
-  execution_message = '',
-  conditions = {
-    filename_is_not = {'picom.conf'}
-  }
-}
-
-require('toggleterm').setup{
-  direction     = 'float',
-  open_mapping  = [[<c-\>]],
-  close_on_exit = false
-}
-
-require('lint').linters_by_ft = {
-  python  = {'flake8'},
-  haskell = {'hlint'},
-  c       = {'cppcheck'},
-  sh      = {'shellcheck'},
+vim.g.coq_settings = {
+auto_start = 'shut-up'
 }
 
 local map     = vim.api.nvim_set_keymap
@@ -152,9 +209,9 @@ local on_attach = function(client, bn)
 
   vim.diagnostic.config({virtual_text=false})
 
-  autocmd("CursorHold",  {callback = vim.lsp.buf.document_highlight})
-  autocmd("CursorMoved", {callback = vim.lsp.buf.clear_references})
-  autocmd("CursorHold",  {callback = require'nvim-lightbulb'.update_lightbulb})
+  autocmd('CursorHold',  {callback = vim.lsp.buf.document_highlight})
+  autocmd('CursorMoved', {callback = vim.lsp.buf.clear_references})
+  autocmd('CursorHold',  {callback = require'nvim-lightbulb'.update_lightbulb})
 end
 
 local coq = require'coq'
@@ -172,82 +229,40 @@ local servers = {
 for _, server in ipairs(servers) do
   lsp[server].setup(coq.lsp_ensure_capabilities{
     on_attach = on_attach,
-    flags = {
-      debounce_text_changes = 150,
-    }
+    flags = {debounce_text_changes = 150}
   })
 end
 
-local npairs = require('nvim-autopairs')
-
-npairs.setup({
-  map_c             = false,
-  check_ts          = true,
-  ignored_next_char = '[%w%.]',
-})
-
 ------ To make nvim-autopairs work with coq ------
+local npairs = require('nvim-autopairs')
 _G.MUtils= {}
 vim.g.coq_settings = {keymap = {recommended = false}}
 
 map('i', '<Esc>',   [[pumvisible() ? "\<C-e><Esc>" : "\<Esc>"]],
-  {silent = true, expr = true})
+ {silent = true, expr = true})
 map('i', '<Tab>',   [[pumvisible() ? "\<C-n>" : "\<Tab>"]],
-  {silent = true, expr = true})
+ {silent = true, expr = true})
 map('i', '<S-Tab>', [[pumvisible() ? "\<C-p>" : "\<BS>"]],
-  {silent = true, expr = true})
+ {silent = true, expr = true})
+map('i', '<c-c>', [[pumvisible() ? "<c-e><c-c>" : "<c-c>"]],
+  {expr = true, noremap = true})
+
 
 MUtils.CR = function()
-  if vim.fn.pumvisible() ~= 0 then
-    if vim.fn.complete_info({ 'selected' }).selected ~= -1 then
-      return npairs.esc('<c-y>')
-    else
-      return npairs.esc('<c-e>') .. npairs.autopairs_cr()
-    end
-  else
-    return npairs.autopairs_cr()
-  end
+ if vim.fn.pumvisible() ~= 0 then
+   if vim.fn.complete_info({ 'selected' }).selected ~= -1 then
+     return npairs.esc('<c-y>')
+   else
+     return npairs.esc('<c-e>') .. npairs.autopairs_cr()
+   end
+ else
+   return npairs.autopairs_cr()
+ end
 end
 
 map('i', '<cr>', 'v:lua.MUtils.CR()', {expr = true, noremap = true})
 
 --------------------------------------------------
-
-require'nvim-treesitter.configs'.setup{
-  ensure_installed = 'maintained',
-  sync_install     = false,
-  highlight        = {
-    enable  = true,
-    disable = {}
-  },
-  rainbow = {
-    enable         = true,
-    extended_mode  = true,
-    max_file_lines = nil,
-    colors = {
-        '#DC241D',
-        '#DC55F9',
-        '#D7DB11',
-        '#68BD6A',
-        '#E64D0E',
-        '#4585C7',
-        '#A8A9A4',
-    }
-  }
-}
-
-require('lualine').setup{
-  options  = {theme = require('cassiopeia')},
-  sections = {lualine_x = {'encoding', 'filetype'}},
-  tabline  = {
-    lualine_a = {'buffers'},
-    lualine_b = {},
-    lualine_c = {'branch'},
-    lualine_x = {},
-    lualine_y = {},
-    lualine_z = {}
-  }
-}
 
 vim.o.foldmethod  = 'expr'
 vim.o.spelllang   = 'en_us,cs'
@@ -256,6 +271,7 @@ vim.o.signcolumn  = 'number'
 vim.o.encoding    = 'utf-8'
 vim.o.undodir     = [[/home/martin/.config/nvim/undodir]]
 vim.o.whichwrap   = vim.o.whichwrap .. '<,>,h,l,[,]'
+vim.o.colorcolumn = '80'
 vim.o.tabstop     = 4
 vim.o.softtabstop = 4
 vim.o.shiftwidth  = 4
@@ -263,6 +279,7 @@ vim.o.laststatus  = 2
 vim.o.textwidth   = 0
 vim.o.spell       = false
 vim.o.foldenable  = false
+vim.o.spell       = true
 vim.o.undofile    = true
 vim.o.expandtab   = true
 vim.o.smarttab    = true
@@ -287,7 +304,6 @@ vim.opt.fillchars:append('vert: ')
 
 vim.cmd('filetype plugin indent on')
 
--- vim.g.pydocstring_doq_path = vim.env.HOME .. '/anaconda3/envs/nvim/bin/doq'
 vim.g.python3_host_prog = vim.env.HOME
   .. '/anaconda3/envs/nvim/bin/python'
 
@@ -317,38 +333,37 @@ TrimWhiteSpace = function()
   vim.fn.winrestview(save)
 end
 
----------------------------------------------------------------
----------------------------Normal-Mode-------------------------
----------------------------------------------------------------
-map('n', '-'          , '$'                             , {}  )
-map('n', '<S-Tab>'    , ':bprevious<CR>'                , {}  )
-map('n', '<Tab>'      , ':bnext<CR>'                    , {}  )
-map('n', '<leader>O'  , 'O<ESC>'                        , {}  )
-map('n', '<leader>V'  , 'V<C-g>'                        , {}  )
-map('n', '<leader>a'  , 'gaip*'                         , {}  )
-map('n', '<leader>e'  , ':UndotreeToggle<CR>'           , {}  )
-map('n', '<leader>o'  , 'o<ESC>'                        , {}  )
-map('n', '<leader>q'  , ':CHADopen<CR>'                 , {}  )
-map('n', '<leader>s'  , ':%s/'                          , {}  )
-map('n', '<leader>ss' , ':set nospell!<CR>'             , {}  )
-map('n', '<leader>t'  , ':lua TrimWhiteSpace()<CR>'     , {}  )
-map('n', '<leader>un' , ':UnicodeSearch!'               , {}  )
-map('n', '<leader>vip', 'vip<C-g>'                      , {}  )
-map('n', '<leader>viw', 'viw<C-g>'                      , {}  )
-map('n', '<leader>w'  , ':TagbarToggle<CR>'             , {}  )
-map('n', '<space>'    , 'za'                            , {}  )
-map('n', 'J'          , ':bprevious<CR>'                , {}  )
-map('n', 'K'          , ':bnext<CR>'                    , {}  )
-map('n', '<leader>fl' , ':FzfLua lines<CR>'             , {}  )
-map('n', '<leader>fbl', ':FzfLua blines<CR>'            , {}  )
-map('n', '<leader>fb' , ':FzfLua buffers<CR>'           , {}  )
----------------------------------------------------------------
--------------------------Visual-Mode---------------------------
----------------------------------------------------------------
-map('x', '<space>'    , 'zf'                            , {}  )
-map('x', '-'          , '$'                             , {}  )
-map('x', '<leader>a'  , 'gaip*'            , {noremap = false})
-map('x', 'ga'         , '<Plug>(EasyAlign)', {noremap = false})
+
+map('n', '-'               , '$'                        , {})
+map('n', 'J'               , ':bprevious<CR>'           , {})
+map('n', 'K'               , ':bnext<CR>'               , {})
+map('n', '<leader>O'       , 'O<ESC>'                   , {})
+map('n', '<leader>V'       , 'V<C-g>'                   , {})
+map('n', '<leader>a'       , 'vipga'                    , {})
+map('n', '<leader>e'       , ':UndotreeToggle<CR>'      , {})
+map('n', '<leader>o'       , 'o<ESC>'                   , {})
+map('n', '<leader>q'       , ':CHADopen<CR>'            , {})
+map('n', '<leader>s'       , ':%s/'                     , {})
+map('n', '<leader>ns'      , ':set nospell!<CR>'        , {})
+map('n', '<leader>t'       , ':lua TrimWhiteSpace()<CR>', {})
+map('n', '<leader>un'      , ':UnicodeSearch!'          , {})
+map('n', '<leader>vip'     , 'vip<C-g>'                 , {})
+map('n', '<leader>viw'     , 'viw<C-g>'                 , {})
+map('n', '<space>'         , 'za'                       , {})
+map('n', '<leader>fl'      , ':FzfLua lines<CR>'        , {})
+map('n', '<leader>fbl'     , ':FzfLua blines<CR>'       , {})
+map('n', '<leader>fb'      , ':FzfLua buffers<CR>'      , {})
+map('n', '<leader><leader>', ':noh<CR>'                 , {})
+map('n', '<leader>r'       , ':source $MYVIMRC|noh<CR>' , {})
+map('n', 'ff'              , ':HopChar1<CR>'            , {})
+map('n', 'fl'              , ':HopLine<CR>'             , {})
+map('n', 'F'               , ':HopPattern<CR>'          , {})
+
+map('x', '<space>'         , 'zf'                       , {})
+map('x', '-'               , '$'                        , {})
+
+map('x', '<leader>a', 'gaip*'            , {noremap = false})
+map('x', 'ga'       , '<Plug>(EasyAlign)', {noremap = false})
 
 
 autocmd('FileType', {
@@ -369,13 +384,13 @@ autocmd('FileType', {
 
 autocmd('FileType', {
   pattern = 'markdown',
-  command = 'nmap <leader>gg :Glow<CR>'
+  command = 'nmap <leader>x :Glow<CR>'
 })
 
 -- This fixes a bug
-autocmd('FileType', {
-  command = 'exe "normal zR"'
-})
+autocmd('FileType', {command = 'exe "normal zR"'})
+
+autocmd('FileType', {command = 'noh'})
 
 autocmd('FileType', {
   pattern = 'python',
@@ -423,8 +438,13 @@ autocmd('VimEnter', {
 })
 
 autocmd('InsertLeavePre', {callback = TrimWhiteSpace})
+autocmd('BufWritePost', {
+  pattern = 'init.lua',
+  command = 'PackerCompile'
+})
 
 vim.cmd[[
+set nu rnu
 set foldexpr=nvim_treesitter#foldexpr()
 colorscheme cassiopeia
 ]]
