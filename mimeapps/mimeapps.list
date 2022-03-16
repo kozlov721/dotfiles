@@ -10,7 +10,3 @@ x-scheme-handler/https=xfce4-web-browser.desktop;
 image/jpeg=org.kde.gwenview.desktop;org.nomacs.ImageLounge.desktop;
 application/pdf=org.pwmt.zathura.desktop;org.qutebrowser.qutebrowser.desktop;
 video/x-matroska=vlc.desktop;
-video/mp4=vlc.desktop;
-application/x-ms-dos-executable=wine.desktop;
-image/png=org.nomacs.ImageLounge.desktop;
-video/x-msvideo=vlc.desktop;

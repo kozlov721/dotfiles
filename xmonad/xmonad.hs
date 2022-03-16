@@ -1,8 +1,6 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE CPP #-}
 
-
-import Control.Monad
 import Data.Function.Flippers
 import Data.List   ( zip4, mapAccumL )
 import Data.Maybe  ( fromJust )
@@ -28,7 +26,6 @@ import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.WindowSwallowing
 
 import XMonad.Layout.Grid
-import XMonad.Layout.IndependentScreens
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Reflect
 import XMonad.Layout.Renamed
@@ -124,34 +121,20 @@ searchFunc s
 
 mySearchEngine = searchEngineF "" searchFunc
 
-currScreenID :: X ScreenId
-currScreenID = gets $ W.screen . W.current . windowset
-
 ----------------------------------------------------------------------
 -- BEGIN BINDINGS
-myKeys conf@XConfig { XMonad.modMask    = modm
-                    , XMonad.terminal   = term
-                    , XMonad.workspaces = workspaces''
+myKeys conf@XConfig { XMonad.modMask  = modm
+                    , XMonad.terminal = term
                     } = M.fromList $
     let flashText_ c = flashText c (3/4)
         runProcessAndTrim p f i = trim <$> runProcessWithInput p f i
         workspacesApps = getWorkspacesApps term
-        workspaces = workspaces' conf
     in
     -- function keys
     [ ((0, xF86XK_MonBrightnessUp)
        , runProcessWithInput "lux" ["-a", "5%"] ""
        >> runProcessAndTrim "lux" ["-G"] ""
        >>= flashText_ mySHC . ("Brightness: "++))
-
-    , ((modm .|. controlMask, xK_comma),
-        do
-            curr <- gets (W.currentTag . windowset)
-            last <- head <$> gets (map W.tag . W.hidden . windowset)
-            flashText_ mySHC (show curr ++ ' ': show last)
-        -- gets (W.currentTag . windowset)
-        -- >>= flashText_ mySHC . show
-      )
 
     , ((0, xF86XK_MonBrightnessDown)
        , runProcessWithInput "lux" ["-s", "5%"] ""
@@ -188,26 +171,22 @@ myKeys conf@XConfig { XMonad.modMask    = modm
     ]
     ++
     -- Spawn certain apps on certain workspaces
-    let runAndShift w c = sequence_ [spawnOn w c, windows $ onCurrentScreen W.view w]
-    in
     [ ( (modm .|. m, k)
-      , case q of
-          Nothing -> runAndShift w c
-          Just x -> raiseMaybe (runAndShift w c) (className =? x)
+      , sequence_ [spawnOn w c, windows (W.greedyView w)]
       )
-    | ((m, k, q), w, c) <- zip3
-        [ (0,       xK_Return, Nothing           ) -- term
-        , (0,       xK_w,      Just "qutebrowser") -- web
-        , (0,       xK_r,      Just "Thunar"     ) -- files
-        , (0,       xK_s,      Just "Spotify"    ) -- music
-        , (altMask, xK_o,      Nothing           ) -- documents
-        , (altMask, xK_Return, Nothing           ) -- free
-        , (altMask, xK_s,      Just "Skype"      ) -- calls
-        , (0,       xK_v,      Just "vlc"        ) -- video
-        , (0,       xK_d,      Just "discord"    ) -- chat
-        , (0,       xK_b,      Nothing           ) -- development
+    | ((m, k), w, c) <- zip3
+        [ (0, xK_Return)       -- term
+        , (0, xK_w)            -- web
+        , (0, xK_r)            -- files
+        , (0, xK_s)            -- music
+        , (altMask, xK_o)      -- documents
+        , (altMask, xK_Return) -- free
+        , (altMask, xK_s)      -- calls
+        , (0, xK_v)            -- video
+        , (0, xK_d)            -- chat
+        , (0, xK_b)            -- development
         ]
-        workspaces
+        (XMonad.workspaces conf)
         workspacesApps
     ]
     ++
@@ -237,12 +216,12 @@ myKeys conf@XConfig { XMonad.modMask    = modm
       )
     , ((modm, xK_o), inputPrompt myPromptConfig "Web search"
         ?+ \s -> windows
-                 (W.view (workspaces !! 1))
+                 (W.greedyView (XMonad.workspaces conf !! 1))
                  >> liftIO getBrowser
                  >>= flip3 search s searchFunc
       )
     , ((modm .|. shiftMask, xK_g), windows
-        (W.view (workspaces !! 1))
+        (W.greedyView (XMonad.workspaces conf !! 1))
         >> selectSearch mySearchEngine)
     -- Open shell prompt
     , ((modm, xK_p), shellPrompt myPromptConfig)
@@ -261,14 +240,7 @@ myKeys conf@XConfig { XMonad.modMask    = modm
     -- Close focused window
     , ((modm, xK_c), kill)
     -- Copy window to all workspaces (for floating skype window)
-    -- , ((modm .|. altMask, xK_c), do
-        -- let compM f mg = mg >>= \g -> pure $ f . g
-        -- let marshall_ = marshall <$> currScreenID
-        -- copy_ <- copy `compM` marshall_
-        -- windows \s -> mapM (flashText_ mySHC . show . W.tag) (W.workspaces s)
-        -- -- windows (\s -> foldr (copy_ . W.tag) s (W.workspaces s))
-        -- -- windows copyToAll
-      -- )
+    , ((modm .|. altMask, xK_c), windows copyToAll)
     -- Rotate through the available layout algorithms
     , ((modm, xK_space), sendMessage NextLayout)
     -- Toggle fullscreen
@@ -313,7 +285,7 @@ myKeys conf@XConfig { XMonad.modMask    = modm
         (className =? "kitty-dropdown")
         (ask >>= doF
         . (\a s -> if a `elem` W.index s
-                   then W.shiftWin (marshall 0 "hid") a s
+                   then W.shiftWin "hid" a s
                    else W.shiftWin (W.currentTag s) a s
           )
         )
@@ -331,20 +303,14 @@ myKeys conf@XConfig { XMonad.modMask    = modm
     ++
     -- mod-[1..0], toggles workspace N
     -- mod-shift-[1..0], move client to workspace N
-    let
-    shiftAndFocus i = W.view i . W.shift i
-    toggle i = do
-        curr <- gets $ W.currentTag . windowset
-        last <- head <$> gets (map W.tag . W.hidden . windowset)
-        wanted <- marshall <$> currScreenID <*> pure i
-        let next = if curr == wanted then last else wanted
-        windows $ W.view next
-    in
+    let shiftAndFocus i = W.greedyView i . W.shift i in
     [ ((m .|. modm, k), f i)
-        | (i, k) <- zip workspaces $ [xK_1..xK_9] ++ [xK_0]
-        , (f, m) <- [ (toggle, 0)
-                    , (windows . onCurrentScreen shiftAndFocus, shiftMask)
-                    , (windows . onCurrentScreen W.shift, controlMask)
+        | (i, k) <- zip
+            (XMonad.workspaces conf)
+            $ [xK_1..xK_9] ++ [xK_0]
+        , (f, m) <- [ (toggleOrDoSkip ["hid"] W.greedyView, 0)
+                    , (windows . shiftAndFocus, shiftMask)
+                    , (windows . W.shift, controlMask)
                     ]
     ]
     ++
@@ -429,7 +395,7 @@ myManageHook = composeAll
                    , "gpick"
                    ]
 #ifdef PC
-            ++ ["Spotify", "netflix", "Steam", "spotify", "discord", "Thunar"]
+            ++ ["Spotify", "spotify", "discord", "Thunar"]
 #else
             ++ ["kitty-dropdown"]
 #endif
@@ -453,14 +419,10 @@ myStartupHook = spawnOnce "picom --experimental-backends &"
 
 ----------------------------------------------------------------------
 myLogHook proc = dynamicLogWithPP
-#ifdef PC
-    $ marshallPP 0
-#endif
     $ xmobarPP
         { ppOutput          = hPutStrLn proc
         , ppCurrent         = xmobarColor "#FFCC10" "" . prepareWS
         , ppHidden          = xmobarColor "#CA65F9" "" . prepareWS
-        , ppVisible         = xmobarColor "#FF6C6B" "" . prepareWS
         , ppHiddenNoWindows = xmobarColor "#4594BF" "" . prepareWS
         , ppTitle           = mempty
         , ppUrgent          = xmobarColor "#C45500" "" . wrap "!" "!"
@@ -511,12 +473,7 @@ myConfig logHandle = def
     , clickJustFocuses   = False
     , borderWidth        = 0
     , modMask            = myModMask
-#ifdef PC
-    -- , workspaces         = withScreen 0 myWorkspaces <> withScreen 1 ["free"]
-    , workspaces         = withScreens 2 myWorkspaces
-#else
-    , workspaces = myWorkspaces
-#endif
+    , workspaces         = myWorkspaces
     , keys               = myKeys
     , mouseBindings      = myMouseBindings
     , layoutHook         = myLayout

@@ -33,7 +33,8 @@ require('packer').startup(
       })
     }
     use {'junegunn/vim-journal'}
-    use {'p00f/nvim-ts-rainbow', requires = 'nvim-treesitter/nvim-treesitter'}
+    use {'p00f/nvim-ts-rainbow',
+      requires = 'nvim-treesitter/nvim-treesitter'}
     use {'kozlov721/cassiopeia-vim'}
     use {'lukas-reineke/indent-blankline.nvim',
       config = setup('indent_blankline')
@@ -226,8 +227,8 @@ local on_attach = function(client, bn)
   autocmd('CursorHold',  {callback = require'nvim-lightbulb'.update_lightbulb})
 end
 
-local coq = require'coq'
-local lsp = require'lspconfig'
+local coq = require('coq')
+local lsp = require('lspconfig')
 
 local servers = {
   'pyright',
