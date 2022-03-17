@@ -1,17 +1,10 @@
-# pylint: disable=E0602
-
-import os
-
-# Documentation:
-#   qute://help/configuring.html
-#   qute://help/settings.html
-
+import socket
 config.load_autoconfig(False)
 
 c.auto_save.session = True
 
 config.set('content.cookies.accept', 'all', 'chrome-devtools://*')
-
+config.set('content.cookies.accept', 'all', '*')
 config.set('content.cookies.accept', 'all', 'devtools://*')
 
 config.set('content.headers.accept_language', '',
@@ -66,17 +59,24 @@ c.url.searchengines = {
 
 c.url.start_pages = 'https://google.com'
 
-c.zoom.default = '150%'
-c.fonts.default_size = '11pt'
-c.zoom.levels = ['25%', '33%', '50%', '67%', '75%',
-                 '90%', '100%', '110%', '125%', '135%',
-                 '140%', '150%', '175%', '200%', '250%',
-                 '300%', '400%', '500%'
-]
+if socket.gethostname() == 'martin-hnwx9x':
+    zd = 150
+    ds = 11
+else:
+    zd = 140
+    ds = 12
+c.zoom.default = f'{zd}%'
+c.fonts.default_size = f'{ds}pt'
+c.zoom.levels = [
+    '25%', '33%', '50%', '67%', '75%',
+    '90%', '100%', '110%', '125%', '135%',
+    '140%', '150%', '175%', '200%', '250%',
+    '300%', '400%', '500%'
+    ]
 
 c.content.blocking.whitelist = ['https://www.googleadservices.com/*']
 
-# To prevent youtube from playing videos before I focus them
+# To prevent YouTube from playing videos before I focus them
 c.content.autoplay = False
 
 c.fonts.completion.category = 'bold default_size default_family'
@@ -87,17 +87,20 @@ config.unbind('d')
 config.unbind('D')
 config.unbind('u')
 
-config.bind('<Alt+j>', 'run-with-count 10 scroll down')
-config.bind('<Alt+k>', 'run-with-count 10 scroll up')
-config.bind('J',       'tab-prev')
-config.bind('K',       'tab-next')
-config.bind('X',       'undo')
-config.bind('x',       'tab-close')
-config.bind('<Alt-h>', 'back -t')
-config.bind('<Alt-l>', 'forward -t')
-config.bind('do',      'download-open')
-config.bind('dc',      'download-clear')
-config.bind('dr',      'download-retry')
+config.bind('<Alt-j>',     'run-with-count 10 scroll down')
+config.bind('<Alt-k>',     'run-with-count 10 scroll up')
+config.bind('<Ctrl-d>',    'run-with-count 20 scroll down')
+config.bind('<Ctrl-u>',    'run-with-count 20 scroll up')
+config.bind('J',           'tab-prev')
+config.bind('K',           'tab-next')
+config.bind('X',           'undo')
+config.bind('x',           'tab-close')
+config.bind('<Alt-h>',     'back -t')
+config.bind('<Alt-l>',     'forward -t')
+config.bind('do',          'download-open')
+config.bind('dc',          'download-clear')
+config.bind('dr',          'download-retry')
+config.bind(',r',          'config-source')
 
 # --------------- Theme ----------------
 
@@ -115,12 +118,9 @@ c.colors.webpage.darkmode.threshold.background = 205
 c.colors.webpage.darkmode.threshold.text = 150
 c.colors.webpage.darkmode.algorithm = 'lightness-hsl'
 
-# Conditional dark mode
-# if not os.path.isfile('/var/local/change_theme/light_on.lck'):
-    # c.colors.webpage.preferred_color_scheme = "dark"
-    # c.colors.webpage.darkmode.enabled = True
-    # c.colors.webpage.bg = '#111111'
-    # c.content.user_stylesheets = [
-        # '~/.config/qutebrowser/css/darculized/darculized-all-sites.css'
-    # ]
-
+if c.colors.webpage.darkmode.enabled:
+    c.colors.webpage.preferred_color_scheme = "dark"
+    c.colors.webpage.bg = '#111111'
+    c.content.user_stylesheets = [
+        '~/.config/qutebrowser/css/darculized/darculized-all-sites.css'
+    ]

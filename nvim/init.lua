@@ -39,7 +39,15 @@ require('packer').startup(
     use {'lukas-reineke/indent-blankline.nvim',
       config = setup('indent_blankline')
     }
-    use {'michaelb/sniprun', run = 'bash ./install.sh'}
+    use {'michaelb/sniprun',
+      run = 'bash ./install.sh',
+      config = setup('sniprun', {
+        display = {
+          'LongTempFloatingWindow',
+          'VirtualTextOk'
+        }
+      })
+    }
     use {'jesseleite/vim-noh'}
     use {'ellisonleao/glow.nvim', ft = {'markdown'}}
     use {'akinsho/toggleterm.nvim',
@@ -51,8 +59,8 @@ require('packer').startup(
     }
     use {'rmagatti/goto-preview',
       config = setup('goto-preview', {
-          default_mappings = true
-        })
+        default_mappings = true
+      })
     }
     use {'winston0410/range-highlight.nvim',
       config = setup('range-highlight')
@@ -199,11 +207,15 @@ auto_start = 'shut-up'
 local autocmd = vim.api.nvim_create_autocmd
 
 local map = function(mode, key, command, opts)
-  vim.api.nvim_set_keymap(mode, key, command, opts or {})
+  opts = opts or {}
+  if opts['noremap'] == nil then
+    opts['noremap'] = true
+  end
+  vim.api.nvim_set_keymap(mode, key, command, opts)
 end
 
 local bmap = function(bn, mode, key, command, opts)
-  vim.api.nvim_buf_set_keymap(bn, mode, key, command, opts or {})
+  vim.api.nvim_buf_set_keymap(bn, mode, key, command, opts or {noremap = true})
 end
 
 
@@ -305,7 +317,6 @@ vim.o.showcmd     = true
 vim.o.showmode    = true
 vim.o.smartcase   = true
 vim.o.smarttab    = true
-vim.o.spell       = true
 vim.o.title       = true
 vim.o.undofile    = true
 vim.o.wildmenu    = true
@@ -369,13 +380,19 @@ map('n', '<leader>r'       , ':source $MYVIMRC|noh<CR>' )
 map('n', 'ff'              , ':HopChar1<CR>'            )
 map('n', 'fl'              , ':HopLine<CR>'             )
 map('n', 'F'               , ':HopPattern<CR>'          )
+map('n', '<leader>R'       , '<Plug>SnipRunOperator'    )
+map('n', '<PageDown>'      , '<C-f>', {noremap = false} )
+map('n', '<PageUp>'        , '<C-b>', {noremap = false} )
 
 map('x', '<space>'         , 'zf'                       )
 map('x', '-'               , '$'                        )
+map('x', '<leader>a'       , 'gaip*', {noremap = false} )
+map('x', 'ga'              , '<Plug>(EasyAlign)'        )
+map('x', '<PageDown>'      , '<C-f>', {noremap = false} )
+map('x', '<PageUp>'        , '<C-b>', {noremap = false} )
 
-map('x', '<leader>a', 'gaip*'            , {noremap = false})
-map('x', 'ga'       , '<Plug>(EasyAlign)', {noremap = false})
-
+map('i', '<PageDown>'      , '<NOP>'                    )
+map('i', '<PageUp>'        , '<NOP>'                    )
 
 autocmd('FileType', {
   pattern = {'html', 'lua', 'css', 'xml', 'markdown', 'journal'},

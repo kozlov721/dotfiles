@@ -4,9 +4,7 @@ fish        ~/.config/fish/ftc.fish
 fish        ~/.config/fish/config.fish
 fish        ~/.config/fish/fish_prompt.fish
 kitty       ~/.config/kitty/cbonsaiTheme.conf
-kitty       ~/.config/kitty/theme.conf
 kitty       ~/.config/kitty/kitty.conf
-kitty       ~/.config/kitty/open-actions.conf
 macchina    ~/.config/macchina/*
 mimeapps    ~/.config/mimeapps.list
 nvim        ~/.config/nvim/init.lua
