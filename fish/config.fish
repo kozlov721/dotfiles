@@ -6,6 +6,7 @@ alias pacinfo    'yay -Si'
 alias update     'yay -Syu'
 alias fixpacman  'sudo rm /var/lib/pacman/db.lck'
 alias fastreboot 'killall qutebrowser; reboot'
+alias qutebrowser '/usr/bin/qutebrowser --qt-flag ignore-gpu-blacklist --qt-flag enable-gpu-rasterization --qt-flag enable-native-gpu-memory-buffers --qt-flag num-raster-threads=4'
 alias tarnow     'tar -acf'
 alias untar      'tar -zxvf'
 alias icat       'kitty +kitten icat'
@@ -37,3 +38,4 @@ source $HOME/.config/fish/fish_prompt.fish
 
 fish_add_path -P $HOME/.local/bin
 fish_add_path -P $HOME/.ghcup/bin
+fish_add_path -P /opt/nvidia/hpc_sdk/Linux_x86_64/22.2/compilers/bin

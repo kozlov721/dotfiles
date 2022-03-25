@@ -69,12 +69,14 @@ myWorkspaces =
     , "dev"
     , "hid" -- always hidden, this is for dropdown terminal
     ]
-
 myWorkspaceIDs = M.fromList $ zip myWorkspaces $ [1..9] ++ [0]
 
 getWorkspacesApps term =
     [ term
-    , "qutebrowser"
+    , "qutebrowser --qt-flag ignore-gpu-blacklist"
+    ++ " --qt-flag enable-gpu-rasterization"
+    ++ " --qt-flag enable-native-gpu-memory-buffers"
+    ++ " --qt-flag num-raster-threads=4"
 #ifdef PC
     , "thunar"
 #else
@@ -143,15 +145,6 @@ myKeys conf@XConfig { XMonad.modMask    = modm
        , runProcessWithInput "lux" ["-a", "5%"] ""
        >> runProcessAndTrim "lux" ["-G"] ""
        >>= flashText_ mySHC . ("Brightness: "++))
-
-    , ((modm .|. controlMask, xK_comma),
-        do
-            curr <- gets (W.currentTag . windowset)
-            last <- head <$> gets (map W.tag . W.hidden . windowset)
-            flashText_ mySHC (show curr ++ ' ': show last)
-        -- gets (W.currentTag . windowset)
-        -- >>= flashText_ mySHC . show
-      )
 
     , ((0, xF86XK_MonBrightnessDown)
        , runProcessWithInput "lux" ["-s", "5%"] ""
@@ -333,12 +326,16 @@ myKeys conf@XConfig { XMonad.modMask    = modm
     -- mod-shift-[1..0], move client to workspace N
     let
     shiftAndFocus i = W.view i . W.shift i
+#ifdef PC
     toggle i = do
         curr <- gets $ W.currentTag . windowset
         last <- head <$> gets (map W.tag . W.hidden . windowset)
         wanted <- marshall <$> currScreenID <*> pure i
         let next = if curr == wanted then last else wanted
         windows $ W.view next
+#else
+    toggle = toggleOrDoSkip ["hid"] W.greedyView
+#endif
     in
     [ ((m .|. modm, k), f i)
         | (i, k) <- zip workspaces $ [xK_1..xK_9] ++ [xK_0]
@@ -439,6 +436,8 @@ myManageHook = composeAll
     in [className =? cls --> doFloat  | cls <- floating]
     ++ [className =? cls --> doCenter | cls <- centered]
     ++ [className =? cls --> doIgnore | cls <- ignored ]
+    ++ [stringProperty "WM_NAME" =? "Zoom Meeting" --> doCenter]
+    ++ [stringProperty "WM_NAME" =? "Zoom Cloud Meetings" --> doCenter]
 #ifdef PC
     ++ [className =? "kitty-dropdown" --> doRectFloat (W.RationalRect (1/14) (1/3) (3/8) (4/9))]
 #endif
@@ -512,7 +511,6 @@ myConfig logHandle = def
     , borderWidth        = 0
     , modMask            = myModMask
 #ifdef PC
-    -- , workspaces         = withScreen 0 myWorkspaces <> withScreen 1 ["free"]
     , workspaces         = withScreens 2 myWorkspaces
 #else
     , workspaces = myWorkspaces

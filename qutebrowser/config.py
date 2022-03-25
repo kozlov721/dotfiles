@@ -117,10 +117,10 @@ c.colors.webpage.darkmode.enabled = False
 c.colors.webpage.darkmode.threshold.background = 205
 c.colors.webpage.darkmode.threshold.text = 150
 c.colors.webpage.darkmode.algorithm = 'lightness-hsl'
+# c.colors.webpage.preferred_color_scheme = "dark"
+# c.colors.webpage.bg = '#111111'
 
 if c.colors.webpage.darkmode.enabled:
-    c.colors.webpage.preferred_color_scheme = "dark"
-    c.colors.webpage.bg = '#111111'
     c.content.user_stylesheets = [
         '~/.config/qutebrowser/css/darculized/darculized-all-sites.css'
     ]

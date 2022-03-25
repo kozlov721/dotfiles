@@ -8,6 +8,7 @@ kitty       ~/.config/kitty/kitty.conf
 macchina    ~/.config/macchina/*
 mimeapps    ~/.config/mimeapps.list
 nvim        ~/.config/nvim/init.lua
+nvim        ~/.config/nvim/lua/plugins.lua
 picom       ~/.config/picom/picom.conf
 qutebrowser ~/.config/qutebrowser/config.py
 qutebrowser ~/.config/qutebrowser/quickmarks
