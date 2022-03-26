@@ -44,7 +44,6 @@ vim.o.wrap           = true
 vim.opt.listchars = {trail = '»', tab = '»-'}
 vim.opt.fillchars:append('vert:│')
 
-vim.cmd('filetype plugin indent on')
 
 vim.g.code_action_menu_show_details    = false
 vim.g.cursorhold_updatetime            = 50
@@ -83,11 +82,18 @@ map('n', '<leader>viw'     , 'viw<C-g>'                )
 map('n', '<space>'         , 'za'                      )
 map('n', '<leader><leader>', ':noh<CR>'                )
 map('n', '<leader>r'       , ':source $MYVIMRC|noh<CR>')
+map('n', '<leader><TAB>'   , '<C-w><C-w>', {remap = true})
 map('n', '<leader>t'       , trimWhiteSpace            )
+
+map('n', '<C-j>'   , ':resize -1<CR>', {silent = true})
+map('n', '<C-k>'   , ':resize +1<CR>', {silent = true})
+map('n', '<C->>'   , ':vert resize +1<CR>', {silent = true})
+map('n', '<C-<>'   , ':vert resize -1<CR>', {silent = true})
 
 map('i', '<PageDown>', '<NOP>')
 map('i', '<PageUp>'  , '<NOP>')
 map('x', '<PageDown>', '<C-f>', {remap = true})
+
 map('x', '<PageUp>'  , '<C-b>', {remap = true})
 map('n', '<PageDown>', '<C-f>', {remap = true})
 map('n', '<PageUp>'  , '<C-b>', {remap = true})
@@ -147,6 +153,9 @@ autocmd('BufWritePost', {
 })
 
 autocmd('BufWinLeave', {command = 'silent! mkview'})
-autocmd('BufWinEnter', {command = 'exe "normal zR" | silent! loadview | 0'})
+autocmd('BufWinEnter', {command = 'exe "normal zR" | silent! loadview'})
 
-vim.cmd('colorscheme cassiopeia')
+vim.cmd[[
+syntax off
+colorscheme cassiopeia
+]]

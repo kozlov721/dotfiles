@@ -6,6 +6,8 @@ autocmd = vim.api.nvim_create_autocmd
 return require('packer').startup {
   function()
     use {'mizlan/iswap.nvim',
+      event = 'CmdlineEnter',
+      keys = 'ss',
       config = function()
         map('n', 'ss', ':ISwap<CR>')
       end
@@ -38,16 +40,23 @@ return require('packer').startup {
     use {'gelguy/wilder.nvim',
       run = ':UpdateRemotePlugins',
       event = 'CmdlineEnter',
+      rocks = 'pcre2',
+      requires = 'romgrk/fzy-lua-native',
       config = function()
         require('wilder').setup {
-          modes = {':'}
+          modes = {':', '/', '?'}
         }
         local wilder = require('wilder')
         wilder.set_option {
           renderer = wilder.popupmenu_renderer(
             wilder.popupmenu_border_theme {
+              highlighter = {
+                wilder.lua_pcre2_highlighter(),
+                wilder.lua_fzy_highlighter()
+              },
               highlights = {
-                border = 'Normal'
+                border = 'Normal',
+                accent = 'Red'
               },
               border = 'rounded',
               left = {
@@ -62,8 +71,19 @@ return require('packer').startup {
                   }
                 }
               },
+              right = {' ', wilder.popupmenu_scrollbar()},
               max_height = '15%',
-              min_width  = '40%'
+              min_width  = '40%',
+              reverse = 1,
+            }
+          ),
+          pipeline = wilder.branch(
+            wilder.cmdline_pipeline {
+              fuzzy = 1,
+              set_pcre2_pattern = 1
+            },
+            wilder.python_search_pipeline {
+              pattern = 'fuzzy'
             }
           )
         }
@@ -169,6 +189,7 @@ return require('packer').startup {
       end
     }
     use {'phaazon/hop.nvim',
+      keys = {'ff', 'fl', 'F'},
       branch = 'v1',
       config = function()
         require('hop').setup {
@@ -183,6 +204,8 @@ return require('packer').startup {
       config = function() require('indent_blankline').setup() end
     }
     use {'michaelb/sniprun',
+      keys = '<leader>R',
+      event = 'CmdlineEnter',
       run = 'bash ./install.sh',
       config = function()
         require('sniprun').setup {
@@ -195,16 +218,18 @@ return require('packer').startup {
     }
     use {'jesseleite/vim-noh', event = 'CmdlineEnter'}
     use {'ellisonleao/glow.nvim',
+      keys = '<leader>g',
       ft = {'markdown'},
       config = function ()
           map('n', '<leader>g', ':Glow<CR>', {silent = true})
       end
     }
     use {'akinsho/toggleterm.nvim',
+      keys = [[<C-\>]],
       config = function()
         require('toggleterm').setup {
           direction     = 'float',
-          open_mapping  = [[<c-\>]],
+          open_mapping  = [[<C-\>]],
           close_on_exit = false
         }
       end
@@ -226,6 +251,7 @@ return require('packer').startup {
       end
     }
     use {'rmagatti/goto-preview',
+      keys = {'gpd', 'gpi', 'gpr'},
       config = function()
         require('goto-preview').setup {
           default_mappings = true
@@ -238,10 +264,10 @@ return require('packer').startup {
       config = function() require('range-highlight').setup() end
     }
     use {'nvim-treesitter/playground',
+      event = 'CmdlineEnter',
       run = ':TSInstall query'
     }
     use {'RRethy/nvim-treesitter-endwise',
-      ft = {'ruby', 'lua', 'sh'},
       event = 'InsertEnter',
       config = function()
         require('nvim-treesitter.configs').setup {
@@ -256,7 +282,7 @@ return require('packer').startup {
         require('nvim-treesitter.configs').setup {
           ensure_installed = 'maintained',
           sync_install     = false,
-          highlight        = {
+          highlight = {
             enable  = true,
             disable = {'haskell'},
             additional_vim_regex_highlighting = {'haskell'}
@@ -275,16 +301,17 @@ return require('packer').startup {
       end
     }
     use {'mbbill/undotree',
+      keys = '<leader>e',
       config = function ()
         map('n', '<leader>e', ':UndotreeToggle<CR>')
       end
     }
     use {'chrisbra/unicode.vim',
+      keys = '<leader>un',
       config = function()
         map('n', '<leader>un', ':UnicodeSearch!')
       end
     }
-    use {'tpope/vim-sensible'}
     use {'terrortylor/nvim-comment',
       config = function()
         require('nvim_comment').setup {
@@ -308,9 +335,20 @@ return require('packer').startup {
         autocmd('BufWritePost', {callback = require('lint').try_lint})
       end
     }
-    use {'kosayoda/nvim-lightbulb'}
     use {'neovim/nvim-lspconfig',
-      after = 'coq_nvim',
+      requires = {
+        {'kosayoda/nvim-lightbulb'},
+        {'weilbith/nvim-code-action-menu'},
+        {'ms-jpq/coq.thirdparty', branch = '3p'},
+        {'ms-jpq/coq.artifacts', branch = 'artifacts'},
+        {'ms-jpq/coq_nvim',
+          branch = 'coq',
+          run = ':COQdeps',
+          config = function()
+            vim.g.coq_settings = {auto_start = 'shut-up'}
+          end
+        }
+      },
       config = function()
         local on_attach = function(_, bn)
           local function bmap(m, lhs, rhs)
@@ -344,7 +382,6 @@ return require('packer').startup {
 
         local coq = require('coq')
         local lsp = require('lspconfig')
-
         local servers = {
           'pyright',
           'hls',
@@ -362,15 +399,6 @@ return require('packer').startup {
         end
       end
     }
-    use {'ms-jpq/coq_nvim',
-      branch = 'coq',
-      run = ':COQdeps',
-      config = function()
-        vim.g.coq_settings = {auto_start = 'shut-up'}
-      end
-    }
-    use {'ms-jpq/coq.thirdparty', branch = '3p'}
-    use {'ms-jpq/coq.artifacts', branch = 'artifacts'}
     use {'ZhiyuanLck/smart-pairs',
       after = 'coq_nvim',
       event = 'InsertEnter',
@@ -397,7 +425,7 @@ return require('packer').startup {
           default_opts = {
             ['*'] = {
               ignore_pre = [[\\]],
-              ignore_after = '[^)\\]}]'
+              ignore_after = '[^)\\]};, ]'
             }
           }
         })
@@ -436,7 +464,6 @@ return require('packer').startup {
       ft = {'html', 'xml'},
       event = 'InsertEnter'
     }
-    use {'weilbith/nvim-code-action-menu'}
     use {'chrisbra/Colorizer',
       config = function()
         autocmd('BufEnter', {command = 'ColorHighlight'})
@@ -466,6 +493,8 @@ return require('packer').startup {
         {'nvim-telescope/telescope-fzf-native.nvim', run = 'make'},
       },
       after = 'nvim-notify',
+      keys = {'tel', '<leader>fl', '<leader>fb', '<leader>fm', '<leader>q'},
+      event = 'CmdlineEnter',
       config = function()
         local telescope = require('telescope')
         telescope.setup {
@@ -507,11 +536,11 @@ return require('packer').startup {
         map('n', '<leader>fl' , ':Telescope live_grep grep_open_files=true<CR>')
         map('n', '<leader>fb' , ':Telescope current_buffer_fuzzy_find<CR>'     )
         map('n', '<leader>fm' , ':Telescope man_pages sections=ALL<CR>'        )
-        map('n', '<leader>ffb', ':Telescope buffers<CR>'                       )
         map('n', '<leader>q'  , ':Telescope file_browser<CR>'                  )
       end
     }
     use {'karb94/neoscroll.nvim',
+      keys = {'<C-u>', '<C-d>', '<C-f>', '<C-b>'},
       config = function()
         require('neoscroll').setup {
         }
@@ -537,10 +566,18 @@ return require('packer').startup {
       ft = {'python'}
     }
     use {'alx741/vim-stylishask',
-      ft = {'haskell'}
+      ft = 'haskell'
     }
     use {'neovimhaskell/haskell-vim',
-      ft = {'haskell'}
+      after = 'vim-stylishask',
+      config = function() vim.cmd('syntax on') end
     }
-  end
+  end,
+  config = {
+  display = {
+    open_fn = function()
+      return require('packer.util').float({border = 'single'})
+    end
+    }
+  }
 }
