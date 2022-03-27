@@ -47,16 +47,34 @@ return require('packer').startup {
           modes = {':', '/', '?'}
         }
         local wilder = require('wilder')
+        local scale = {
+          '#f4468f',
+          '#fd4a85',
+          '#ff507a',
+          '#ff566f',
+          '#ff5e63',
+          '#ff6658',
+          '#ff704e',
+          '#ff7a45',
+          '#ff843d',
+          '#ff9036',
+          '#f89b31',
+        }
+        local gradient = {}
+        for i, fg in ipairs(scale) do
+          gradient[i] = 'WilderGradient' .. i
+          vim.cmd(string.format('highlight %s guifg=%s', gradient[i], fg))
+        end
         wilder.set_option {
           renderer = wilder.popupmenu_renderer(
             wilder.popupmenu_border_theme {
-              highlighter = {
+              highlighter = wilder.highlighter_with_gradient {
                 wilder.lua_pcre2_highlighter(),
                 wilder.lua_fzy_highlighter()
               },
               highlights = {
                 border = 'Normal',
-                accent = 'Red'
+                gradient = gradient
               },
               border = 'rounded',
               left = {
@@ -109,7 +127,7 @@ return require('packer').startup {
                   error = '✘ ',
                   warn  = '⚠  ',
                   info  = '🛈  ',
-                  hint  = '🎔  '
+                  hint  = '💡'
                 }
               }
             },
@@ -191,6 +209,7 @@ return require('packer').startup {
     use {'phaazon/hop.nvim',
       keys = {'ff', 'fl', 'F'},
       branch = 'v1',
+      event = 'CmdlineEnter',
       config = function()
         require('hop').setup {
           keys = 'etovxqpdygfblzhckisuran'
@@ -344,12 +363,15 @@ return require('packer').startup {
         {'ms-jpq/coq_nvim',
           branch = 'coq',
           run = ':COQdeps',
-          config = function()
-            vim.g.coq_settings = {auto_start = 'shut-up'}
-          end
         }
       },
       config = function()
+        vim.cmd([[
+          sign define DiagnosticSignError text=✘ linehl= texthl=DiagnosticSignError numhl=
+          sign define DiagnosticSignWarn text=  linehl= texthl=DiagnosticSignWarn numhl=
+          sign define DiagnosticSignInfo text=🛈  linehl= texthl=DiagnosticSignInfo numhl=
+          sign define DiagnosticSignHint text=💡 linehl= texthl=DiagnosticSignHint numhl=
+        ]])
         local on_attach = function(_, bn)
           local function bmap(m, lhs, rhs)
             map(m, lhs, rhs, {buffer = bn})
@@ -379,7 +401,7 @@ return require('packer').startup {
               end
           })
         end
-
+        vim.g.coq_settings = {auto_start = 'shut-up'}
         local coq = require('coq')
         local lsp = require('lspconfig')
         local servers = {
@@ -390,7 +412,6 @@ return require('packer').startup {
           'bashls',
           'sumneko_lua'
         }
-
         for _, server in ipairs(servers) do
           lsp[server].setup(coq.lsp_ensure_capabilities{
             on_attach = on_attach,
@@ -455,6 +476,9 @@ return require('packer').startup {
       end
     }
     use {'junegunn/vim-easy-align',
+      keys = {'<leader>a'},
+      event = 'ModeChanged',
+      cmd = '*:v',
       config = function()
         map('n', '<leader>a' , 'vipga', {remap = true})
         map('x', 'ga'        , '<Plug>(EasyAlign)'    )
@@ -574,10 +598,12 @@ return require('packer').startup {
     }
   end,
   config = {
-  display = {
-    open_fn = function()
-      return require('packer.util').float({border = 'single'})
-    end
-    }
+    display = {
+      open_fn = function()
+        return require('packer.util').float {
+          border = 'rounded',
+        }
+      end
+      }
   }
 }
