@@ -21,7 +21,6 @@ return require('packer').startup {
         vim.notify = require('notify')
       end
     }
-    use {'mhinz/vim-startify'}
     use {'kozlov721/cassiopeia.nvim'}
     use {'fedepujol/move.nvim',
       event = 'ModeChanged',
@@ -101,7 +100,9 @@ return require('packer').startup {
               set_pcre2_pattern = 1
             },
             wilder.python_search_pipeline {
-              pattern = 'fuzzy'
+              pattern = 'fuzzy',
+              sorter = wilder.python_difflib_sorter(),
+              engire = 're2'
             }
           )
         }
@@ -125,9 +126,9 @@ return require('packer').startup {
               { 'diagnostics',
                 symbols = {
                   error = '✘ ',
-                  warn  = '⚠  ',
-                  info  = '🛈  ',
-                  hint  = '💡'
+                  warn  = '🛈  ',
+                  info  = '🎔  ',
+                  hint  = '💡 '
                 }
               }
             },
@@ -207,7 +208,7 @@ return require('packer').startup {
       end
     }
     use {'phaazon/hop.nvim',
-      keys = {'ff', 'fl', 'F'},
+      keys = {'ff', 'fl', 'fw', 'F'},
       branch = 'v1',
       event = 'CmdlineEnter',
       config = function()
@@ -216,7 +217,14 @@ return require('packer').startup {
         }
         map('n', 'ff', ':HopChar1<CR>'  )
         map('n', 'fl', ':HopLine<CR>'   )
+        map('n', 'fw', ':HopWord<CR>'   )
         map('n', 'F' , ':HopPattern<CR>')
+      end
+    }
+    use {'mfussenegger/nvim-treehopper',
+      config = function()
+        map({'v', 'n'}, 'ft', require('tsht').nodes)
+        map('o', 'm', ':<C-U>lua require("tsht").nodes()<CR>', {silent = true})
       end
     }
     use {'lukas-reineke/indent-blankline.nvim',
@@ -295,6 +303,19 @@ return require('packer').startup {
       end
     }
     use {'p00f/nvim-ts-rainbow'}
+    use {'RRethy/nvim-treesitter-textsubjects',
+      requires = 'nvim-treesitter/nvim-treesitter',
+      config = function()
+        require('nvim-treesitter.configs').setup {
+          textsubjects = {
+            enable = true,
+            keymaps = {
+              ['<CR>'] = 'textsubjects-smart',
+            },
+          },
+        }
+      end
+    }
     use {'nvim-treesitter/nvim-treesitter',
       run = ':TSUpdate',
       config = function()
@@ -366,12 +387,12 @@ return require('packer').startup {
         }
       },
       config = function()
-        vim.cmd([[
+        vim.cmd [[
           sign define DiagnosticSignError text=✘ linehl= texthl=DiagnosticSignError numhl=
-          sign define DiagnosticSignWarn text=  linehl= texthl=DiagnosticSignWarn numhl=
-          sign define DiagnosticSignInfo text=🛈  linehl= texthl=DiagnosticSignInfo numhl=
+          sign define DiagnosticSignWarn text=🛈  linehl= texthl=DiagnosticSignWarn numhl=
+          sign define DiagnosticSignInfo text=🎔  linehl= texthl=DiagnosticSignInfo numhl=
           sign define DiagnosticSignHint text=💡 linehl= texthl=DiagnosticSignHint numhl=
-        ]])
+        ]]
         local on_attach = function(_, bn)
           local function bmap(m, lhs, rhs)
             map(m, lhs, rhs, {buffer = bn})
@@ -389,7 +410,6 @@ return require('packer').startup {
           bmap('n', 'gr'        , vim.lsp.buf.references    )
 
           vim.diagnostic.config({virtual_text = false})
-
           autocmd('CursorHold' , {callback = vim.lsp.buf.document_highlight})
           autocmd('CursorMoved', {callback = vim.lsp.buf.clear_references})
           autocmd('CursorHold' , {
@@ -410,7 +430,6 @@ return require('packer').startup {
           'vimls',
           'clangd',
           'bashls',
-          'sumneko_lua'
         }
         for _, server in ipairs(servers) do
           lsp[server].setup(coq.lsp_ensure_capabilities{
@@ -488,9 +507,9 @@ return require('packer').startup {
       ft = {'html', 'xml'},
       event = 'InsertEnter'
     }
-    use {'chrisbra/Colorizer',
+    use {'norcalli/nvim-colorizer.lua',
       config = function()
-        autocmd('BufEnter', {command = 'ColorHighlight'})
+        require('colorizer').setup()
       end
     }
     use {'dkarter/bullets.vim',
@@ -579,11 +598,22 @@ return require('packer').startup {
       end
     }
     use {'echasnovski/mini.nvim',
-      config = function() require('mini.surround').setup() end
-    }
-    use {'lewis6991/spellsitter.nvim',
-      cmd = 'set nospell!',
-      config = function() require('spellsitter').setup() end
+      config = function()
+        require('mini.surround').setup()
+        local starter = require('mini.starter')
+        starter.setup {
+          evaluate_single = true,
+          items = {
+            starter.sections.builtin_actions(),
+            starter.sections.recent_files(10),
+          },
+          content_hooks = {
+            starter.gen_hook.adding_bullet('• '),
+            starter.gen_hook.aligning('center', 'center')
+          },
+          footer = ''
+        }
+      end
     }
     use {'Vimjas/vim-python-pep8-indent',
       event = 'InsertEnter',

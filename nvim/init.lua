@@ -62,6 +62,8 @@ vim.g.vim_json_syntax_conceal          = 0
 vim.g.vim_markdown_conceal             = 0
 vim.g.vim_markdown_conceal_code_blocks = 0
 
+vim.g.python3_host_prog = vim.env.HOME .. '/anaconda3/envs/nvim/bin/python'
+
 local function trimWhiteSpace()
   local save = vim.fn.winsaveview()
   vim.cmd[[%s/\\\@<!\s\+$//e]]
@@ -69,8 +71,6 @@ local function trimWhiteSpace()
 end
 
 map({'n', 'x'} , '-'       , '$'                       )
-map('n', 'J'               , ':bprevious<CR>'          )
-map('n', 'K'               , ':bnext<CR>'              )
 map('n', '<leader>J'       , ':join<CR>'               )
 map('n', '<leader>O'       , 'O<ESC>'                  )
 map('n', '<leader>V'       , 'V<C-g>'                  )
@@ -85,10 +85,10 @@ map('n', '<leader>r'       , ':source $MYVIMRC|noh<CR>')
 map('n', '<leader><TAB>'   , '<C-w><C-w>', {remap = true})
 map('n', '<leader>t'       , trimWhiteSpace            )
 
+map('n', 'J'       , ':bprevious<CR>', {silent = true})
+map('n', 'K'       , ':bnext<CR>'    , {silent = true})
 map('n', '<C-j>'   , ':resize -1<CR>', {silent = true})
 map('n', '<C-k>'   , ':resize +1<CR>', {silent = true})
-map('n', '<C->>'   , ':vert resize +1<CR>', {silent = true})
-map('n', '<C-<>'   , ':vert resize -1<CR>', {silent = true})
 
 map('i', '<PageDown>', '<NOP>')
 map('i', '<PageUp>'  , '<NOP>')
@@ -156,6 +156,5 @@ autocmd('BufWinLeave', {command = 'silent! mkview'})
 autocmd('BufWinEnter', {command = 'exe "normal zR" | silent! loadview'})
 
 vim.cmd[[
-syntax off
 colorscheme cassiopeia
 ]]
