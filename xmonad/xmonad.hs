@@ -28,7 +28,7 @@ import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.WindowSwallowing
 
 import XMonad.Layout.Grid
-import XMonad.Layout.IndependentScreens
+-- import XMonad.Layout.IndependentScreens
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Reflect
 import XMonad.Layout.Renamed
@@ -138,7 +138,11 @@ myKeys conf@XConfig { XMonad.modMask    = modm
     let flashText_ c = flashText c (3/4)
         runProcessAndTrim p f i = trim <$> runProcessWithInput p f i
         workspacesApps = getWorkspacesApps term
+#ifdef PC
         workspaces = workspaces' conf
+#else
+        workspaces = workspaces''
+#endif
     in
     -- function keys
     [ ((0, xF86XK_MonBrightnessUp)
@@ -181,7 +185,11 @@ myKeys conf@XConfig { XMonad.modMask    = modm
     ]
     ++
     -- Spawn certain apps on certain workspaces
-    let runAndShift w c = sequence_ [spawnOn w c, windows $ onCurrentScreen W.view w]
+#ifdef PC
+    let runAndShift w c = sequence_ [ spawnOn w c, windows $ onCurrentScreen W.view w]
+#else
+    let runAndShift w c = sequence_ [ spawnOn w c, windows $ W.view w]
+#endif
     in
     [ ( (modm .|. m, k)
       , case q of
@@ -306,7 +314,11 @@ myKeys conf@XConfig { XMonad.modMask    = modm
         (className =? "kitty-dropdown")
         (ask >>= doF
         . (\a s -> if a `elem` W.index s
+#ifdef PC
                    then W.shiftWin (marshall 0 "hid") a s
+#else
+                   then W.shiftWin "hid" a s
+#endif
                    else W.shiftWin (W.currentTag s) a s
           )
         )
@@ -335,6 +347,7 @@ myKeys conf@XConfig { XMonad.modMask    = modm
         windows $ W.view next
 #else
     toggle = toggleOrDoSkip ["hid"] W.greedyView
+    onCurrentScreen = id
 #endif
     in
     [ ((m .|. modm, k), f i)
