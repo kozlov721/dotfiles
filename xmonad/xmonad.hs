@@ -28,7 +28,7 @@ import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.WindowSwallowing
 
 import XMonad.Layout.Grid
--- import XMonad.Layout.IndependentScreens
+import XMonad.Layout.IndependentScreens
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Reflect
 import XMonad.Layout.Renamed
@@ -51,6 +51,11 @@ import XMonad.Util.SpawnOnce
 
 import qualified Data.Map          as M
 import qualified XMonad.StackSet   as W
+import qualified XMonad.Util.ExtensibleState as XS
+
+newtype LastAction = LastAction (X ())
+instance ExtensionClass LastAction where
+  initialValue = LastAction $ pure ()
 
 myTerminal = "kitty"
 myModMask  = mod4Mask
@@ -129,6 +134,14 @@ mySearchEngine = searchEngineF "" searchFunc
 currScreenID :: X ScreenId
 currScreenID = gets $ W.screen . W.current . windowset
 
+rememberActions :: [((KeyMask, KeySym), X ())]
+                -> [((KeyMask, KeySym), X ())]
+rememberActions = map remember
+  where
+    remember :: ((KeyMask, KeySym), X ())
+             -> ((KeyMask, KeySym), X ())
+    remember (k, x) = (k, XS.put (LastAction x) >> x)
+
 ----------------------------------------------------------------------
 -- BEGIN BINDINGS
 myKeys conf@XConfig { XMonad.modMask    = modm
@@ -144,6 +157,14 @@ myKeys conf@XConfig { XMonad.modMask    = modm
         workspaces = workspaces''
 #endif
     in
+    (:)
+    ((modm, xK_comma), do
+        LastAction x <- XS.get
+        x
+    )
+    $
+    rememberActions
+    $
     -- function keys
     [ ((0, xF86XK_MonBrightnessUp)
        , runProcessWithInput "lux" ["-a", "5%"] ""
@@ -242,15 +263,16 @@ myKeys conf@XConfig { XMonad.modMask    = modm
                  >> liftIO getBrowser
                  >>= flip3 search s searchFunc
       )
+    -- Search the content of clipboard on web
     , ((modm .|. shiftMask, xK_g), windows
         (W.view (workspaces !! 1))
         >> selectSearch mySearchEngine)
     -- Open shell prompt
     , ((modm, xK_p), shellPrompt myPromptConfig)
-    -- Increase opacity
-    , ((modm .|. controlMask, xK_Up), spawn "picom-trans -c -o -5")
     -- Screenshot
     , ((0, xK_Print), spawn "flameshot gui")
+    -- Increase opacity
+    , ((modm .|. controlMask, xK_Up), spawn "picom-trans -c -o -5")
     -- Decrease opacity
     , ((modm .|. controlMask, xK_Down), spawn "picom-trans -c -o +5")
     -- mod-F12 toggles 'free' workspace
@@ -261,15 +283,6 @@ myKeys conf@XConfig { XMonad.modMask    = modm
     , ((modm .|. shiftMask, xK_p), spawn "rofi -show window")
     -- Close focused window
     , ((modm, xK_c), kill)
-    -- Copy window to all workspaces (for floating skype window)
-    -- , ((modm .|. altMask, xK_c), do
-        -- let compM f mg = mg >>= \g -> pure $ f . g
-        -- let marshall_ = marshall <$> currScreenID
-        -- copy_ <- copy `compM` marshall_
-        -- windows \s -> mapM (flashText_ mySHC . show . W.tag) (W.workspaces s)
-        -- -- windows (\s -> foldr (copy_ . W.tag) s (W.workspaces s))
-        -- -- windows copyToAll
-      -- )
     -- Rotate through the available layout algorithms
     , ((modm, xK_space), sendMessage NextLayout)
     -- Toggle fullscreen
@@ -288,8 +301,6 @@ myKeys conf@XConfig { XMonad.modMask    = modm
     , ((modm, xK_j), windows W.focusDown)
     -- Move focus to the previous window
     , ((modm, xK_k), windows W.focusUp)
-    -- Spawn floating terminal
-    , ((modm .|. shiftMask, xK_Return), spawn "kitty --class=kitty-float")
     -- Spawn floating facebook messenger
     , ((modm .|. shiftMask, xK_m), spawn "caprine")
     -- Swap the focused window with the next window
@@ -325,17 +336,9 @@ myKeys conf@XConfig { XMonad.modMask    = modm
         (spawnHere "kitty --class=kitty-dropdown"))
     ]
     ++
-    -- Rotate through workspaces using j and k
-    -- Shift window on the way using h and l
-    [ ((modm .|. controlMask, k), sequence_ (f1 : f2))
-        | (k, f1, f2) <- zip3
-            [xK_k, xK_j, xK_h, xK_l]
-            [nextWS, prevWS, shiftToPrev, shiftToNext]
-            [[], [], [prevWS], [nextWS]]
-    ]
-    ++
-    -- mod-[1..0], toggles workspace N
-    -- mod-shift-[1..0], move client to workspace N
+    -- mod-[0..9], toggles workspace N
+    -- mod-shift-[0..9], move window to workspace N and shift there
+    -- mod-ctrl-[0..9], only move window to workspace N
     let
     shiftAndFocus i = W.view i . W.shift i
 #ifdef PC
@@ -366,7 +369,6 @@ myKeys conf@XConfig { XMonad.modMask    = modm
        , sequence_ [toggleWS, removeWorkspaceByTag "saver"])
     ]
 
--- END BINDINGS
 ----------------------------------------------------------------------
 myMouseBindings XConfig { XMonad.modMask = modm } =
     M.fromList
@@ -379,7 +381,6 @@ myMouseBindings XConfig { XMonad.modMask = modm } =
                 >> mouseResizeWindow w
                 >> windows W.shiftMaster)
         ]
-
 
 ----------------------------------------------------------------------
 myPromptConfig = def
@@ -502,7 +503,7 @@ myLogHook proc = dynamicLogWithPP
         , ("dev" , "<fn=1>\xf126</fn>")
         ]
     prepareWS name
-        | name `M.notMember` icons = mempty
+        | name `M.notMember` icons = ""
         | otherwise = "<action=xdotool key super+"
             ++ show (myWorkspaceIDs M.! name)
             ++ ">"
@@ -531,9 +532,7 @@ myConfig logHandle = def
     , keys               = myKeys
     , mouseBindings      = myMouseBindings
     , layoutHook         = myLayout
-    , manageHook         = manageSpawn
-        <+> myManageHook
-        <+> manageDocks
+    , manageHook         = manageSpawn <+> myManageHook <+> manageDocks
     , logHook            = myLogHook logHandle
     , startupHook        = myStartupHook
     , handleEventHook    = myHandleEventHook
@@ -544,4 +543,3 @@ main = setEnv "BROWSER" "qutebrowser"
     >> setEnv "EDITOR" "nvim"
     >> spawnPipe "/home/martin/.local/bin/xmobar"
     >>= xmonad . docks . ewmh . ewmhFullscreen . myConfig
-
