@@ -10,5 +10,5 @@ nvim           ~/.config/nvim/init.lua ~/.config/nvim/lua/plugins.lua
 vim            ~/.config/nvim/init.lua ~/.config/nvim/lua/plugins.lua
 xmobar         ~/.config/xmobar/xmobar.hs
 xmobar-plugins ~/.config/xmobar/MyPlugins.hs
-xmonad         ~/.config/xmonad/xmonad.hs
+xmonad         ~/.config/xmonad/app/xmonad.hs
 zathura        ~/.config/zathura/zathurarc

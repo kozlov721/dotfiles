@@ -152,9 +152,16 @@ autocmd('BufWritePost', {
   command = 'PackerCompile'
 })
 
-autocmd('BufWinLeave', {command = 'silent! mkview'})
-autocmd('BufWinEnter', {command = 'exe "normal zR" | silent! loadview'})
+-- autocmd('BufWinLeave', {command = 'silent! mkview'})
+-- autocmd('BufWinEnter', {command = 'exe "normal zR" | silent! loadview'})
+autocmd('BufWinEnter', {command = 'exe "normal zR"'})
 
 vim.cmd[[
 colorscheme cassiopeia
 ]]
+if vim.env.TERM == 'xterm-kitty' then
+  vim.cmd([[
+    autocmd UIEnter * if v:event.chan ==# 0 | call chansend(v:stderr, "\x1b[>1u") | endif
+    autocmd UILeave * if v:event.chan ==# 0 | call chansend(v:stderr, "\x1b[<1u") | endif
+  ]])
+end

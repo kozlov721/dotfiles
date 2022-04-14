@@ -24,5 +24,5 @@ scripts     ~/.local/bin/xmobar_scripts
 xmobar      ~/.config/xmobar/xmobar.hs
 xmobar      ~/.config/xmobar/MyPlugins.hs
 xmobar      ~/.config/xmobar/build
-xmonad      ~/.config/xmonad/xmonad.hs
+xmonad      ~/.config/xmonad/app/xmonad.hs
 xsession    ~/.xsession

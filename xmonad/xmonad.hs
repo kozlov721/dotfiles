@@ -1,13 +1,12 @@
+{-# LANGUAGE CPP        #-}
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE CPP #-}
-
+module Main where
 
 import Control.Monad
-import Data.Function.Flippers
-import Data.List   ( zip4, mapAccumL )
-import Data.Maybe  ( fromJust )
-import System.Environment ( setEnv )
-import System.Exit ( exitSuccess )
+import Data.List          (mapAccumL, zip4)
+import Data.Maybe         (fromJust)
+import System.Environment (setEnv)
+import System.Exit        (exitSuccess)
 import Text.Format
 import XMonad
 
@@ -42,20 +41,17 @@ import XMonad.Prompt.ConfirmPrompt
 import XMonad.Prompt.FuzzyMatch
 import XMonad.Prompt.Input
 import XMonad.Prompt.Man
-import XMonad.Prompt.OrgMode       ( orgPrompt )
+import XMonad.Prompt.OrgMode       (orgPrompt)
 import XMonad.Prompt.Shell
 import XMonad.Prompt.Unicode
 
 import XMonad.Util.Run
 import XMonad.Util.SpawnOnce
 
-import qualified Data.Map          as M
-import qualified XMonad.StackSet   as W
-import qualified XMonad.Util.ExtensibleState as XS
+import qualified Data.Map        as M
+import qualified XMonad.StackSet as W
 
-newtype LastAction = LastAction (X ())
-instance ExtensionClass LastAction where
-  initialValue = LastAction $ pure ()
+import RepeatAction
 
 myTerminal = "kitty"
 myModMask  = mod4Mask
@@ -134,13 +130,6 @@ mySearchEngine = searchEngineF "" searchFunc
 currScreenID :: X ScreenId
 currScreenID = gets $ W.screen . W.current . windowset
 
-rememberActions :: [((KeyMask, KeySym), X ())]
-                -> [((KeyMask, KeySym), X ())]
-rememberActions = map remember
-  where
-    remember :: ((KeyMask, KeySym), X ())
-             -> ((KeyMask, KeySym), X ())
-    remember (k, x) = (k, XS.put (LastAction x) >> x)
 
 ----------------------------------------------------------------------
 -- BEGIN BINDINGS
@@ -157,14 +146,7 @@ myKeys conf@XConfig { XMonad.modMask    = modm
         workspaces = workspaces''
 #endif
     in
-    (:)
-    ((modm, xK_comma), do
-        LastAction x <- XS.get
-        x
-    )
-    $
-    rememberActions
-    $
+    (modm, xK_period) `rememberActions`
     -- function keys
     [ ((0, xF86XK_MonBrightnessUp)
        , runProcessWithInput "lux" ["-a", "5%"] ""
@@ -203,19 +185,101 @@ myKeys conf@XConfig { XMonad.modMask    = modm
     , ((modm, xK_F1), spawn "playerctl previous")
     , ((modm, xK_F2), spawn "playerctl play-pause")
     , ((modm, xK_F3), spawn "playerctl next")
+    -- Quick web search
+    , ((modm, xK_o), inputPrompt myPromptConfig "Web search"
+        ?+ \s -> do
+            windows (W.view (workspaces !! 1))
+            b <- liftIO getBrowser
+            search b searchFunc s
+      )
+    -- Search the content of clipboard on web
+    , ((modm .|. shiftMask, xK_g), windows
+        (W.view (workspaces !! 1))
+        >> selectSearch mySearchEngine)
+    -- Open shell prompt
+    , ((modm, xK_p), shellPrompt myPromptConfig)
+    -- Screenshot
+    , ((0, xK_Print), spawn "flameshot gui")
+    -- Increase opacity
+    , ((modm .|. controlMask, xK_Up), spawn "picom-trans -c -o -5")
+    -- Decrease opacity
+    , ((modm .|. controlMask, xK_Down), spawn "picom-trans -c -o +5")
+    -- Launch rofi
+    , ((modm .|. controlMask, xK_p), spawn "rofi -show run")
+    -- Launch rofi window
+    , ((modm .|. shiftMask, xK_p), spawn "rofi -show window")
+    -- Close focused window
+    , ((modm, xK_c), kill)
+    -- Rotate through the available layout algorithms
+    , ((modm, xK_space), sendMessage NextLayout)
+    -- Toggle fullscreen
+    , ((0, xK_F11), sendMessage ToggleLayout)
+    -- Shrinkg window
+    , ((modm, xK_a), sendMessage MirrorShrink)
+    -- Grow window
+    , ((modm, xK_z), sendMessage MirrorExpand)
+    -- Shrink the master area
+    , ((modm, xK_h), sendMessage Expand)
+    -- Expand the master area
+    , ((modm, xK_l), sendMessage Shrink)
+    -- Move focus to the next window
+    , ((modm, xK_Tab), windows W.focusDown)
+    -- Move focus to the next window
+    , ((modm, xK_j), windows W.focusDown)
+    -- Move focus to the previous window
+    , ((modm, xK_k), windows W.focusUp)
+    -- Spawn floating facebook messenger
+    , ((modm .|. shiftMask, xK_m), spawn "caprine")
+    -- Swap the focused window with the next window
+    , ((modm .|. shiftMask, xK_j), windows W.swapDown)
+    -- Swap the focused window with the previous window
+    , ((modm .|. shiftMask, xK_k), windows W.swapUp)
+    -- Push window back into tiling
+    , ((modm, xK_t), withFocused $ windows . W.sink)
+    -- Quit xmonad
+    , ((modm .|. shiftMask, xK_q)
+       , confirmPrompt myPromptConfig "exit?" $ io exitSuccess)
+    -- Shutdown
+    , ((modm .|. shiftMask .|. controlMask, xK_q)
+       , confirmPrompt myPromptConfig "shutdown?"
+       $ spawn "shutdown +0")
+    -- Restart xmonad
+    , ((modm, xK_q), spawn "xmonad --recompile && xmonad --restart")
+    -- Simulates drop-down terminal
+    , ((modm, xK_backslash), ifWindow
+        (className =? "kitty-dropdown")
+        (ask >>= doF
+        . (\a s -> if   a `elem` W.index s
+                   then
+#ifdef PC
+                   W.shiftWin (marshall 0 "hid") a s
+#else
+                   W.shiftWin "hid" a s
+#endif
+                   else W.shiftWin (W.currentTag s) a s
+          )
+        )
+        (spawnHere "kitty --class=kitty-dropdown"))
+    -- Special bindings to run cbonsai as screensaver
+    -- Not to be used by the user
+    , ((modm .|. controlMask .|. shiftMask, xK_s)
+       , sequence_ [appendWorkspace "saver"])
+    , ((modm .|. controlMask .|. shiftMask, xK_w)
+       , sequence_ [toggleWS, removeWorkspaceByTag "saver"])
     ]
     ++
     -- Spawn certain apps on certain workspaces
+    let
 #ifdef PC
-    let runAndShift w c = sequence_ [ spawnOn w c, windows $ onCurrentScreen W.view w]
+    runAndShift w c = sequence_ [ spawnOn w c, windows $ onCurrentScreen W.view w]
 #else
-    let runAndShift w c = sequence_ [ spawnOn w c, windows $ W.view w]
+    runAndShift w c = sequence_ [ spawnOn w c, windows $ W.view w]
 #endif
     in
     [ ( (modm .|. m, k)
       , case q of
           Nothing -> runAndShift w c
-          Just x -> raiseMaybe (runAndShift w c) (className =? x)
+          Just x  -> raiseMaybe (runAndShift w c) (className =? x)
       )
     | ((m, k, q), w, c) <- zip3
         [ (0,       xK_Return, Nothing           ) -- term
@@ -250,92 +314,6 @@ myKeys conf@XConfig { XMonad.modMask    = modm
         workspacesApps
     ]
     ++
-    -- Quick web search
-    [ ((modm .|. shiftMask, xK_o), promptSearchBrowser
-        myPromptConfig { showCompletionOnTab = True
-                       , defaultPrompter = const "Quick search: "
-                       }
-        "vimb" mySearchEngine
-      )
-    , ((modm, xK_o), inputPrompt myPromptConfig "Web search"
-        ?+ \s -> windows
-                 (W.view (workspaces !! 1))
-                 >> liftIO getBrowser
-                 >>= flip3 search s searchFunc
-      )
-    -- Search the content of clipboard on web
-    , ((modm .|. shiftMask, xK_g), windows
-        (W.view (workspaces !! 1))
-        >> selectSearch mySearchEngine)
-    -- Open shell prompt
-    , ((modm, xK_p), shellPrompt myPromptConfig)
-    -- Screenshot
-    , ((0, xK_Print), spawn "flameshot gui")
-    -- Increase opacity
-    , ((modm .|. controlMask, xK_Up), spawn "picom-trans -c -o -5")
-    -- Decrease opacity
-    , ((modm .|. controlMask, xK_Down), spawn "picom-trans -c -o +5")
-    -- mod-F12 toggles 'free' workspace
-    , ((modm, xK_F12), toggleOrView "free")
-    -- Launch rofi
-    , ((modm .|. controlMask, xK_p), spawn "rofi -show run")
-    -- Launch rofi window
-    , ((modm .|. shiftMask, xK_p), spawn "rofi -show window")
-    -- Close focused window
-    , ((modm, xK_c), kill)
-    -- Rotate through the available layout algorithms
-    , ((modm, xK_space), sendMessage NextLayout)
-    -- Toggle fullscreen
-    , ((0, xK_F11), sendMessage ToggleLayout)
-    -- Shrinkg window
-    , ((modm, xK_a), sendMessage MirrorShrink)
-    -- Grow window
-    , ((modm, xK_z), sendMessage MirrorExpand)
-    -- Shrink the master area
-    , ((modm, xK_h), sendMessage Expand)
-    -- Expand the master area
-    , ((modm, xK_l), sendMessage Shrink)
-    -- Move focus to the next window
-    , ((modm, xK_Tab), windows W.focusDown)
-    -- Move focus to the next window
-    , ((modm, xK_j), windows W.focusDown)
-    -- Move focus to the previous window
-    , ((modm, xK_k), windows W.focusUp)
-    -- Spawn floating facebook messenger
-    , ((modm .|. shiftMask, xK_m), spawn "caprine")
-    -- Swap the focused window with the next window
-    , ((modm .|. shiftMask, xK_j), windows W.swapDown)
-    -- Swap the focused window with the previous window
-    , ((modm .|. shiftMask, xK_k), windows W.swapUp)
-    -- Push window back into tiling
-    , ((modm, xK_t), withFocused $ windows . W.sink)
-    -- Toggle bluettoth
-    , ((modm .|. altMask, xK_b), spawn "bluetooth toggle")
-    -- Quit xmonad
-    , ((modm .|. shiftMask, xK_q)
-       , confirmPrompt myPromptConfig "exit?" $ io exitSuccess)
-    -- Shutdown
-    , ((modm .|. shiftMask .|. controlMask, xK_q)
-       , confirmPrompt myPromptConfig "shutdown?"
-       $ spawn "shutdown +0")
-    -- Restart xmonad
-    , ((modm, xK_q), spawn "xmonad --recompile && xmonad --restart")
-    -- Simulates drop-down terminal
-    , ((modm, xK_backslash), ifWindow
-        (className =? "kitty-dropdown")
-        (ask >>= doF
-        . (\a s -> if a `elem` W.index s
-#ifdef PC
-                   then W.shiftWin (marshall 0 "hid") a s
-#else
-                   then W.shiftWin "hid" a s
-#endif
-                   else W.shiftWin (W.currentTag s) a s
-          )
-        )
-        (spawnHere "kitty --class=kitty-dropdown"))
-    ]
-    ++
     -- mod-[0..9], toggles workspace N
     -- mod-shift-[0..9], move window to workspace N and shift there
     -- mod-ctrl-[0..9], only move window to workspace N
@@ -359,14 +337,6 @@ myKeys conf@XConfig { XMonad.modMask    = modm
                     , (windows . onCurrentScreen shiftAndFocus, shiftMask)
                     , (windows . onCurrentScreen W.shift, controlMask)
                     ]
-    ]
-    ++
-    -- Special bindings to run cbonsai as screensaver
-    -- Not to be used by the user
-    [ ((modm .|. controlMask .|. shiftMask, xK_s)
-       , sequence_ [appendWorkspace "saver"])
-    , ((modm .|. controlMask .|. shiftMask, xK_w)
-       , sequence_ [toggleWS, removeWorkspaceByTag "saver"])
     ]
 
 ----------------------------------------------------------------------
@@ -527,7 +497,7 @@ myConfig logHandle = def
 #ifdef PC
     , workspaces         = withScreens 2 myWorkspaces
 #else
-    , workspaces = myWorkspaces
+    , workspaces         = myWorkspaces
 #endif
     , keys               = myKeys
     , mouseBindings      = myMouseBindings
@@ -537,7 +507,6 @@ myConfig logHandle = def
     , startupHook        = myStartupHook
     , handleEventHook    = myHandleEventHook
     }
-
 ----------------------------------------------------------------------
 main = setEnv "BROWSER" "qutebrowser"
     >> setEnv "EDITOR" "nvim"

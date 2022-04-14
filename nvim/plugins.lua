@@ -228,7 +228,16 @@ return require('packer').startup {
       end
     }
     use {'lukas-reineke/indent-blankline.nvim',
-      config = function() require('indent_blankline').setup() end
+      config = function()
+        require('indent_blankline').setup()
+        vim.g.indent_blankline_filetype_exclude = {
+          'starter',
+          'help',
+          'lspinfo',
+          'checkhealth',
+          'terminal'
+        }
+      end
     }
     use {'michaelb/sniprun',
       keys = '<leader>R',
@@ -320,7 +329,7 @@ return require('packer').startup {
       run = ':TSUpdate',
       config = function()
         require('nvim-treesitter.configs').setup {
-          ensure_installed = 'maintained',
+          ensure_installed = 'all',
           sync_install     = false,
           highlight = {
             enable  = true,
@@ -449,7 +458,7 @@ return require('packer').startup {
               {'(', ')'},
               {'[', ']'},
               {'{', '}'},
-              {"'", "'"},
+              {"'", "'", {ignore_pre = [[\w]]}},
               {'"', '"'},
               {'`', '`', {triplet = true}}
             },
@@ -532,6 +541,8 @@ return require('packer').startup {
     use {'nvim-telescope/telescope.nvim',
       requires = {
         'nvim-lua/plenary.nvim',
+        'nvim-lua/popup.nvim',
+        'nvim-telescope/telescope-media-files.nvim',
         'nvim-telescope/telescope-file-browser.nvim',
         {'nvim-telescope/telescope-fzf-native.nvim', run = 'make'},
       },
@@ -574,6 +585,7 @@ return require('packer').startup {
         telescope.load_extension('file_browser')
         telescope.load_extension('notify')
         telescope.load_extension('fzf')
+        telescope.load_extension('media_files')
 
         map('n', 'tel'        , ':Telescope '                                  )
         map('n', '<leader>fl' , ':Telescope live_grep grep_open_files=true<CR>')
@@ -600,9 +612,14 @@ return require('packer').startup {
     use {'echasnovski/mini.nvim',
       config = function()
         require('mini.surround').setup()
+
         local starter = require('mini.starter')
+        local f = assert(io.popen('fortune | cowsay', 'r'))
+        local s = assert(f:read('*a'))
+        f:close()
         starter.setup {
           evaluate_single = true,
+          header = s,
           items = {
             starter.sections.builtin_actions(),
             starter.sections.recent_files(10),

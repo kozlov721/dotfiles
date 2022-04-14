@@ -31,7 +31,7 @@ function mdv
     pandoc $argv[1] | lynx -stdin
 end
 
-eval /home/martin/anaconda3/bin/conda "shell.fish" "hook" $argv | source
+# eval /home/martin/anaconda3/bin/conda "shell.fish" "hook" $argv | source
 
 source $HOME/.config/fish/ftc.fish info > /dev/null
 source $HOME/.config/fish/fish_prompt.fish
