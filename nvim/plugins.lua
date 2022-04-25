@@ -384,8 +384,9 @@ return require('packer').startup {
         autocmd('BufWritePost', {callback = require('lint').try_lint})
       end
     }
-    use {'neovim/nvim-lspconfig',
+    use {'williamboman/nvim-lsp-installer',
       requires = {
+        {'neovim/nvim-lspconfig'},
         {'kosayoda/nvim-lightbulb'},
         {'weilbith/nvim-code-action-menu'},
         {'ms-jpq/coq.thirdparty', branch = '3p'},
@@ -402,7 +403,7 @@ return require('packer').startup {
           sign define DiagnosticSignInfo text=🎔  linehl= texthl=DiagnosticSignInfo numhl=
           sign define DiagnosticSignHint text=💡 linehl= texthl=DiagnosticSignHint numhl=
         ]]
-        local on_attach = function(_, bn)
+        local on_attach = function(client, bn)
           local function bmap(m, lhs, rhs)
             map(m, lhs, rhs, {buffer = bn})
           end
@@ -419,8 +420,11 @@ return require('packer').startup {
           bmap('n', 'gr'        , vim.lsp.buf.references    )
 
           vim.diagnostic.config({virtual_text = false})
-          autocmd('CursorHold' , {callback = vim.lsp.buf.document_highlight})
-          autocmd('CursorMoved', {callback = vim.lsp.buf.clear_references})
+
+          if client.resolved_capabilities.document_highlight then
+            autocmd('CursorHold' , {callback = vim.lsp.buf.document_highlight})
+            autocmd('CursorMoved', {callback = vim.lsp.buf.clear_references})
+          end
           autocmd('CursorHold' , {
             callback = require('nvim-lightbulb').update_lightbulb
           })
@@ -432,20 +436,13 @@ return require('packer').startup {
         end
         vim.g.coq_settings = {auto_start = 'shut-up'}
         local coq = require('coq')
-        local lsp = require('lspconfig')
-        local servers = {
-          'pyright',
-          'hls',
-          'vimls',
-          'clangd',
-          'bashls',
-        }
-        for _, server in ipairs(servers) do
-          lsp[server].setup(coq.lsp_ensure_capabilities{
-            on_attach = on_attach,
-            flags = {debounce_text_changes = 150}
-          })
-        end
+        require("nvim-lsp-installer").on_server_ready(
+          function(server)
+            server:setup(coq.lsp_ensure_capabilities{
+              on_attach = on_attach,
+              flags = {debounce_text_changes = 150}
+            })
+          end)
       end
     }
     use {'ZhiyuanLck/smart-pairs',
@@ -482,7 +479,7 @@ return require('packer').startup {
 
         -- To make smart-pairs work with coq.
         -- I also needed to modify smart-pairs/lua/pairs/init.lua to
-        -- remove autocommands at the end of setup.
+        -- remove autocommands at the end of the setup.
         vim.g.coq_settings = {keymap = {recommended = false}}
 
         map('i', '<Esc>'  , [[pumvisible() ? "\<C-e><ESC>" : "\<Esc>"]], opts)

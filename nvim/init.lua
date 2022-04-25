@@ -56,6 +56,8 @@ vim.g.haskell_indent_in                = 0
 vim.g.startify_fortune_use_unicode     = 1
 vim.g.stylishask_on_save               = 0
 vim.g.tex_conceal                      = ''
+vim.g.do_filetype_lua                  = 1
+vim.g.did_load_filetypes               = 0
 vim.g.undotree_SetFocusWhenToggle      = 1
 vim.g.undotree_WindowLayout            = 2
 vim.g.vim_json_syntax_conceal          = 0
@@ -152,16 +154,18 @@ autocmd('BufWritePost', {
   command = 'PackerCompile'
 })
 
--- autocmd('BufWinLeave', {command = 'silent! mkview'})
--- autocmd('BufWinEnter', {command = 'exe "normal zR" | silent! loadview'})
+-- Fixes a bug with folds
 autocmd('BufWinEnter', {command = 'exe "normal zR"'})
+
+if vim.env.TERM == 'xterm-kitty' then
+  autocmd('UIEnter', {
+    command = 'if v:event.chan ==# 0 | call chansend(v:stderr, "\x1b[>1u") | endif'
+  })
+  autocmd('UILeave', {
+    command = 'if v:event.chan ==# 0 | call chansend(v:stderr, "\x1b[<1u") | endif'
+  })
+end
 
 vim.cmd[[
 colorscheme cassiopeia
 ]]
-if vim.env.TERM == 'xterm-kitty' then
-  vim.cmd([[
-    autocmd UIEnter * if v:event.chan ==# 0 | call chansend(v:stderr, "\x1b[>1u") | endif
-    autocmd UILeave * if v:event.chan ==# 0 | call chansend(v:stderr, "\x1b[<1u") | endif
-  ]])
-end

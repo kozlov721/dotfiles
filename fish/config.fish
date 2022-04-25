@@ -15,7 +15,9 @@ alias kdiff      'kitty +kitten diff'
 alias ssh        'kitty +kitten ssh'
 alias mclear     'clear && macchina'
 alias ls         'ls --color=auto'
+alias ds         'du -sh * | sort -hr '
 alias ..         'cd ..'
+alias ,,         'prevd'
 alias ...        'cd ../..'
 alias ....       'cd ../../..'
 
@@ -39,3 +41,6 @@ source $HOME/.config/fish/fish_prompt.fish
 fish_add_path -P $HOME/.local/bin
 fish_add_path -P $HOME/.ghcup/bin
 fish_add_path -P /opt/nvidia/hpc_sdk/Linux_x86_64/22.2/compilers/bin
+
+set -g man_underline -i blue
+set -g man_bold -o brred
