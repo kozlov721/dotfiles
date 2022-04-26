@@ -9,10 +9,6 @@ alias fastreboot 'killall qutebrowser; reboot'
 alias qutebrowser '/usr/bin/qutebrowser --qt-flag ignore-gpu-blacklist --qt-flag enable-gpu-rasterization --qt-flag enable-native-gpu-memory-buffers --qt-flag num-raster-threads=4'
 alias tarnow     'tar -acf'
 alias untar      'tar -zxvf'
-alias icat       'kitty +kitten icat'
-alias kuni       'kitty +kitten unicode_input'
-alias kdiff      'kitty +kitten diff'
-alias ssh        'kitty +kitten ssh'
 alias mclear     'clear && macchina'
 alias ls         'ls --color=auto'
 alias ds         'du -sh * | sort -hr '
@@ -21,7 +17,13 @@ alias ,,         'prevd'
 alias ...        'cd ../..'
 alias ....       'cd ../../..'
 
-alias refresh-kitty 'killall -s SIGUSR1 kitty'
+if test $TERM = 'xterm-kitty'
+    alias ssh        'kitty +kitten ssh'
+    alias icat       'kitty +kitten icat'
+    alias kuni       'kitty +kitten unicode_input'
+    alias kdiff      'kitty +kitten diff'
+    alias refresh-kitty 'killall -s SIGUSR1 kitty'
+end
 
 set fish_greeting
 
@@ -44,3 +46,4 @@ fish_add_path -P /opt/nvidia/hpc_sdk/Linux_x86_64/22.2/compilers/bin
 
 set -g man_underline -i blue
 set -g man_bold -o brred
+set -g man_standout -b white black
