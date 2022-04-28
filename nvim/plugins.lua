@@ -12,15 +12,15 @@ return require('packer').startup {
         map('n', 'ss', ':ISwap<CR>')
       end
     }
-    use {'rcarriga/nvim-notify',
-      config = function()
-        require('notify').setup {
-          timeout = 2000,
-          max_width = 60
-        }
-        vim.notify = require('notify')
-      end
-    }
+    -- use {'rcarriga/nvim-notify',
+    --   config = function()
+    --     require('notify').setup {
+    --       timeout = 2000,
+    --       max_width = 60
+    --     }
+    --     vim.notify = require('notify')
+    --   end
+    -- }
     use {'kozlov721/cassiopeia.nvim'}
     use {'fedepujol/move.nvim',
       event = 'ModeChanged',
@@ -418,9 +418,9 @@ return require('packer').startup {
           bmap('n', 'gd'        , vim.lsp.buf.definition    )
           bmap('n', 'gi'        , vim.lsp.buf.implementation)
           bmap('n', 'gr'        , vim.lsp.buf.references    )
-
+    
           vim.diagnostic.config({virtual_text = false})
-
+    
           if client.resolved_capabilities.document_highlight then
             autocmd('CursorHold' , {callback = vim.lsp.buf.document_highlight})
             autocmd('CursorMoved', {callback = vim.lsp.buf.clear_references})
@@ -543,7 +543,7 @@ return require('packer').startup {
         'nvim-telescope/telescope-file-browser.nvim',
         {'nvim-telescope/telescope-fzf-native.nvim', run = 'make'},
       },
-      after = 'nvim-notify',
+      -- after = 'nvim-notify',
       keys = {'tel', '<leader>fl', '<leader>fb', '<leader>fm', '<leader>q'},
       event = 'CmdlineEnter',
       config = function()
@@ -580,7 +580,7 @@ return require('packer').startup {
         }
 
         telescope.load_extension('file_browser')
-        telescope.load_extension('notify')
+        -- telescope.load_extension('notify')
         telescope.load_extension('fzf')
         telescope.load_extension('media_files')
 
