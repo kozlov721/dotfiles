@@ -5,6 +5,12 @@ autocmd = vim.api.nvim_create_autocmd
 
 return require('packer').startup {
   function()
+    use {'nacro90/numb.nvim',
+      config = function()
+        require('numb').setup()
+      end
+    }
+    use {'kyazdani42/nvim-web-devicons'}
     use {'mizlan/iswap.nvim',
       event = 'CmdlineEnter',
       keys = 'ss',
@@ -12,15 +18,15 @@ return require('packer').startup {
         map('n', 'ss', ':ISwap<CR>')
       end
     }
-    -- use {'rcarriga/nvim-notify',
-    --   config = function()
-    --     require('notify').setup {
-    --       timeout = 2000,
-    --       max_width = 60
-    --     }
-    --     vim.notify = require('notify')
-    --   end
-    -- }
+    use {'rcarriga/nvim-notify',
+      config = function()
+        require('notify').setup {
+          timeout = 2000,
+          max_width = 60
+        }
+        vim.notify = require('notify')
+      end
+    }
     use {'kozlov721/cassiopeia.nvim'}
     use {'fedepujol/move.nvim',
       event = 'ModeChanged',
@@ -89,8 +95,8 @@ return require('packer').startup {
                 }
               },
               right = {' ', wilder.popupmenu_scrollbar()},
-              max_height = '15%',
-              min_width  = '40%',
+              max_height = '25%',
+              min_width  = '50%',
               reverse = 1,
             }
           ),
@@ -164,10 +170,10 @@ return require('packer').startup {
       end,
       requires = {
         {'kozlov721/cassiopeia.nvim'},
-        {'kyazdani42/nvim-web-devicons'}
       }
     }
     use {'anuvyklack/pretty-fold.nvim',
+      requires = 'anuvyklack/nvim-keymap-amend',
       config = function()
         require('pretty-fold').setup()
         require('pretty-fold.preview').setup {
@@ -228,16 +234,7 @@ return require('packer').startup {
       end
     }
     use {'lukas-reineke/indent-blankline.nvim',
-      config = function()
-        require('indent_blankline').setup()
-        vim.g.indent_blankline_filetype_exclude = {
-          'starter',
-          'help',
-          'lspinfo',
-          'checkhealth',
-          'terminal'
-        }
-      end
+      config = function() require('indent_blankline').setup() end
     }
     use {'michaelb/sniprun',
       keys = '<leader>R',
@@ -287,7 +284,7 @@ return require('packer').startup {
       end
     }
     use {'rmagatti/goto-preview',
-      keys = {'gpd', 'gpi', 'gpr'},
+      after = 'telescope.nvim',
       config = function()
         require('goto-preview').setup {
           default_mappings = true
@@ -376,18 +373,19 @@ return require('packer').startup {
       event = 'BufWritePre',
       config = function()
         require('lint').linters_by_ft = {
-          python  = {'flake8'},
-          haskell = {'hlint'},
-          c       = {'cppcheck'},
-          sh      = {'shellcheck'},
+          python   = {'flake8'},
+          haskell  = {'hlint'},
+          markdown = {'vale'},
+          c        = {'cppcheck'},
+          sh       = {'shellcheck'},
         }
         autocmd('BufWritePost', {callback = require('lint').try_lint})
       end
     }
-    use {'williamboman/nvim-lsp-installer',
+    use {'neovim/nvim-lspconfig',
       requires = {
-        {'neovim/nvim-lspconfig'},
         {'kosayoda/nvim-lightbulb'},
+        {'ray-x/lsp_signature.nvim'},
         {'weilbith/nvim-code-action-menu'},
         {'ms-jpq/coq.thirdparty', branch = '3p'},
         {'ms-jpq/coq.artifacts', branch = 'artifacts'},
@@ -398,12 +396,12 @@ return require('packer').startup {
       },
       config = function()
         vim.cmd [[
-          sign define DiagnosticSignError text=✘ linehl= texthl=DiagnosticSignError numhl=
-          sign define DiagnosticSignWarn text=🛈  linehl= texthl=DiagnosticSignWarn numhl=
-          sign define DiagnosticSignInfo text=🎔  linehl= texthl=DiagnosticSignInfo numhl=
-          sign define DiagnosticSignHint text=💡 linehl= texthl=DiagnosticSignHint numhl=
+          sign define DiagnosticSignError text=✘ texthl=DiagnosticSignError
+          sign define DiagnosticSignWarn text=🛈  texthl=DiagnosticSignWarn
+          sign define DiagnosticSignInfo text=🎔  texthl=DiagnosticSignInfo
+          sign define DiagnosticSignHint text=💡 texthl=DiagnosticSignHint
         ]]
-        local on_attach = function(client, bn)
+        local on_attach = function(_, bn)
           local function bmap(m, lhs, rhs)
             map(m, lhs, rhs, {buffer = bn})
           end
@@ -418,13 +416,10 @@ return require('packer').startup {
           bmap('n', 'gd'        , vim.lsp.buf.definition    )
           bmap('n', 'gi'        , vim.lsp.buf.implementation)
           bmap('n', 'gr'        , vim.lsp.buf.references    )
-    
+
           vim.diagnostic.config({virtual_text = false})
-    
-          if client.resolved_capabilities.document_highlight then
-            autocmd('CursorHold' , {callback = vim.lsp.buf.document_highlight})
-            autocmd('CursorMoved', {callback = vim.lsp.buf.clear_references})
-          end
+          autocmd('CursorHold' , {callback = vim.lsp.buf.document_highlight})
+          autocmd('CursorMoved', {callback = vim.lsp.buf.clear_references})
           autocmd('CursorHold' , {
             callback = require('nvim-lightbulb').update_lightbulb
           })
@@ -433,16 +428,24 @@ return require('packer').startup {
                   vim.diagnostic.open_float({focusable = false})
               end
           })
+          require('lsp_signature').on_attach()
         end
         vim.g.coq_settings = {auto_start = 'shut-up'}
         local coq = require('coq')
-        require("nvim-lsp-installer").on_server_ready(
-          function(server)
-            server:setup(coq.lsp_ensure_capabilities{
-              on_attach = on_attach,
-              flags = {debounce_text_changes = 150}
-            })
-          end)
+        local lsp = require('lspconfig')
+        local servers = {
+          'pyright',
+          'hls',
+          'vimls',
+          'clangd',
+          'bashls',
+        }
+        for _, server in ipairs(servers) do
+          lsp[server].setup(coq.lsp_ensure_capabilities{
+            on_attach = on_attach,
+            flags = {debounce_text_changes = 150}
+          })
+        end
       end
     }
     use {'ZhiyuanLck/smart-pairs',
@@ -479,7 +482,7 @@ return require('packer').startup {
 
         -- To make smart-pairs work with coq.
         -- I also needed to modify smart-pairs/lua/pairs/init.lua to
-        -- remove autocommands at the end of the setup.
+        -- remove autocommands at the end of setup.
         vim.g.coq_settings = {keymap = {recommended = false}}
 
         map('i', '<Esc>'  , [[pumvisible() ? "\<C-e><ESC>" : "\<Esc>"]], opts)
@@ -538,13 +541,20 @@ return require('packer').startup {
     use {'nvim-telescope/telescope.nvim',
       requires = {
         'nvim-lua/plenary.nvim',
-        'nvim-lua/popup.nvim',
-        'nvim-telescope/telescope-media-files.nvim',
         'nvim-telescope/telescope-file-browser.nvim',
         {'nvim-telescope/telescope-fzf-native.nvim', run = 'make'},
       },
-      -- after = 'nvim-notify',
-      keys = {'tel', '<leader>fl', '<leader>fb', '<leader>fm', '<leader>q'},
+      after = 'nvim-notify',
+      keys = {
+        'tel',
+        '<leader>fl',
+        '<leader>fb',
+        '<leader>fm',
+        '<leader>q',
+        'gpr',
+        'gpd',
+        'gpi'
+      },
       event = 'CmdlineEnter',
       config = function()
         local telescope = require('telescope')
@@ -580,9 +590,8 @@ return require('packer').startup {
         }
 
         telescope.load_extension('file_browser')
-        -- telescope.load_extension('notify')
+        telescope.load_extension('notify')
         telescope.load_extension('fzf')
-        telescope.load_extension('media_files')
 
         map('n', 'tel'        , ':Telescope '                                  )
         map('n', '<leader>fl' , ':Telescope live_grep grep_open_files=true<CR>')
@@ -609,7 +618,6 @@ return require('packer').startup {
     use {'echasnovski/mini.nvim',
       config = function()
         require('mini.surround').setup()
-
         local starter = require('mini.starter')
         local f = assert(io.popen('fortune | cowsay', 'r'))
         local s = assert(f:read('*a'))

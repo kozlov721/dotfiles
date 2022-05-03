@@ -13,7 +13,6 @@ vim.o.whichwrap      = vim.o.whichwrap .. '<,>,h,l,[,]'
 vim.o.wildmode       = 'longest,list,full'
 vim.o.foldmethod     = 'expr'
 vim.o.foldexpr       = 'nvim_treesitter#foldexpr()'
-vim.o.colorcolumn    = '81'
 vim.o.shiftwidth     = 4
 vim.o.softtabstop    = 4
 vim.o.tabstop        = 4
@@ -56,15 +55,13 @@ vim.g.haskell_indent_in                = 0
 vim.g.startify_fortune_use_unicode     = 1
 vim.g.stylishask_on_save               = 0
 vim.g.tex_conceal                      = ''
-vim.g.do_filetype_lua                  = 1
-vim.g.did_load_filetypes               = 0
 vim.g.undotree_SetFocusWhenToggle      = 1
 vim.g.undotree_WindowLayout            = 2
 vim.g.vim_json_syntax_conceal          = 0
 vim.g.vim_markdown_conceal             = 0
 vim.g.vim_markdown_conceal_code_blocks = 0
 
-vim.g.python3_host_prog = vim.env.HOME .. '/anaconda3/envs/nvim/bin/python'
+vim.g.python3_host_prog = '/usr/bin/python'
 
 local function trimWhiteSpace()
   local save = vim.fn.winsaveview()
@@ -89,8 +86,8 @@ map('n', '<leader>t'       , trimWhiteSpace            )
 
 map('n', 'J'       , ':bprevious<CR>', {silent = true})
 map('n', 'K'       , ':bnext<CR>'    , {silent = true})
-map('n', '<C-j>'   , ':resize -1<CR>', {silent = true})
-map('n', '<C-k>'   , ':resize +1<CR>', {silent = true})
+-- map('n', '<C-j>'   , ':resize -1<CR>', {silent = true})
+-- map('n', '<C-k>'   , ':resize +1<CR>', {silent = true})
 
 map('i', '<PageDown>', '<NOP>')
 map('i', '<PageUp>'  , '<NOP>')
@@ -154,17 +151,7 @@ autocmd('BufWritePost', {
   command = 'PackerCompile'
 })
 
--- Fixes a bug with folds
 autocmd('BufWinEnter', {command = 'exe "normal zR"'})
-
-if vim.env.TERM == 'xterm-kitty' then
-  autocmd('UIEnter', {
-    command = 'if v:event.chan ==# 0 | call chansend(v:stderr, "\x1b[>1u") | endif'
-  })
-  autocmd('UILeave', {
-    command = 'if v:event.chan ==# 0 | call chansend(v:stderr, "\x1b[<1u") | endif'
-  })
-end
 
 vim.cmd[[
 colorscheme cassiopeia

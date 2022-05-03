@@ -1,7 +1,8 @@
 import socket
-config.load_autoconfig(True)
+config.load_autoconfig(False)
 
 c.auto_save.session = True
+
 config.set('content.cookies.accept', 'all', 'chrome-devtools://*')
 config.set('content.cookies.accept', 'all', '*')
 config.set('content.cookies.accept', 'all', 'devtools://*')
@@ -48,11 +49,10 @@ c.url.default_page = 'https://google.com'
 
 
 c.url.searchengines = {
-    'DEFAULT': 'https://google.com/search?q={}',
-    'm':       'https://google.com/maps/search/{}',
-    'y':       'https://youtube.com/results?search_query={}',
+    'DEFAULT': 'https://www.google.com/search?q={}',
+    'y':       'https://www.youtube.com/results?search_query={}',
     'a':       'https://wiki.archlinux.org/index.php?search={}',
-    'r':       'https://reddit.com/r/{}/',
+    'r':       'https://www.reddit.com/r/{}/',
     'w':       'https://en.wikipedia.org/wiki/{}',
     'd':       'https://duckduckgo.com/?q={}'
 }
@@ -75,7 +75,10 @@ c.zoom.levels = [
     ]
 
 c.content.blocking.whitelist = ['https://www.googleadservices.com/*']
+
+# To prevent YouTube from playing videos before I focus them
 c.content.autoplay = False
+
 c.fonts.completion.category = 'bold default_size default_family'
 
 # ------------- Bindings ----------------

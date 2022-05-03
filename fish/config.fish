@@ -10,10 +10,13 @@ alias qutebrowser '/usr/bin/qutebrowser --qt-flag ignore-gpu-blacklist --qt-flag
 alias tarnow     'tar -acf'
 alias untar      'tar -zxvf'
 alias mclear     'clear && macchina'
-alias ls         'ls --color=auto'
-alias ds         'du -sh * | sort -hr '
-alias ..         'cd ..'
+alias ls         'exa'
+alias ll         'exa -l'
+alias la         'exa -a'
+alias lt         'exa -T --icons'
+alias ds         'du -sh * | sort -hr'
 alias ,,         'prevd'
+alias ..         'cd ..'
 alias ...        'cd ../..'
 alias ....       'cd ../../..'
 
@@ -34,8 +37,6 @@ end
 function mdv
     pandoc $argv[1] | lynx -stdin
 end
-
-# eval /home/martin/anaconda3/bin/conda "shell.fish" "hook" $argv | source
 
 source $HOME/.config/fish/ftc.fish info > /dev/null
 source $HOME/.config/fish/fish_prompt.fish
