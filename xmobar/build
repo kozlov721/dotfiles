@@ -1,9 +1,10 @@
 #!/bin/sh
 
-# remove '-DPC' on smaller screens
+# comment out '-DPC' on smaller screens
 
 stack ghc -- \
   --make xmobar.hs \
+  -DPC \
   -threaded \
   -ilib \
   -fforce-recomp \

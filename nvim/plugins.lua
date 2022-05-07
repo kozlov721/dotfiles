@@ -1,5 +1,3 @@
----@diagnostic disable: undefined-global, deprecated, lowercase-global
-
 map = vim.keymap.set
 autocmd = vim.api.nvim_create_autocmd
 
@@ -28,20 +26,6 @@ return require('packer').startup {
       end
     }
     use {'kozlov721/cassiopeia.nvim'}
-    use {'fedepujol/move.nvim',
-      event = 'ModeChanged',
-      cmd = '*:v',
-      config = function()
-        map('n', '<A-j>', ":MoveLine(1)<CR>"   , {silent = true})
-        map('n', '<A-k>', ":MoveLine(-1)<CR>"  , {silent = true})
-        map('x', '<A-j>', ":MoveBlock(1)<CR>"  , {silent = true})
-        map('x', '<A-k>', ":MoveBlock(-1)<CR>" , {silent = true})
-        map('n', '<A-l>', ":MoveHChar(1)<CR>"  , {silent = true})
-        map('n', '<A-h>', ":MoveHChar(-1)<CR>" , {silent = true})
-        map('x', '<A-l>', ":MoveHBlock(1)<CR>" , {silent = true})
-        map('x', '<A-h>', ":MoveHBlock(-1)<CR>", {silent = true})
-      end
-    }
     use {'gelguy/wilder.nvim',
       run = ':UpdateRemotePlugins',
       event = 'CmdlineEnter',
@@ -72,7 +56,7 @@ return require('packer').startup {
         end
         wilder.set_option {
           renderer = wilder.popupmenu_renderer(
-            wilder.popupmenu_border_theme {
+            wilder.popupmenu_palette_theme {
               highlighter = wilder.highlighter_with_gradient {
                 wilder.lua_pcre2_highlighter(),
                 wilder.lua_fzy_highlighter()
@@ -95,9 +79,9 @@ return require('packer').startup {
                 }
               },
               right = {' ', wilder.popupmenu_scrollbar()},
-              max_height = '25%',
-              min_width  = '50%',
-              reverse = 1,
+              max_height = '40%',
+              min_width  = '65%',
+              reverse = 0,
             }
           ),
           pipeline = wilder.branch(
@@ -114,7 +98,9 @@ return require('packer').startup {
         }
       end
     }
+    use {'tpope/vim-repeat'}
     use {'nvim-lualine/lualine.nvim',
+      requires = 'kozlov721/cassiopeia.nvim',
       config = function()
         require('lualine').setup {
           options  = {
@@ -168,9 +154,6 @@ return require('packer').startup {
           }
         }
       end,
-      requires = {
-        {'kozlov721/cassiopeia.nvim'},
-      }
     }
     use {'anuvyklack/pretty-fold.nvim',
       requires = 'anuvyklack/nvim-keymap-amend',
@@ -395,6 +378,10 @@ return require('packer').startup {
         }
       },
       config = function()
+        require('lsp_signature').setup {
+          hint_enable = false,
+          hi_parameter = 'RedUnderline'
+        }
         vim.cmd [[
           sign define DiagnosticSignError text=✘ texthl=DiagnosticSignError
           sign define DiagnosticSignWarn text=🛈  texthl=DiagnosticSignWarn
@@ -618,6 +605,7 @@ return require('packer').startup {
     use {'echasnovski/mini.nvim',
       config = function()
         require('mini.surround').setup()
+        map('n', 'sa', 'viWsa', {remap  = true})
         local starter = require('mini.starter')
         local f = assert(io.popen('fortune | cowsay', 'r'))
         local s = assert(f:read('*a'))

@@ -1,9 +1,8 @@
----@diagnostic disable: undefined-global, unused-local
 vim.o.termguicolors = true
 vim.g.mapleader = ';'
 require('plugins')
 local map = vim.keymap.set
-local autocmd = vim.api.nvim_create_autocmd
+local atocmd = vim.api.nvim_create_autocmd
 
 vim.o.signcolumn     = 'number'
 vim.o.spelllang      = 'en_us,cs'
@@ -13,10 +12,11 @@ vim.o.whichwrap      = vim.o.whichwrap .. '<,>,h,l,[,]'
 vim.o.wildmode       = 'longest,list,full'
 vim.o.foldmethod     = 'expr'
 vim.o.foldexpr       = 'nvim_treesitter#foldexpr()'
+vim.o.colorcolumn    = '81'
 vim.o.shiftwidth     = 4
 vim.o.softtabstop    = 4
 vim.o.tabstop        = 4
-vim.o.laststatus     = 2
+vim.o.laststatus     = 3
 vim.o.textwidth      = 0
 vim.o.foldenable     = false
 vim.o.spell          = false
@@ -69,20 +69,20 @@ local function trimWhiteSpace()
   vim.fn.winrestview(save)
 end
 
-map({'n', 'x'} , '-'       , '$'                       )
-map('n', '<leader>J'       , ':join<CR>'               )
-map('n', '<leader>O'       , 'O<ESC>'                  )
-map('n', '<leader>V'       , 'V<C-g>'                  )
-map('n', '<leader>o'       , 'o<ESC>'                  )
-map('n', '<leader>s'       , ':%s/'                    )
-map('n', '<leader>ns'      , ':set nospell!<CR>'       )
-map('n', '<leader>vip'     , 'vip<C-g>'                )
-map('n', '<leader>viw'     , 'viw<C-g>'                )
-map('n', '<space>'         , 'za'                      )
-map('n', '<leader><leader>', ':noh<CR>'                )
-map('n', '<leader>r'       , ':source $MYVIMRC|noh<CR>')
+map({'n', 'x'} , '-'       , '$'                         )
+map('n', '<leader>J'       , ':join<CR>'                 )
+map('n', '<leader>O'       , 'O<ESC>'                    )
+map('n', '<leader>V'       , 'V<C-g>'                    )
+map('n', '<leader>o'       , 'o<ESC>'                    )
+map('n', '<leader>s'       , ':%s/'                      )
+map('n', '<leader>ns'      , ':set nospell!<CR>'         )
+map('n', '<leader>vip'     , 'vip<C-g>'                  )
+map('n', '<leader>viw'     , 'viw<C-g>'                  )
+map('n', '<space>'         , 'za'                        )
+map('n', '<leader><leader>', ':noh<CR>'                  )
+map('n', '<leader>r'       , ':source $MYVIMRC|noh<CR>'  )
 map('n', '<leader><TAB>'   , '<C-w><C-w>', {remap = true})
-map('n', '<leader>t'       , trimWhiteSpace            )
+map('n', '<leader>t'       , trimWhiteSpace              )
 
 map('n', 'J'       , ':bprevious<CR>', {silent = true})
 map('n', 'K'       , ':bnext<CR>'    , {silent = true})
@@ -144,11 +144,6 @@ autocmd('InsertLeavePre', {
       trimWhiteSpace()
     end
   end
-})
-
-autocmd('BufWritePost', {
-  pattern = 'plugins.lua',
-  command = 'PackerCompile'
 })
 
 autocmd('BufWinEnter', {command = 'exe "normal zR"'})
