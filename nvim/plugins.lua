@@ -4,26 +4,18 @@ autocmd = vim.api.nvim_create_autocmd
 return require('packer').startup {
   function()
     use {'nacro90/numb.nvim',
-      config = function()
-        require('numb').setup()
-      end
+      config = function() require('numb').setup() end
     }
-    use {'kyazdani42/nvim-web-devicons'}
+    use {'lukas-reineke/virt-column.nvim',
+      config = function() require('virt-column').setup() end
+    }
+    use {'yamatsum/nvim-nonicons',
+      requires = {'kyazdani42/nvim-web-devicons'}
+    }
     use {'mizlan/iswap.nvim',
       event = 'CmdlineEnter',
       keys = 'ss',
-      config = function()
-        map('n', 'ss', ':ISwap<CR>')
-      end
-    }
-    use {'rcarriga/nvim-notify',
-      config = function()
-        require('notify').setup {
-          timeout = 2000,
-          max_width = 60
-        }
-        vim.notify = require('notify')
-      end
+      config = function() map('n', 'ss', ':ISwap<CR>') end
     }
     use {'kozlov721/cassiopeia.nvim'}
     use {'gelguy/wilder.nvim',
@@ -97,6 +89,12 @@ return require('packer').startup {
           )
         }
       end
+    }
+    use {'AckslD/nvim-trevJ.lua',
+      module = 'trevj',
+      setup = function()
+        map('n', '<leader>j', require('trevj').format_at_cursor)
+      end,
     }
     use {'tpope/vim-repeat'}
     use {'nvim-lualine/lualine.nvim',
@@ -325,21 +323,15 @@ return require('packer').startup {
       end
     }
     use {'chentau/marks.nvim',
-      config = function()
-        require('marks').setup{}
-      end
+      config = function() require('marks').setup{} end
     }
     use {'mbbill/undotree',
       keys = '<leader>e',
-      config = function ()
-        map('n', '<leader>e', ':UndotreeToggle<CR>')
-      end
+      config = function () map('n', '<leader>e', ':UndotreeToggle<CR>') end
     }
     use {'chrisbra/unicode.vim',
       keys = '<leader>un',
-      config = function()
-        map('n', '<leader>un', ':UnicodeSearch!')
-      end
+      config = function() map('n', '<leader>un', ':UnicodeSearch!') end
     }
     use {'terrortylor/nvim-comment',
       config = function()
@@ -504,9 +496,7 @@ return require('packer').startup {
       event = 'InsertEnter'
     }
     use {'norcalli/nvim-colorizer.lua',
-      config = function()
-        require('colorizer').setup()
-      end
+      config = function() require('colorizer').setup() end
     }
     use {'dkarter/bullets.vim',
       event = 'InsertEnter',
@@ -531,7 +521,6 @@ return require('packer').startup {
         'nvim-telescope/telescope-file-browser.nvim',
         {'nvim-telescope/telescope-fzf-native.nvim', run = 'make'},
       },
-      after = 'nvim-notify',
       keys = {
         'tel',
         '<leader>fl',
@@ -577,7 +566,6 @@ return require('packer').startup {
         }
 
         telescope.load_extension('file_browser')
-        telescope.load_extension('notify')
         telescope.load_extension('fzf')
 
         map('n', 'tel'        , ':Telescope '                                  )
@@ -589,10 +577,7 @@ return require('packer').startup {
     }
     use {'karb94/neoscroll.nvim',
       keys = {'<C-u>', '<C-d>', '<C-f>', '<C-b>'},
-      config = function()
-        require('neoscroll').setup {
-        }
-      end
+      config = function() require('neoscroll').setup() end
     }
     use {'max397574/better-escape.nvim',
       event = 'InsertEnter',

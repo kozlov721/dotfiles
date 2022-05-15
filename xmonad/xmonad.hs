@@ -58,7 +58,7 @@ myWorkspaces =
     , "dir"
     , "mus"
     , "docs"
-    , "free"
+    , "games"
     , "call"
     , "vid"
     , "chat"
@@ -81,7 +81,7 @@ getWorkspacesApps term =
 #endif
     , "spotify"
     , "zathura"
-    , term
+    , "flatpak run com.valvesoftware.Steam"
     , "skypeforlinux"
     , "vlc"
     , "discord"
@@ -260,16 +260,16 @@ myKeys conf@XConfig { modMask    = modm
       , ((modm .|. controlMask, k), spawn app)
       ]
     | ((m, k, cls), ws, app) <- zip3
-        [ (0,       xK_Return, Nothing           ) -- term
-        , (0,       xK_w,      Just "qutebrowser") -- web
-        , (0,       xK_r,      Just "Thunar"     ) -- files
-        , (0,       xK_s,      Just "Spotify"    ) -- music
-        , (altMask, xK_o,      Nothing           ) -- documents
-        , (altMask, xK_Return, Nothing           ) -- free
-        , (altMask, xK_s,      Just "Skype"      ) -- calls
-        , (0,       xK_v,      Just "vlc"        ) -- video
-        , (0,       xK_d,      Just "discord"    ) -- chat
-        , (0,       xK_b,      Nothing           ) -- development
+        [ (0,         xK_Return, Nothing           ) -- term
+        , (0,         xK_w,      Just "qutebrowser") -- web
+        , (0,         xK_r,      Just "Thunar"     ) -- files
+        , (0,         xK_s,      Just "Spotify"    ) -- music
+        , (altMask,   xK_o,      Nothing           ) -- documents
+        , (shiftMask, xK_s,      Just "Steam"      ) -- games
+        , (altMask,   xK_s,      Just "Skype"      ) -- calls
+        , (0,         xK_v,      Just "vlc"        ) -- video
+        , (0,         xK_d,      Just "discord"    ) -- chat
+        , (0,         xK_b,      Nothing           ) -- development
         ]
         workspaces
         workspacesApps
@@ -411,16 +411,16 @@ myLogHook proc = dynamicLogWithPP $ marshallPP 0 $ xmobarPP
     space = "<fn=4> </fn>"
     doubleSpace = space ++ space
     icons = M.fromList
-        [ ("term", "<fn=1>\xf120</fn>")
-        , ("www" , "<fn=1>\xf719</fn>")
-        , ("dir" , "<fn=1>\xf660</fn>")
-        , ("mus" , "<fn=1>\xf001</fn>")
-        , ("docs", "<fn=1>\xf15b</fn>")
-        , ("free", "<fn=1>\xf78a</fn>")
-        , ("call", "<fn=1>\xf095</fn>")
-        , ("vid" , "<fn=1>\xf03d</fn>")
-        , ("chat", "<fn=1>\xf086</fn>")
-        , ("dev" , "<fn=1>\xf126</fn>")
+        [ ("term" , "<fn=1>\xf120</fn>")
+        , ("www"  , "<fn=1>\xf719</fn>")
+        , ("dir"  , "<fn=1>\xf660</fn>")
+        , ("mus"  , "<fn=1>\xf001</fn>")
+        , ("docs" , "<fn=1>\xf15b</fn>")
+        , ("games", "<fn=1>\xf8bc</fn>")
+        , ("call" , "<fn=1>\xf095</fn>")
+        , ("vid"  , "<fn=1>\xf03d</fn>")
+        , ("chat" , "<fn=1>\xf086</fn>")
+        , ("dev"  , "<fn=1>\xf126</fn>")
         ]
     prepareWS name
         | name `M.notMember` icons = ""
