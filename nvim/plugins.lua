@@ -6,9 +6,6 @@ return require('packer').startup {
     use {'nacro90/numb.nvim',
       config = function() require('numb').setup() end
     }
-    use {'lukas-reineke/virt-column.nvim',
-      config = function() require('virt-column').setup() end
-    }
     use {'yamatsum/nvim-nonicons',
       requires = {'kyazdani42/nvim-web-devicons'}
     }
@@ -322,7 +319,8 @@ return require('packer').startup {
         }
       end
     }
-    use {'chentau/marks.nvim',
+
+    use {'chentoast/marks.nvim',
       config = function() require('marks').setup{} end
     }
     use {'mbbill/undotree',
@@ -416,8 +414,9 @@ return require('packer').startup {
           'pyright',
           'hls',
           'vimls',
-          'clangd',
+          'ccls',
           'bashls',
+          'rls'
         }
         for _, server in ipairs(servers) do
           lsp[server].setup(coq.lsp_ensure_capabilities{
