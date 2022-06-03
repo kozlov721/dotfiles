@@ -4,15 +4,14 @@ autocmd = vim.api.nvim_create_autocmd
 return require('packer').startup {
   function()
     use {'nacro90/numb.nvim',
+      event = 'CmdlineEnter',
       config = function() require('numb').setup() end
+    }
+    use {'lukas-reineke/virt-column.nvim',
+      config = function() require('virt-column').setup() end
     }
     use {'yamatsum/nvim-nonicons',
       requires = {'kyazdani42/nvim-web-devicons'}
-    }
-    use {'mizlan/iswap.nvim',
-      event = 'CmdlineEnter',
-      keys = 'ss',
-      config = function() map('n', 'ss', ':ISwap<CR>') end
     }
     use {'kozlov721/cassiopeia.nvim'}
     use {'gelguy/wilder.nvim',
@@ -87,12 +86,6 @@ return require('packer').startup {
         }
       end
     }
-    use {'AckslD/nvim-trevJ.lua',
-      module = 'trevj',
-      setup = function()
-        map('n', '<leader>j', require('trevj').format_at_cursor)
-      end,
-    }
     use {'tpope/vim-repeat'}
     use {'nvim-lualine/lualine.nvim',
       requires = 'kozlov721/cassiopeia.nvim',
@@ -113,9 +106,9 @@ return require('packer').startup {
               { 'diagnostics',
                 symbols = {
                   error = '✘ ',
-                  warn  = '🛈  ',
-                  info  = '🎔  ',
-                  hint  = '💡 '
+                  warn  = '🛈 ',
+                  hint  = '🎔 ',
+                  info  = '💡'
                 }
               }
             },
@@ -206,6 +199,9 @@ return require('packer').startup {
       end
     }
     use {'mfussenegger/nvim-treehopper',
+      event = 'ModeChanged',
+      cmd = '*:o',
+      keys = 'ft',
       config = function()
         map({'v', 'n'}, 'ft', require('tsht').nodes)
         map('o', 'm', ':<C-U>lua require("tsht").nodes()<CR>', {silent = true})
@@ -213,19 +209,6 @@ return require('packer').startup {
     }
     use {'lukas-reineke/indent-blankline.nvim',
       config = function() require('indent_blankline').setup() end
-    }
-    use {'michaelb/sniprun',
-      keys = '<leader>R',
-      event = 'CmdlineEnter',
-      run = 'bash ./install.sh',
-      config = function()
-        require('sniprun').setup {
-          display = {
-            'LongTempFloatingWindow',
-          }
-        }
-        map('n', '<leader>R', '<Plug>SnipRunOperator')
-      end
     }
     use {'jesseleite/vim-noh', event = 'CmdlineEnter'}
     use {'ellisonleao/glow.nvim',
@@ -280,6 +263,7 @@ return require('packer').startup {
     }
     use {'RRethy/nvim-treesitter-endwise',
       event = 'InsertEnter',
+      ft = {'lua', 'bash'},
       config = function()
         require('nvim-treesitter.configs').setup {
           endwise = {enable = true}
@@ -287,19 +271,6 @@ return require('packer').startup {
       end
     }
     use {'p00f/nvim-ts-rainbow'}
-    use {'RRethy/nvim-treesitter-textsubjects',
-      requires = 'nvim-treesitter/nvim-treesitter',
-      config = function()
-        require('nvim-treesitter.configs').setup {
-          textsubjects = {
-            enable = true,
-            keymaps = {
-              ['<CR>'] = 'textsubjects-smart',
-            },
-          },
-        }
-      end
-    }
     use {'nvim-treesitter/nvim-treesitter',
       run = ':TSUpdate',
       config = function()
@@ -319,7 +290,6 @@ return require('packer').startup {
         }
       end
     }
-
     use {'chentoast/marks.nvim',
       config = function() require('marks').setup{} end
     }
@@ -332,6 +302,7 @@ return require('packer').startup {
       config = function() map('n', '<leader>un', ':UnicodeSearch!') end
     }
     use {'terrortylor/nvim-comment',
+      keys = {'<leader>c', '<leader>cc', '<leader>cy'},
       config = function()
         require('nvim_comment').setup {
           line_mapping = '<leader>cc',
@@ -342,22 +313,10 @@ return require('packer').startup {
         map('n', '<leader>cy', 'yy:CommentToggle<CR>' , {silent = true})
       end
     }
-    use {'mfussenegger/nvim-lint',
-      event = 'BufWritePre',
-      config = function()
-        require('lint').linters_by_ft = {
-          python   = {'flake8'},
-          haskell  = {'hlint'},
-          markdown = {'vale'},
-          c        = {'cppcheck'},
-          sh       = {'shellcheck'},
-        }
-        autocmd('BufWritePost', {callback = require('lint').try_lint})
-      end
-    }
     use {'neovim/nvim-lspconfig',
       requires = {
         {'kosayoda/nvim-lightbulb'},
+        {'jubnzv/virtual-types.nvim'},
         {'ray-x/lsp_signature.nvim'},
         {'weilbith/nvim-code-action-menu'},
         {'ms-jpq/coq.thirdparty', branch = '3p'},
@@ -375,8 +334,8 @@ return require('packer').startup {
         vim.cmd [[
           sign define DiagnosticSignError text=✘ texthl=DiagnosticSignError
           sign define DiagnosticSignWarn text=🛈  texthl=DiagnosticSignWarn
-          sign define DiagnosticSignInfo text=🎔  texthl=DiagnosticSignInfo
-          sign define DiagnosticSignHint text=💡 texthl=DiagnosticSignHint
+          sign define DiagnosticSignHint text=🎔  texthl=DiagnosticSignInfo
+          sign define DiagnosticSignInfo text=💡 texthl=DiagnosticSignHint
         ]]
         local on_attach = function(_, bn)
           local function bmap(m, lhs, rhs)
@@ -394,7 +353,10 @@ return require('packer').startup {
           bmap('n', 'gi'        , vim.lsp.buf.implementation)
           bmap('n', 'gr'        , vim.lsp.buf.references    )
 
-          vim.diagnostic.config({virtual_text = false})
+          vim.diagnostic.config {
+            virtual_text = false,
+            severity_sort = true
+          }
           autocmd('CursorHold' , {callback = vim.lsp.buf.document_highlight})
           autocmd('CursorMoved', {callback = vim.lsp.buf.clear_references})
           autocmd('CursorHold' , {
@@ -406,6 +368,7 @@ return require('packer').startup {
               end
           })
           require('lsp_signature').on_attach()
+          require('virtualtypes').on_attach()
         end
         vim.g.coq_settings = {auto_start = 'shut-up'}
         local coq = require('coq')
@@ -416,7 +379,7 @@ return require('packer').startup {
           'vimls',
           'ccls',
           'bashls',
-          'rls'
+          'rust_analyzer'
         }
         for _, server in ipairs(servers) do
           lsp[server].setup(coq.lsp_ensure_capabilities{
@@ -448,6 +411,9 @@ return require('packer').startup {
               {"'", "'", {ignore_pre = '\\v(\\\\|\\S)'}},
               {'$', '$', {cross_line = true}},
             },
+            rust = {
+              {"|", "|"}
+            }
           },
           default_opts = {
             ['*'] = {
@@ -495,7 +461,11 @@ return require('packer').startup {
       event = 'InsertEnter'
     }
     use {'norcalli/nvim-colorizer.lua',
-      config = function() require('colorizer').setup() end
+      config = function()
+        require('colorizer').setup ({
+          '*';
+        }, { css = true })
+      end
     }
     use {'dkarter/bullets.vim',
       event = 'InsertEnter',
@@ -575,7 +545,7 @@ return require('packer').startup {
       end
     }
     use {'karb94/neoscroll.nvim',
-      keys = {'<C-u>', '<C-d>', '<C-f>', '<C-b>'},
+      keys = {'<C-u>', '<C-d>', '<C-f>', '<C-b>', '<C-e>', '<C-y>'},
       config = function() require('neoscroll').setup() end
     }
     use {'max397574/better-escape.nvim',
@@ -614,7 +584,7 @@ return require('packer').startup {
       ft = {'python'}
     }
     use {'alx741/vim-stylishask',
-      ft = 'haskell'
+      ft = {'haskell'}
     }
     use {'neovimhaskell/haskell-vim',
       after = 'vim-stylishask',

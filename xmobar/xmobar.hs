@@ -111,4 +111,3 @@ config = defaultConfig {
 
 main :: IO ()
 main = xmobar config
-

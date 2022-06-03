@@ -1,8 +1,10 @@
 vim.o.termguicolors = true
 vim.g.mapleader = ';'
+
 require('plugins')
+
 local map = vim.keymap.set
-local atocmd = vim.api.nvim_create_autocmd
+local autocmd = vim.api.nvim_create_autocmd
 
 vim.o.signcolumn     = 'number'
 vim.o.spelllang      = 'en_us,cs'
@@ -12,6 +14,7 @@ vim.o.whichwrap      = vim.o.whichwrap .. '<,>,h,l,[,]'
 vim.o.wildmode       = 'longest,list,full'
 vim.o.foldmethod     = 'expr'
 vim.o.foldexpr       = 'nvim_treesitter#foldexpr()'
+vim.o.colorcolumn    = '80'
 vim.o.shiftwidth     = 4
 vim.o.softtabstop    = 4
 vim.o.tabstop        = 4
@@ -81,12 +84,11 @@ map('n', '<space>'         , 'za'                        )
 map('n', '<leader><leader>', ':noh<CR>'                  )
 map('n', '<leader>r'       , ':source $MYVIMRC|noh<CR>'  )
 map('n', '<leader><TAB>'   , '<C-w><C-w>', {remap = true})
+map('n', '<ESC>'           , 'a'         , {remap = true})
 map('n', '<leader>t'       , trimWhiteSpace              )
 
 map('n', 'J'       , ':bprevious<CR>', {silent = true})
 map('n', 'K'       , ':bnext<CR>'    , {silent = true})
--- map('n', '<C-j>'   , ':resize -1<CR>', {silent = true})
--- map('n', '<C-k>'   , ':resize +1<CR>', {silent = true})
 
 map('i', '<PageDown>', '<NOP>')
 map('i', '<PageUp>'  , '<NOP>')
@@ -98,7 +100,7 @@ map('n', '<PageUp>'  , '<C-b>', {remap = true})
 
 
 autocmd('FileType', {
-  pattern = {'html', 'lua', 'css', 'xml', 'markdown', 'journal'},
+  pattern = {'html', 'lua', 'css', 'xml', 'markdown', 'journal', 'fish'},
   command = 'setlocal shiftwidth=2 tabstop=2 softtabstop=2',
 })
 
@@ -108,6 +110,11 @@ autocmd('FileType', {
 })
 
 autocmd('FileType', {command = 'noh'})
+
+autocmd('FileType', {
+  pattern='idlang',
+  command = 'set filetype=prolog | syntax on'
+})
 
 autocmd('FileType', {
   pattern = 'help',
@@ -142,6 +149,13 @@ autocmd('InsertLeavePre', {
     if vim.o.modifiable then
       trimWhiteSpace()
     end
+  end
+})
+
+autocmd('FileType', {
+  pattern = "fish",
+  callback = function()
+    vim.api.nvim_buf_set_option(0, "commentstring", "# %s")
   end
 })
 

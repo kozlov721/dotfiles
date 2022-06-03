@@ -2,9 +2,6 @@
 {-# LANGUAGE LambdaCase #-}
 module Main where
 
-import Control.Monad
-import Data.List          (mapAccumL, zip4)
-import Data.Maybe         (fromJust)
 import System.Environment (setEnv)
 import System.Exit        (exitSuccess)
 import Text.Format
@@ -12,7 +9,6 @@ import XMonad
 
 import Graphics.X11.ExtraTypes.XF86
 
-import XMonad.Actions.CopyWindow
 import XMonad.Actions.CycleWS
 import XMonad.Actions.DynamicWorkspaces
 import XMonad.Actions.Search
@@ -40,19 +36,21 @@ import XMonad.Prompt
 import XMonad.Prompt.ConfirmPrompt
 import XMonad.Prompt.FuzzyMatch
 import XMonad.Prompt.Input
+import XMonad.Prompt.Man
 import XMonad.Prompt.Shell
+import XMonad.Prompt.Unicode
 
 import XMonad.Util.Run
 import XMonad.Util.SpawnOnce
 
+import Data.Map (Map)
+
 import qualified Data.Map        as M
 import qualified XMonad.StackSet as W
 
-import RepeatAction
-
-myTerminal = "kitty"
-myModMask  = mod4Mask
-altMask    = mod1Mask
+myTerminal = "kitty"  :: String
+myModMask  = mod4Mask :: KeyMask
+altMask    = mod1Mask :: KeyMask
 
 myWorkspaces =
     [ "term"
@@ -60,14 +58,15 @@ myWorkspaces =
     , "dir"
     , "mus"
     , "docs"
-    , "free"
+    , "games"
     , "call"
     , "vid"
     , "chat"
     , "dev"
     , "hid" -- always hidden, this is for dropdown terminal
-    ]
-myWorkspaceIDs = M.fromList $ zip myWorkspaces $ [1..9] ++ [0]
+    ] :: [String]
+
+myWorkspaceIDs = M.fromList $ zip myWorkspaces $ [1..9] ++ [0] :: Map String Int
 
 getWorkspacesApps term =
     [ term
@@ -82,32 +81,32 @@ getWorkspacesApps term =
 #endif
     , "spotify"
     , "zathura"
-    , term
+    , "flatpak run com.valvesoftware.Steam"
     , "skypeforlinux"
     , "vlc"
     , "discord"
     , term ++ " -e nvim"
-    ]
+    ] :: [String]
 
 mySHC = def
     { st_font = "xft:FiraCode:size=30:weight=semibold"
     , st_bg   = "#24283B"
     , st_fg   = "#C9C1D6"
-    }
+    } :: ShowTextConfig
 
 mySHCIcons = mySHC
     { st_font = "xft:Font Awesome 5 Pro-Solid:size=60:weight=bold"
-    }
+    } :: ShowTextConfig
 
 mySearchEngines = M.fromList
-    [ ("a", "https://wiki.archlinux.org/index.php?search={0}")
+    [ ("a", "https://wiki.archlinux.org/index.php?search={0}" )
     , ("y", "https://www.youtube.com/results?search_query={0}")
-    , ("r", "https://www.reddit.com/r/{0}/")
-    , ("d", "https://duckduckgo.com/?q={0}")
-    , ("w", "https://en.wikipedia.org/wiki/{0}")
-    , ("g", "https://www.google.com/search?q={0}")
-    , ("DEFAULT", "https://www.google.com/search?q={0}")
-    ]
+    , ("r", "https://www.reddit.com/r/{0}/"                   )
+    , ("d", "https://duckduckgo.com/?q={0}"                   )
+    , ("w", "https://en.wikipedia.org/wiki/{0}"               )
+    , ("g", "https://www.google.com/search?q={0}"             )
+    , ("DEFAULT", "https://www.google.com/search?q={0}"       )
+    ] :: Map String String
 
 searchFunc :: String -> String
 searchFunc s
@@ -122,45 +121,37 @@ searchFunc s
                     else ("DEFAULT", s)
         _ -> ("DEFAULT", s)
 
-mySearchEngine = searchEngineF "" searchFunc
-
-currScreenID :: X ScreenId
-currScreenID = gets $ W.screen . W.current . windowset
-
-
 ----------------------------------------------------------------------
 -- BEGIN BINDINGS
-myKeys conf@XConfig { XMonad.modMask    = modm
-                    , XMonad.terminal   = term
-                    , XMonad.workspaces = workspaces''
+myKeys conf@XConfig { modMask    = modm
+                    , terminal   = term
                     } = M.fromList $
     let flashText_ c = flashText c (3/4)
         runProcessAndTrim p f i = trim <$> runProcessWithInput p f i
         workspacesApps = getWorkspacesApps term
         workspaces = workspaces' conf
     in
-    (modm, xK_period) `rememberActions`
     -- function keys
     [ ((0, xF86XK_MonBrightnessUp)
-       , runProcessWithInput "lux" ["-a", "5%"] ""
-       >> runProcessAndTrim "lux" ["-G"] ""
+       ,   runProcessWithInput "lux" ["-a", "5%"] ""
+       >>  runProcessAndTrim "lux" ["-G"] ""
        >>= flashText_ mySHC . ("Brightness: "++))
 
     , ((0, xF86XK_MonBrightnessDown)
-       , runProcessWithInput "lux" ["-s", "5%"] ""
-       >> runProcessAndTrim "lux" ["-G"] ""
+       ,   runProcessWithInput "lux" ["-s", "5%"] ""
+       >>  runProcessAndTrim "lux" ["-G"] ""
        >>= flashText_ mySHC . ("Brightness: "++))
 
     , ((0, xF86XK_AudioRaiseVolume)
        , runProcessWithInput "amixer"
        ["-qD", "pulse", "sset", "Master", "2%+"] ""
-       >> runProcessAndTrim "pamixer" ["--get-volume"] ""
+       >>  runProcessAndTrim "pamixer" ["--get-volume"] ""
        >>= flashText_ mySHC . ("Volume: "++) . (++"%"))
 
     , ((0, xF86XK_AudioLowerVolume)
        , runProcessWithInput "amixer"
        ["-qD", "pulse", "sset", "Master", "2%-"] ""
-       >> runProcessAndTrim "pamixer" ["--get-volume"] ""
+       >>  runProcessAndTrim "pamixer" ["--get-volume"] ""
        >>= flashText_ mySHC . ("Volume: "++) . (++"%"))
 
     , ((0, xF86XK_AudioMute)
@@ -170,25 +161,25 @@ myKeys conf@XConfig { XMonad.modMask    = modm
            _       -> (mySHCIcons { st_fg = "#90A050" }, "\xf6a8"))
        >> spawn "amixer -qD pulse sset Master toggle")
 
-    , ((0, xF86XK_AudioPrev), spawn "playerctl previous")
-    , ((0, xF86XK_AudioPlay), spawn "playerctl play-pause")
+    , ((0, xF86XK_AudioPrev),  spawn "playerctl previous")
+    , ((0, xF86XK_AudioPlay),  spawn "playerctl play-pause")
     , ((0, xF86XK_AudioPause), spawn "playerctl play-pause")
-    , ((0, xF86XK_AudioNext), spawn "playerctl next")
-    , ((0, xF86XK_AudioStop), spawn "playerctl stop")
+    , ((0, xF86XK_AudioNext),  spawn "playerctl next")
+    , ((0, xF86XK_AudioStop),  spawn "playerctl stop")
     , ((modm, xK_F1), spawn "playerctl previous")
     , ((modm, xK_F2), spawn "playerctl play-pause")
     , ((modm, xK_F3), spawn "playerctl next")
     -- Quick web search
     , ((modm, xK_o), inputPrompt myPromptConfig "Web search"
         ?+ \s -> do
-            windows (W.view (workspaces !! 1))
+            windows $ W.view $ workspaces !! 1
             b <- liftIO getBrowser
             search b searchFunc s
       )
     -- Search the content of clipboard on web
-    , ((modm .|. shiftMask, xK_g), windows
+    , ((modm .|. shiftMask, xK_o), windows
         (W.view (workspaces !! 1))
-        >> selectSearch mySearchEngine)
+        >> selectSearch (searchEngineF "" searchFunc))
     -- Open shell prompt
     , ((modm, xK_p), shellPrompt myPromptConfig)
     -- Screenshot
@@ -241,12 +232,11 @@ myKeys conf@XConfig { XMonad.modMask    = modm
     -- Simulates drop-down terminal
     , ((modm, xK_backslash), ifWindow
         (className =? "kitty-dropdown")
-        (ask >>= doF
-        . (\a s -> if   a `elem` W.index s
-                   then
-                   W.shiftWin (marshall 0 "hid") a s
-                   else W.shiftWin (W.currentTag s) a s
-          )
+        (do
+           ws <- ask
+           doF (\s -> if   ws `elem` W.index s
+                      then W.shiftWin (marshall 0 "hid") ws s
+                      else W.shiftWin (W.currentTag s) ws s)
         )
         (spawnHere "kitty --class=kitty-dropdown"))
     -- Special bindings to run cbonsai as screensaver
@@ -258,52 +248,39 @@ myKeys conf@XConfig { XMonad.modMask    = modm
     ]
     ++
     -- Spawn certain apps on certain workspaces
+    -- Some apps (like browser) are not spawn for second time until
+    -- specifically their spawning is requested with ctrl.
     let
-    runAndShift w c = sequence_ [ spawnOn w c, windows $ onCurrentScreen W.view w]
+    runAndShift w c = sequence_ [spawnOn w c, windows $ onCurrentScreen W.view w]
     in
-    [ ( (modm .|. m, k)
-      , case q of
-          Nothing -> runAndShift w c
-          Just x  -> raiseMaybe (runAndShift w c) (className =? x)
-      )
-    | ((m, k, q), w, c) <- zip3
-        [ (0,       xK_Return, Nothing           ) -- term
-        , (0,       xK_w,      Just "qutebrowser") -- web
-        , (0,       xK_r,      Just "Thunar"     ) -- files
-        , (0,       xK_s,      Just "Spotify"    ) -- music
-        , (altMask, xK_o,      Nothing           ) -- documents
-        , (altMask, xK_Return, Nothing           ) -- free
-        , (altMask, xK_s,      Just "Skype"      ) -- calls
-        , (0,       xK_v,      Just "vlc"        ) -- video
-        , (0,       xK_d,      Just "discord"    ) -- chat
-        , (0,       xK_b,      Nothing           ) -- development
+    concat
+    [ [ ((modm .|. m, k), case cls of
+            Nothing -> runAndShift ws app
+            Just x  -> raiseMaybe (runAndShift ws app) (className =? x))
+      , ((modm .|. controlMask, k), spawn app)
+      ]
+    | ((m, k, cls), ws, app) <- zip3
+        [ (0,         xK_Return, Nothing           ) -- term
+        , (0,         xK_w,      Just "qutebrowser") -- web
+        , (0,         xK_r,      Just "Thunar"     ) -- files
+        , (0,         xK_s,      Just "Spotify"    ) -- music
+        , (altMask,   xK_o,      Nothing           ) -- documents
+        , (shiftMask, xK_s,      Just "Steam"      ) -- games
+        , (altMask,   xK_s,      Just "Skype"      ) -- calls
+        , (0,         xK_v,      Just "vlc"        ) -- video
+        , (0,         xK_d,      Just "discord"    ) -- chat
+        , (0,         xK_b,      Nothing           ) -- development
         ]
         workspaces
         workspacesApps
     ]
     ++
-    -- With ctrl, spawn the app on current workspace
-    [ ((modm .|. controlMask, k), spawn c)
-    | (k, c) <- zip
-        [ xK_Return
-        , xK_w
-        , xK_r
-        , xK_s
-        , xK_o
-        , xK_Return
-        , xK_m
-        , xK_v
-        , xK_d
-        , xK_b
-        ]
-        workspacesApps
-    ]
-    ++
     -- mod-[0..9], toggles workspace N
+    -- mod-ctrl-[0..9], move window to workspace N
     -- mod-shift-[0..9], move window to workspace N and shift there
-    -- mod-ctrl-[0..9], only move window to workspace N
     let
     shiftAndFocus i = W.view i . W.shift i
+    currScreenID = gets $ W.screen . W.current . windowset
     toggle i = do
         curr <- gets $ W.currentTag . windowset
         last <- head <$> gets (map W.tag . W.hidden . windowset)
@@ -388,6 +365,7 @@ myManageHook = composeAll
                    , "qBittorrent"
                    , "Gpick"
                    , "gpick"
+                   , "File-roller"
                    ]
 #ifdef PC
             ++ ["Spotify", "netflix", "Steam", "spotify", "discord", "Thunar"]
@@ -407,7 +385,6 @@ myManageHook = composeAll
 #endif
 
 ----------------------------------------------------------------------
--- The rest is managed in ~/.xsession
 myStartupHook = spawnOnce "picom --experimental-backends &"
 #ifndef PC
     >> spawnOnce "xautolock -time 10 -locker 'screensaver' &"
@@ -415,54 +392,46 @@ myStartupHook = spawnOnce "picom --experimental-backends &"
     >> spawnNOnOnce 2 "term" myTerminal
 
 ----------------------------------------------------------------------
-myLogHook proc = dynamicLogWithPP
-    $ marshallPP 0
-    $ xmobarPP
-        { ppOutput          = hPutStrLn proc
-        , ppCurrent         = xmobarColor "#FFCC10" "" . prepareWS
-        , ppHidden          = xmobarColor "#CA65F9" "" . prepareWS
-        , ppVisible         = xmobarColor "#FF6C6B" "" . prepareWS
-        , ppHiddenNoWindows = xmobarColor "#4594BF" "" . prepareWS
-        , ppTitle           = mempty
-        , ppUrgent          = xmobarColor "#C45500" "" . wrap "!" "!"
-        , ppOrder           = \(ws:l:t:ex) -> (ws:l:ex) ++ [t]
-        , ppSep             = wrap space doubleSpace
-            $ xmobarColor "#999999" "" "|"
-        , ppWsSep           = wrap space space
-            $ xmobarColor "#555555" "" "|"
-        , ppLayout          = xmobarColor "#FF4854" ""
-            . wrap "<action=xdotool key super+space>" "</action>"
-            . last
-            . words
-        }
+myLogHook proc = dynamicLogWithPP $ marshallPP 0 $ xmobarPP
+    { ppOutput          = hPutStrLn proc
+    , ppCurrent         = xmobarColor "#FFCC10" "" . prepareWS
+    , ppHidden          = xmobarColor "#CA65F9" "" . prepareWS
+    , ppVisible         = xmobarColor "#FF6C6B" "" . prepareWS
+    , ppHiddenNoWindows = xmobarColor "#4594BF" "" . prepareWS
+    , ppTitle           = mempty
+    , ppUrgent          = xmobarColor "#C45500" "" . wrap "!" "!"
+    , ppOrder           = \(ws:l:t:ex) -> (ws:l:ex) ++ [t]
+    , ppSep             = wrap space doubleSpace $ xmobarColor "#999999" "" "|"
+    , ppWsSep           = wrap space space $ xmobarColor "#555555" "" "|"
+    , ppLayout          = xmobarColor "#FF4854" ""
+        . wrap "<action=xdotool key super+space>" "</action>"
+        . last
+        . words
+    }
   where
     space = "<fn=4> </fn>"
     doubleSpace = space ++ space
     icons = M.fromList
-        [ ("term", "<fn=1>\xf120</fn>")
-        , ("www" , "<fn=1>\xf719</fn>")
-        , ("dir" , "<fn=1>\xf660</fn>")
-        , ("mus" , "<fn=1>\xf001</fn>")
-        , ("docs", "<fn=1>\xf15b</fn>")
-        , ("free", "<fn=1>\xf78a</fn>")
-        , ("call", "<fn=1>\xf095</fn>")
-        , ("vid" , "<fn=1>\xf03d</fn>")
-        , ("chat", "<fn=1>\xf086</fn>")
-        , ("dev" , "<fn=1>\xf126</fn>")
+        [ ("term" , "<fn=1>\xf120</fn>")
+        , ("www"  , "<fn=1>\xf719</fn>")
+        , ("dir"  , "<fn=1>\xf660</fn>")
+        , ("mus"  , "<fn=1>\xf001</fn>")
+        , ("docs" , "<fn=1>\xf15b</fn>")
+        , ("games", "<fn=1>\xf8bc</fn>")
+        , ("call" , "<fn=1>\xf095</fn>")
+        , ("vid"  , "<fn=1>\xf03d</fn>")
+        , ("chat" , "<fn=1>\xf086</fn>")
+        , ("dev"  , "<fn=1>\xf126</fn>")
         ]
     prepareWS name
         | name `M.notMember` icons = ""
-        | otherwise = "<action=xdotool key super+"
-            ++ show (myWorkspaceIDs M.! name)
-            ++ ">"
-            ++ icons M.! name
-            ++ "</action>"
+        | otherwise = format
+            "<action=xdotool key super+{0}>{1}</action>"
+            [show (myWorkspaceIDs M.! name), icons M.! name]
 
 ----------------------------------------------------------------------
 myHandleEventHook = handleTimerEvent <+> swallowEventHook
-    (    className =? "kitty"
-    <||> className =? "Alacritty"
-    <||> className =? "st-256color")
+    (className =? "kitty" <||> className =? "Alacritty")
     (pure True)
 
 ----------------------------------------------------------------------
@@ -486,7 +455,9 @@ myConfig logHandle = def
     , handleEventHook    = myHandleEventHook
     }
 ----------------------------------------------------------------------
+main :: IO ()
 main = setEnv "BROWSER" "qutebrowser"
     >> setEnv "EDITOR" "nvim"
     >> spawnPipe "xmobar"
     >>= xmonad . docks . ewmh . ewmhFullscreen . myConfig
+
