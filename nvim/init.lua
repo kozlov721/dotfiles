@@ -14,7 +14,7 @@ vim.o.whichwrap      = vim.o.whichwrap .. '<,>,h,l,[,]'
 vim.o.wildmode       = 'longest,list,full'
 vim.o.foldmethod     = 'expr'
 vim.o.foldexpr       = 'nvim_treesitter#foldexpr()'
-vim.o.colorcolumn    = '80'
+vim.o.colorcolumn    = '81'
 vim.o.shiftwidth     = 4
 vim.o.softtabstop    = 4
 vim.o.tabstop        = 4
@@ -153,7 +153,7 @@ autocmd('InsertLeavePre', {
 })
 
 autocmd('FileType', {
-  pattern = "fish",
+  pattern = {"fish", "asm"},
   callback = function()
     vim.api.nvim_buf_set_option(0, "commentstring", "# %s")
   end

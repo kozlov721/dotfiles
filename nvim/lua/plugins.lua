@@ -337,11 +337,14 @@ return require('packer').startup {
           sign define DiagnosticSignHint text=🎔  texthl=DiagnosticSignInfo
           sign define DiagnosticSignInfo text=💡 texthl=DiagnosticSignHint
         ]]
-        local on_attach = function(_, bn)
+        local on_attach = function(client, bn)
+          local cap = client.resolved_capabilities
           local function bmap(m, lhs, rhs)
             map(m, lhs, rhs, {buffer = bn})
           end
-          bmap('n', '<C-k>'     , vim.lsp.buf.signature_help)
+          if cap.signature_help then
+            bmap('n', '<C-k>'     , vim.lsp.buf.signature_help)
+          end
           bmap('n', '<leader>b' , '<cmd>CodeActionMenu<CR>' )
           bmap('n', '<leader>rn', vim.lsp.buf.rename        )
           bmap('n', '<leader>f' , vim.lsp.buf.formatting    )
@@ -357,7 +360,9 @@ return require('packer').startup {
             virtual_text = false,
             severity_sort = true
           }
-          autocmd('CursorHold' , {callback = vim.lsp.buf.document_highlight})
+          if cap.document_highlight then
+            autocmd('CursorHold' , {callback = vim.lsp.buf.document_highlight})
+          end
           autocmd('CursorMoved', {callback = vim.lsp.buf.clear_references})
           autocmd('CursorHold' , {
             callback = require('nvim-lightbulb').update_lightbulb
@@ -379,7 +384,7 @@ return require('packer').startup {
           'vimls',
           'ccls',
           'bashls',
-          'rust_analyzer'
+          'rust_analyzer',
         }
         for _, server in ipairs(servers) do
           lsp[server].setup(coq.lsp_ensure_capabilities{

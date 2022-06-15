@@ -66,18 +66,18 @@ myWorkspaces =
     , "hid" -- always hidden, this is for dropdown terminal
     ] :: [String]
 
-myWorkspaceIDs = M.fromList $ zip myWorkspaces $ [1..9] ++ [0] :: Map String Int
+myWorkspaceIDs = M.fromList $ zip myWorkspaces $ [1..9] <> [0] :: Map String Int
 
 getWorkspacesApps term =
     [ term
-    , "qutebrowser --qt-flag ignore-gpu-blacklist"
-    ++ " --qt-flag enable-gpu-rasterization"
-    ++ " --qt-flag enable-native-gpu-memory-buffers"
-    ++ " --qt-flag num-raster-threads=4"
+    , "qutebrowser" -- --qt-flag ignore-gpu-blacklist"
+    -- <> " --qt-flag enable-gpu-rasterization"
+    -- <> " --qt-flag enable-native-gpu-memory-buffers"
+    -- <> " --qt-flag num-raster-threads=4"
 #ifdef PC
     , "thunar"
 #else
-    , term ++ " -e ranger"
+    , term <> " -e ranger"
 #endif
     , "spotify"
     , "zathura"
@@ -85,7 +85,7 @@ getWorkspacesApps term =
     , "skypeforlinux"
     , "vlc"
     , "discord"
-    , term ++ " -e nvim"
+    , term <> " -e nvim"
     ] :: [String]
 
 mySHC = def
@@ -135,24 +135,24 @@ myKeys conf@XConfig { modMask    = modm
     [ ((0, xF86XK_MonBrightnessUp)
        ,   runProcessWithInput "lux" ["-a", "5%"] ""
        >>  runProcessAndTrim "lux" ["-G"] ""
-       >>= flashText_ mySHC . ("Brightness: "++))
+       >>= flashText_ mySHC . ("Brightness: "<>))
 
     , ((0, xF86XK_MonBrightnessDown)
        ,   runProcessWithInput "lux" ["-s", "5%"] ""
        >>  runProcessAndTrim "lux" ["-G"] ""
-       >>= flashText_ mySHC . ("Brightness: "++))
+       >>= flashText_ mySHC . ("Brightness: "<>))
 
     , ((0, xF86XK_AudioRaiseVolume)
        , runProcessWithInput "amixer"
        ["-qD", "pulse", "sset", "Master", "2%+"] ""
        >>  runProcessAndTrim "pamixer" ["--get-volume"] ""
-       >>= flashText_ mySHC . ("Volume: "++) . (++"%"))
+       >>= flashText_ mySHC . ("Volume: "<>) . (<>"%"))
 
     , ((0, xF86XK_AudioLowerVolume)
        , runProcessWithInput "amixer"
        ["-qD", "pulse", "sset", "Master", "2%-"] ""
        >>  runProcessAndTrim "pamixer" ["--get-volume"] ""
-       >>= flashText_ mySHC . ("Volume: "++) . (++"%"))
+       >>= flashText_ mySHC . ("Volume: "<>) . (<>"%"))
 
     , ((0, xF86XK_AudioMute)
        , runProcessAndTrim "pamixer" ["--get-mute"] ""
@@ -246,7 +246,7 @@ myKeys conf@XConfig { modMask    = modm
     , ((modm .|. controlMask .|. shiftMask, xK_w)
        , sequence_ [toggleWS, removeWorkspaceByTag "saver"])
     ]
-    ++
+    <>
     -- Spawn certain apps on certain workspaces
     -- Some apps (like browser) are not spawn for second time until
     -- specifically their spawning is requested with ctrl.
@@ -274,7 +274,7 @@ myKeys conf@XConfig { modMask    = modm
         workspaces
         workspacesApps
     ]
-    ++
+    <>
     -- mod-[0..9], toggles workspace N
     -- mod-ctrl-[0..9], move window to workspace N
     -- mod-shift-[0..9], move window to workspace N and shift there
@@ -289,7 +289,7 @@ myKeys conf@XConfig { modMask    = modm
         windows $ W.view next
     in
     [ ((m .|. modm, k), f i)
-        | (i, k) <- zip workspaces $ [xK_1..xK_9] ++ [xK_0]
+        | (i, k) <- zip workspaces $ [xK_1..xK_9] <> [xK_0]
         , (f, m) <- [ (toggle, 0)
                     , (windows . onCurrentScreen shiftAndFocus, shiftMask)
                     , (windows . onCurrentScreen W.shift, controlMask)
@@ -368,20 +368,20 @@ myManageHook = composeAll
                    , "File-roller"
                    ]
 #ifdef PC
-            ++ ["Spotify", "netflix", "Steam", "spotify", "discord", "Thunar"]
+            <> ["Spotify", "netflix", "Steam", "spotify", "discord", "Thunar"]
 #else
-            ++ ["kitty-dropdown"]
+            <> ["kitty-dropdown"]
 #endif
         floating = ["ij-ImageJ", "ImageJ"]
         ignored  = ["desktop_window"]
 
     in [className =? cls --> doFloat  | cls <- floating]
-    ++ [className =? cls --> doCenter | cls <- centered]
-    ++ [className =? cls --> doIgnore | cls <- ignored ]
-    ++ [stringProperty "WM_NAME" =? "Zoom Meeting" --> doCenter]
-    ++ [stringProperty "WM_NAME" =? "Zoom Cloud Meetings" --> doCenter]
+    <> [className =? cls --> doCenter | cls <- centered]
+    <> [className =? cls --> doIgnore | cls <- ignored ]
+    <> [stringProperty "WM_NAME" =? "Zoom Meeting" --> doCenter]
+    <> [stringProperty "WM_NAME" =? "Zoom Cloud Meetings" --> doCenter]
 #ifdef PC
-    ++ [className =? "kitty-dropdown" --> doRectFloat (W.RationalRect (1/14) (1/3) (3/8) (4/9))]
+    <> [className =? "kitty-dropdown" --> doRectFloat (W.RationalRect (1/14) (1/3) (3/8) (4/9))]
 #endif
 
 ----------------------------------------------------------------------
@@ -400,7 +400,7 @@ myLogHook proc = dynamicLogWithPP $ marshallPP 0 $ xmobarPP
     , ppHiddenNoWindows = xmobarColor "#4594BF" "" . prepareWS
     , ppTitle           = mempty
     , ppUrgent          = xmobarColor "#C45500" "" . wrap "!" "!"
-    , ppOrder           = \(ws:l:t:ex) -> (ws:l:ex) ++ [t]
+    , ppOrder           = \(ws:l:t:ex) -> (ws:l:ex) <> [t]
     , ppSep             = wrap space doubleSpace $ xmobarColor "#999999" "" "|"
     , ppWsSep           = wrap space space $ xmobarColor "#555555" "" "|"
     , ppLayout          = xmobarColor "#FF4854" ""
@@ -410,7 +410,7 @@ myLogHook proc = dynamicLogWithPP $ marshallPP 0 $ xmobarPP
     }
   where
     space = "<fn=4> </fn>"
-    doubleSpace = space ++ space
+    doubleSpace = space <> space
     icons = M.fromList
         [ ("term" , "<fn=1>\xf120</fn>")
         , ("www"  , "<fn=1>\xf719</fn>")

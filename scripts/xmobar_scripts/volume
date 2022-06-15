@@ -1,7 +1,6 @@
-#/bin/bash
+#/bin/sh
 
 VOLUME="$(pamixer --get-volume)%"
 MUTE="$(pamixer --get-mute)"
 
 echo "$MUTE $VOLUME"
-
