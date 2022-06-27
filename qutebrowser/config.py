@@ -54,7 +54,8 @@ c.url.searchengines = {
     'a':       'https://wiki.archlinux.org/index.php?search={}',
     'r':       'https://reddit.com/r/{}/',
     'w':       'https://en.wikipedia.org/wiki/{}',
-    'd':       'https://duckduckgo.com/?q={}'
+    'd':       'https://duckduckgo.com/?q={}',
+    'g':       'https://wiki.gentoo.org/wiki/{}',
 }
 
 c.url.start_pages = 'https://google.com'
@@ -114,8 +115,6 @@ c.colors.webpage.darkmode.enabled = False
 c.colors.webpage.darkmode.threshold.background = 205
 c.colors.webpage.darkmode.threshold.text = 150
 c.colors.webpage.darkmode.algorithm = 'lightness-hsl'
-# c.colors.webpage.preferred_color_scheme = "dark"
-# c.colors.webpage.bg = '#111111'
 
 if c.colors.webpage.darkmode.enabled:
     c.content.user_stylesheets = [

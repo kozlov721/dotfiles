@@ -84,7 +84,6 @@ map('n', '<space>'         , 'za'                        )
 map('n', '<leader><leader>', ':noh<CR>'                  )
 map('n', '<leader>r'       , ':source $MYVIMRC|noh<CR>'  )
 map('n', '<leader><TAB>'   , '<C-w><C-w>', {remap = true})
-map('n', '<ESC>'           , 'a'         , {remap = true})
 map('n', '<leader>t'       , trimWhiteSpace              )
 
 map('n', 'J'       , ':bprevious<CR>', {silent = true})

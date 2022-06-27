@@ -1,12 +1,11 @@
 alias vim        'nvim'
 alias aisa       'kitty +kitten ssh xkozlov1@aisa.fi.muni.cz'
-alias install    'paru -S'
-alias remove     'paru -Rsn'
-alias pacinfo    'paru -Si'
-alias update     'paru -Syu'
+alias install    'sudo emerge --ask'
+alias remove     'sudo emerge --deselect --ask'
+# alias pacinfo    'paru -Si'
+# alias update     'paru -Syu'
 alias fixpacman  'sudo rm /var/lib/pacman/db.lck'
 alias fastreboot 'killall qutebrowser; reboot'
-# alias qutebrowser '/usr/bin/qutebrowser --qt-flag ignore-gpu-blacklist --qt-flag enable-gpu-rasterization --qt-flag enable-native-gpu-memory-buffers --qt-flag num-raster-threads=4'
 alias tarnow     'tar -acf'
 alias untar      'tar -zxvf'
 alias mclear     'clear && macchina'
@@ -33,6 +32,11 @@ end
 
 set fish_greeting
 
+fish_add_path -P $HOME/.local/bin
+fish_add_path -P $HOME/.ghcup/bin
+fish_add_path -P $HOME/.cargo/bin
+fish_add_path -P /opt/nvidia/hpc_sdk/Linux_x86_64/22.2/compilers/bin
+
 if status --is-interactive
     macchina
 end
@@ -41,12 +45,12 @@ function mdv
     pandoc $argv[1] | lynx -stdin
 end
 
-source $HOME/.config/fish/ftc.fish info > /dev/null
-source $HOME/.config/fish/fish_prompt.fish
+function add-overlay
+    sudo eselect repository enable $argv[1]
+    sudo emaint sync -r $argv[1]
+end
 
-fish_add_path -P $HOME/.local/bin
-fish_add_path -P $HOME/.ghcup/bin
-fish_add_path -P /opt/nvidia/hpc_sdk/Linux_x86_64/22.2/compilers/bin
+source $HOME/.config/fish/fish_prompt.fish
 
 set -g man_underline -i blue
 set -g man_bold -o brred

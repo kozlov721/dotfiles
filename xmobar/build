@@ -4,7 +4,6 @@
 
 stack ghc -- \
   --make xmobar.hs \
-  -DPC \
   -threaded \
   -ilib \
   -fforce-recomp \

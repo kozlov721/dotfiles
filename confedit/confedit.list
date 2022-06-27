@@ -8,7 +8,7 @@ qutebrowser    ~/.config/qutebrowser/config.py
 ranger         ~/.config/ranger/rifle.conf
 nvim           ~/.config/nvim/init.lua ~/.config/nvim/lua/plugins.lua
 vim            ~/.config/nvim/init.lua ~/.config/nvim/lua/plugins.lua
-xmobar         ~/.config/xmobar/xmobar.hs
-xmobar-plugins ~/.config/xmobar/MyPlugins.hs
+xmobar         ~/.config/xmobar/app/xmobar.hs
+xmobar-plugins ~/.config/xmobar/src/MyPlugins.hs
 xmonad         ~/.config/xmonad/app/xmonad.hs
 zathura        ~/.config/zathura/zathurarc

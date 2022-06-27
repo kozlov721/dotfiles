@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 xdotool key super+shift+ctrl+s
 kitty -c "$HOME"/.config/kitty/cbonsaiTheme.conf -e cbonsai -S -w 2 -L 80 -M 15 -m "Enjoy your time off!"&

@@ -70,10 +70,7 @@ myWorkspaceIDs = M.fromList $ zip myWorkspaces $ [1..9] <> [0] :: Map String Int
 
 getWorkspacesApps term =
     [ term
-    , "qutebrowser" -- --qt-flag ignore-gpu-blacklist"
-    -- <> " --qt-flag enable-gpu-rasterization"
-    -- <> " --qt-flag enable-native-gpu-memory-buffers"
-    -- <> " --qt-flag num-raster-threads=4"
+    , "qutebrowser"
 #ifdef PC
     , "thunar"
 #else
@@ -385,11 +382,13 @@ myManageHook = composeAll
 #endif
 
 ----------------------------------------------------------------------
-myStartupHook = spawnOnce "picom --experimental-backends &"
+myStartupHook = do 
+    spawnOnce "picom &"
+    spawnOnce "nitrogen --restore &"
+    spawnNOnOnce 2 "term" myTerminal
 #ifndef PC
-    >> spawnOnce "xautolock -time 10 -locker 'screensaver' &"
+    spawnOnce "xautolock -time 10 -locker 'screensaver' &"
 #endif
-    >> spawnNOnOnce 2 "term" myTerminal
 
 ----------------------------------------------------------------------
 myLogHook proc = dynamicLogWithPP $ marshallPP 0 $ xmobarPP

@@ -7,4 +7,4 @@ for DIR in $@; do
     cp -r "$DIR" "$HOME/.config/" || echo "$1 not found"
 done
 
-cp -r ./scripts/* "$HOME/.local/bin/"
+# cp -r ./scripts/* "$HOME/.local/bin/"
