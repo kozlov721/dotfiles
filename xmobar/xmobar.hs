@@ -27,7 +27,6 @@ myCommands =
         ++ "<usedratio>%"] 20
     , Run $ MyVolume "volume" 1
     , Run $ Bluetooth "bluetooth"
-    , Run $ Pacman "pacupdate" 1800
     , Run $ Date
         (    "%A,"
         <--> "%B"
@@ -56,7 +55,6 @@ myTemplate = doubleSpace
     <|> cpu
     <|> mem
     <|> volume
-    <|> upd
 #ifndef PC
     <|> "%bluetooth%"
     <|> "%battery%"
@@ -76,8 +74,6 @@ myTemplate = doubleSpace
     cpu     = fullWrap "#E58030" htop $ space ++ "%cpu%"
     mem     = fullWrap "#FF6050" htop $ space ++ "%memory%"
     volume  = actionWrap mute "%volume%"
-    upd     = actionWrap "kitty --class=kitty-float -e yay -Syu"
-                "%pacupdate%"
     htop    = script "run-process btop"
     mute    = "pactl set-sink-mute @DEFAULT_SINK@ toggle"
 

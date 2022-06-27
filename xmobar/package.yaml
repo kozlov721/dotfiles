@@ -1,0 +1,29 @@
+name:                xmobar-bar
+version:             0.1.0.0
+github:              "kozlov721/xmobar"
+license:             BSD3
+author:              "Martin Kozlovský"
+maintainer:          "kozlovsky.m7@gmail.com"
+copyright:           "2022 Martin Kozlovský"
+
+dependencies:
+- base >= 4.7 && < 5
+- xmobar
+- process
+- extra
+- text-format-simple
+
+library:
+  source-dirs: src
+
+executables:
+  xmobar:
+    main:                xmobar.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -O2
+    dependencies:
+    - xmobar-bar

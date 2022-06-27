@@ -1,0 +1,39 @@
+name:                xmonad-wm
+version:             0.1.0.0
+github:              "kozlov721/xmonad"
+license:             BSD3
+author:              "Martin Kozlovsky"
+maintainer:          "kozlovsky.m7@gmail.com"
+copyright:           "2022 Martin Kozlovsky"
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/kozlov721/xmonad#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- xmonad >= 0.17.0
+- xmonad-contrib >= 0.17.0
+- containers
+- text-format-simple
+- X11
+
+library:
+  source-dirs: src
+
+executables:
+  xmonad:
+    main:                xmonad.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -O2
+    dependencies:
+    - xmonad-wm
