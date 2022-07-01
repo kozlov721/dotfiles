@@ -130,12 +130,12 @@ myKeys conf@XConfig { modMask    = modm
     in
     -- function keys
     [ ((0, xF86XK_MonBrightnessUp)
-       ,   runProcessWithInput "lux" ["-a", "5%"] ""
+       ,   runProcessWithInput "lux" ["-a", "3%"] ""
        >>  runProcessAndTrim "lux" ["-G"] ""
        >>= flashText_ mySHC . ("Brightness: "<>))
 
     , ((0, xF86XK_MonBrightnessDown)
-       ,   runProcessWithInput "lux" ["-s", "5%"] ""
+       ,   runProcessWithInput "lux" ["-s", "3%"] ""
        >>  runProcessAndTrim "lux" ["-G"] ""
        >>= flashText_ mySHC . ("Brightness: "<>))
 
@@ -382,7 +382,7 @@ myManageHook = composeAll
 #endif
 
 ----------------------------------------------------------------------
-myStartupHook = do 
+myStartupHook = do
     spawnOnce "picom &"
     spawnOnce "nitrogen --restore &"
     spawnNOnOnce 2 "term" myTerminal
@@ -457,6 +457,6 @@ myConfig logHandle = def
 main :: IO ()
 main = setEnv "BROWSER" "qutebrowser"
     >> setEnv "EDITOR" "nvim"
-    >> spawnPipe "xmobar"
+    >> spawnPipe "~/.local/bin/xmobar"
     >>= xmonad . docks . ewmh . ewmhFullscreen . myConfig
 

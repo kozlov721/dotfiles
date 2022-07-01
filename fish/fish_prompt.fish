@@ -1,11 +1,7 @@
 function __user_host
-  set -l content
-  if [ (id -u) = "0" ];
-    echo -n (set_color --bold red)
-  else
-    echo -n (set_color --bold green)
-  end
-  echo -n $USER@(hostname | cut -d . -f 1) (set color normal)
+  echo -n (set_color --bold green)
+  echo -n (hostname | cut -d . -f 1)
+  echo -n (set color normal)
 end
 
 function __current_path
@@ -79,6 +75,8 @@ function fish_prompt
   set -g _status $status
   if [ $_status -ne 0 ]
     set -f prompt_symbol (set_color red)"✘"(set_color normal)
+  else if fish_is_root_user
+    set -f prompt_symbol (set_color yellow)"#"(set_color normal)
   else
     set -f prompt_symbol "λ"
   end
@@ -94,5 +92,7 @@ function fish_right_prompt
   echo -n $CONDA_PROMPT_MODIFIER
   __status
   echo -n ' '
-  __fish_mode_prompt
+  if [ $fish_key_bindings = 'fish_vi_key_bindings' ]
+    __fish_mode_prompt
+  end
 end

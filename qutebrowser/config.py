@@ -60,9 +60,9 @@ c.url.searchengines = {
 
 c.url.start_pages = 'https://google.com'
 
-if socket.gethostname() == 'martin-hnwx9x':
-    zd = 150
-    ds = 11
+if socket.gethostname() == 'martin-ms7b21':
+    zd = 155
+    ds = 12
 else:
     zd = 140
     ds = 12

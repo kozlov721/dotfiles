@@ -8,7 +8,6 @@ local autocmd = vim.api.nvim_create_autocmd
 
 vim.o.signcolumn     = 'number'
 vim.o.spelllang      = 'en_us,cs'
-vim.o.encoding       = 'utf-8'
 vim.o.undodir        = [[/home/martin/.config/nvim/undodir]]
 vim.o.whichwrap      = vim.o.whichwrap .. '<,>,h,l,[,]'
 vim.o.wildmode       = 'longest,list,full'
@@ -19,46 +18,25 @@ vim.o.shiftwidth     = 4
 vim.o.softtabstop    = 4
 vim.o.tabstop        = 4
 vim.o.laststatus     = 3
-vim.o.textwidth      = 0
 vim.o.foldenable     = false
-vim.o.spell          = false
-vim.o.autoindent     = true
 vim.o.breakindent    = true
 vim.o.expandtab      = true
-vim.o.hidden         = true
-vim.o.hlsearch       = true
 vim.o.ignorecase     = true
-vim.o.incsearch      = true
 vim.o.list           = true
 vim.o.number         = true
 vim.o.relativenumber = true
-vim.o.ruler          = true
-vim.o.showcmd        = true
+vim.o.showcmd        = false
 vim.o.showmode       = true
 vim.o.smartcase      = true
-vim.o.smarttab       = true
 vim.o.title          = true
 vim.o.undofile       = true
-vim.o.wildmenu       = true
 vim.o.wrap           = true
 
 vim.opt.listchars = {trail = '»', tab = '»-'}
 vim.opt.fillchars:append('vert:│')
 
-
-vim.g.code_action_menu_show_details    = false
-vim.g.cursorhold_updatetime            = 50
-vim.g.haskell_indent_after_bare_where  = 2
-vim.g.haskell_indent_before_where      = 2
-vim.g.haskell_indent_case_alternative  = 1
-vim.g.haskell_indent_guard             = 4
-vim.g.haskell_indent_if                = 0
-vim.g.haskell_indent_in                = 0
-vim.g.startify_fortune_use_unicode     = 1
-vim.g.stylishask_on_save               = 0
+vim.g.cursorhold_updatetime            = 100
 vim.g.tex_conceal                      = ''
-vim.g.undotree_SetFocusWhenToggle      = 1
-vim.g.undotree_WindowLayout            = 2
 vim.g.vim_json_syntax_conceal          = 0
 vim.g.vim_markdown_conceal             = 0
 vim.g.vim_markdown_conceal_code_blocks = 0
@@ -86,44 +64,19 @@ map('n', '<leader>r'       , ':source $MYVIMRC|noh<CR>'  )
 map('n', '<leader><TAB>'   , '<C-w><C-w>', {remap = true})
 map('n', '<leader>t'       , trimWhiteSpace              )
 
-map('n', 'J'       , ':bprevious<CR>', {silent = true})
-map('n', 'K'       , ':bnext<CR>'    , {silent = true})
-
-map('i', '<PageDown>', '<NOP>')
-map('i', '<PageUp>'  , '<NOP>')
-map('x', '<PageDown>', '<C-f>', {remap = true})
-
-map('x', '<PageUp>'  , '<C-b>', {remap = true})
-map('n', '<PageDown>', '<C-f>', {remap = true})
-map('n', '<PageUp>'  , '<C-b>', {remap = true})
-
+map('n', 'J', ':bprevious<CR>', {silent = true})
+map('n', 'K', ':bnext<CR>'    , {silent = true})
 
 autocmd('FileType', {
   pattern = {'html', 'lua', 'css', 'xml', 'markdown', 'journal', 'fish'},
   command = 'setlocal shiftwidth=2 tabstop=2 softtabstop=2',
 })
 
-autocmd('FileType', {
-  pattern = 'python',
-  command = 'nmap <leader>x :w<CR>:execute "!python " . expand("%:p")<CR>'
-})
-
 autocmd('FileType', {command = 'noh'})
-
-autocmd('FileType', {
-  pattern='idlang',
-  command = 'set filetype=prolog | syntax on'
-})
 
 autocmd('FileType', {
   pattern = 'help',
   command = 'noremap <buffer> <F1> :q<CR>'
-})
-
-autocmd('VimEnter', {
-  pattern = '*xmobar/*.hs',
-  command = 'nmap <leader>x :w<CR>:execute' ..
-    '"!cd ~/.config/xmobar && ./build && xmonad --restart"<CR>'
 })
 
 autocmd('VimEnter', {
