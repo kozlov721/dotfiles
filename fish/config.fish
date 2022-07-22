@@ -1,9 +1,9 @@
 alias vim        'nvim'
 alias aisa       'kitty +kitten ssh xkozlov1@aisa.fi.muni.cz'
-alias install    'doas emerge --ask'
-alias remove     'doas emerge --deselect --ask && doas emerge --depclean'
-# alias pacinfo    'paru -Si'
-# alias update     'paru -Syu'
+alias emacs      'emacsclient -c'
+alias install    'doas emerge -a'
+alias remove     'doas emerge -aW && doas emerge -c'
+alias update     'doas emerge -avuDU @world'
 alias fixpacman  'doas rm /var/lib/pacman/db.lck'
 alias fastreboot 'killall qutebrowser; reboot'
 alias tarnow     'tar -acf'
@@ -37,7 +37,7 @@ set fish_greeting
 fish_add_path -P $HOME/.local/bin
 fish_add_path -P $HOME/.ghcup/bin
 fish_add_path -P $HOME/.cargo/bin
-fish_add_path -P /opt/nvidia/hpc_sdk/Linux_x86_64/22.2/compilers/bin
+fish_add_path -P $HOME/.emacs.d/bin/
 
 source $HOME/.config/fish/fish_prompt.fish
 

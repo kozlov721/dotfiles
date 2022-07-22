@@ -47,8 +47,9 @@ import Data.Map (Map)
 
 import qualified Data.Map        as M
 import qualified XMonad.StackSet as W
+import XMonad.Util.Cursor (setDefaultCursor)
 
-myTerminal = "kitty"  :: String
+myTerminal = "st"  :: String
 myModMask  = mod4Mask :: KeyMask
 altMask    = mod1Mask :: KeyMask
 
@@ -178,17 +179,13 @@ myKeys conf@XConfig { modMask    = modm
         (W.view (workspaces !! 1))
         >> selectSearch (searchEngineF "" searchFunc))
     -- Open shell prompt
-    , ((modm, xK_p), shellPrompt myPromptConfig)
+    , ((modm, xK_p), spawn "dmenu_run_history")
     -- Screenshot
     , ((0, xK_Print), spawn "flameshot gui")
     -- Increase opacity
     , ((modm .|. controlMask, xK_Up), spawn "picom-trans -c -o -5")
     -- Decrease opacity
     , ((modm .|. controlMask, xK_Down), spawn "picom-trans -c -o +5")
-    -- Launch rofi
-    , ((modm .|. controlMask, xK_p), spawn "rofi -show run")
-    -- Launch rofi window
-    , ((modm .|. shiftMask, xK_p), spawn "rofi -show window")
     -- Close focused window
     , ((modm, xK_c), kill)
     -- Rotate through the available layout algorithms
@@ -228,14 +225,14 @@ myKeys conf@XConfig { modMask    = modm
     , ((modm, xK_q), spawn "xmonad --recompile && xmonad --restart")
     -- Simulates drop-down terminal
     , ((modm, xK_backslash), ifWindow
-        (className =? "kitty-dropdown")
+        (className =? "term-dropdown")
         (do
            ws <- ask
            doF (\s -> if   ws `elem` W.index s
                       then W.shiftWin (marshall 0 "hid") ws s
                       else W.shiftWin (W.currentTag s) ws s)
         )
-        (spawnHere "kitty --class=kitty-dropdown"))
+        (spawnHere $ term ++ " -c term-dropdown"))
     -- Special bindings to run cbonsai as screensaver
     -- Not to be used by the user
     , ((modm .|. controlMask .|. shiftMask, xK_s)
@@ -358,7 +355,7 @@ myManageHook = composeAll
         centered = [ "Vimb"
                    , "Skype"
                    , "Caprine"
-                   , "kitty-float"
+                   , "term-float"
                    , "qBittorrent"
                    , "Gpick"
                    , "gpick"
@@ -367,7 +364,7 @@ myManageHook = composeAll
 #ifdef PC
             <> ["Spotify", "netflix", "Steam", "spotify", "discord", "Thunar"]
 #else
-            <> ["kitty-dropdown"]
+            <> ["term-dropdown"]
 #endif
         floating = ["ij-ImageJ", "ImageJ"]
         ignored  = ["desktop_window"]
@@ -378,14 +375,13 @@ myManageHook = composeAll
     <> [stringProperty "WM_NAME" =? "Zoom Meeting" --> doCenter]
     <> [stringProperty "WM_NAME" =? "Zoom Cloud Meetings" --> doCenter]
 #ifdef PC
-    <> [className =? "kitty-dropdown" --> doRectFloat (W.RationalRect (1/14) (1/3) (3/8) (4/9))]
+    <> [className =? "term-dropdown" --> doRectFloat (W.RationalRect (1/14) (1/3) (3/8) (4/9))]
 #endif
 
 ----------------------------------------------------------------------
 myStartupHook = do
-    spawnOnce "picom &"
-    spawnOnce "nitrogen --restore &"
     spawnNOnOnce 2 "term" myTerminal
+    setDefaultCursor xC_left_ptr
 #ifndef PC
     spawnOnce "xautolock -time 10 -locker 'screensaver' &"
 #endif
@@ -430,7 +426,7 @@ myLogHook proc = dynamicLogWithPP $ marshallPP 0 $ xmobarPP
 
 ----------------------------------------------------------------------
 myHandleEventHook = handleTimerEvent <+> swallowEventHook
-    (className =? "kitty" <||> className =? "Alacritty")
+    (className =? "kitty" <||> className =? "st-256color")
     (pure True)
 
 ----------------------------------------------------------------------
@@ -456,7 +452,6 @@ myConfig logHandle = def
 ----------------------------------------------------------------------
 main :: IO ()
 main = setEnv "BROWSER" "qutebrowser"
-    >> setEnv "EDITOR" "nvim"
     >> spawnPipe "~/.local/bin/xmobar"
     >>= xmonad . docks . ewmh . ewmhFullscreen . myConfig
 

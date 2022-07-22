@@ -8,9 +8,6 @@ return require('packer').startup {
       event = 'CmdlineEnter',
       config = function() require('numb').setup() end
     }
-    use {'lukas-reineke/virt-column.nvim',
-      config = function() require('virt-column').setup() end
-    }
     use {'yamatsum/nvim-nonicons',
       requires = {'kyazdani42/nvim-web-devicons'}
     }
@@ -26,17 +23,10 @@ return require('packer').startup {
         }
         local wilder = require('wilder')
         local scale = {
-          '#f4468f',
-          '#fd4a85',
-          '#ff507a',
-          '#ff566f',
-          '#ff5e63',
-          '#ff6658',
-          '#ff704e',
-          '#ff7a45',
-          '#ff843d',
-          '#ff9036',
-          '#f89b31',
+          '#f4468f', '#fd4a85', '#ff507a',
+          '#ff566f', '#ff5e63', '#ff6658',
+          '#ff704e', '#ff7a45', '#ff843d',
+          '#ff9036', '#f89b31', '#f7ab31'
         }
         local gradient = {}
         for i, fg in ipairs(scale) do
@@ -87,7 +77,6 @@ return require('packer').startup {
         }
       end
     }
-    use {'tpope/vim-repeat'}
     use {'nvim-lualine/lualine.nvim',
       requires = 'kozlov721/cassiopeia.nvim',
       config = function()
@@ -96,8 +85,10 @@ return require('packer').startup {
             theme = 'cassiopeia',
             component_separators = '',
             section_separators = {
-              left = '',
-              right = ''
+              left = '',
+              right = ''
+              -- left = '',
+              -- right = ''
             },
           },
           sections = {
@@ -193,7 +184,7 @@ return require('packer').startup {
       branch = 'v1',
       event = 'CmdlineEnter',
       config = function()
-        require('hop').setup{keys = 'etovxqpdygfblzhckisuran'}
+        require('hop').setup {keys = 'etovxqpdygfblzhckisuran'}
         map('n', 'ff', ':HopChar1<CR>'  )
         map('n', 'fl', ':HopLine<CR>'   )
         map('n', 'fw', ':HopWord<CR>'   )
@@ -244,8 +235,9 @@ return require('packer').startup {
       run = ':TSUpdate',
       config = function()
         require('nvim-treesitter.configs').setup {
-          ensure_installed = 'all',
-          sync_install     = false,
+          ensure_installed = {
+            'c', 'fish', 'cpp', 'lua', 'python', 'bash'},
+          sync_install = false,
           highlight = {
             enable  = true,
             disable = {'haskell'},
@@ -264,10 +256,6 @@ return require('packer').startup {
         vim.g.undotree_WindowLayout       = 2
         map('n', '<leader>e', ':UndotreeToggle<CR>')
       end
-    }
-    use {'chrisbra/unicode.vim',
-      keys = '<leader>un',
-      config = function() map('n', '<leader>un', ':UnicodeSearch!') end
     }
     use {'terrortylor/nvim-comment',
       keys = {'<leader>c', '<leader>cc', '<leader>cy'},
@@ -395,24 +383,24 @@ return require('packer').startup {
         -- To make smart-pairs work with coq.
         -- I also needed to modify smart-pairs/lua/pairs/init.lua to
         -- remove autocommands at the end of setup.
-        vim.g.coq_settings = {keymap = {recommended = false}}
+       vim.g.coq_settings = {keymap = {recommended = false}}
 
-        map('i', '<Esc>'  , [[pumvisible() ? "\<C-e><ESC>" : "\<Esc>"]], opts)
-        map('i', '<Tab>'  , [[pumvisible() ? "\<C-n>" : "\<Tab>"]], opts)
-        map('i', '<S-Tab>', [[pumvisible() ? "\<C-p>" : "\<BS>"]] , opts)
-        local function smartPairsCR()
-          if vim.fn.pumvisible() ~= 0 then
-            if vim.fn.complete_info({ 'selected' }).selected ~= -1 then
-              require('pairs.utils').feedkeys('<c-y>', 'i')
-            else
-              require('pairs.utils').feedkeys('<c-e>', 'i')
-              require('pairs.enter').type()
-            end
-          else
-              require('pairs.enter').type()
-          end
-        end
-        map('i', '<CR>', smartPairsCR, {silent = true})
+       map('i', '<Esc>'  , [[pumvisible() ? "\<C-e><ESC>" : "\<Esc>"]], opts)
+       map('i', '<Tab>'  , [[pumvisible() ? "\<C-n>" : "\<Tab>"]], opts)
+       map('i', '<S-Tab>', [[pumvisible() ? "\<C-p>" : "\<BS>"]] , opts)
+       local function smartPairsCR()
+         if vim.fn.pumvisible() ~= 0 then
+           if vim.fn.complete_info({ 'selected' }).selected ~= -1 then
+             require('pairs.utils').feedkeys('<c-y>', 'i')
+           else
+             require('pairs.utils').feedkeys('<c-e>', 'i')
+             require('pairs.enter').type()
+           end
+         else
+             require('pairs.enter').type()
+         end
+       end
+       map('i', '<CR>', smartPairsCR, {silent = true})
       end
     }
     use {'junegunn/vim-easy-align',
@@ -423,10 +411,6 @@ return require('packer').startup {
         map('n', '<leader>a' , 'vipga', {remap = true})
         map('x', 'ga'        , '<Plug>(EasyAlign)'    )
       end
-    }
-    use {'alvan/vim-closetag',
-      ft = {'html', 'xml'},
-      event = 'InsertEnter'
     }
     use {'norcalli/nvim-colorizer.lua',
       config = function()
@@ -451,7 +435,6 @@ return require('packer').startup {
       end,
     }
     use {'antoinemadec/FixCursorHold.nvim'}
-    use {'bryanmylee/vim-colorscheme-icons'}
     use {'nvim-telescope/telescope.nvim',
       requires = {
         'nvim-lua/plenary.nvim',
@@ -494,9 +477,7 @@ return require('packer').startup {
             },
             file_browser = {
               mappings = {
-                i = {
-                  ['<leader>q'] = require('telescope.actions').close
-                }
+                i = { ['<leader>q'] = require('telescope.actions').close }
               }
             }
           }
@@ -546,6 +527,6 @@ return require('packer').startup {
           border = 'rounded',
         }
       end
-      }
+    }
   }
 }

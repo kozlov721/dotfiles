@@ -13,7 +13,7 @@ vim.o.whichwrap      = vim.o.whichwrap .. '<,>,h,l,[,]'
 vim.o.wildmode       = 'longest,list,full'
 vim.o.foldmethod     = 'expr'
 vim.o.foldexpr       = 'nvim_treesitter#foldexpr()'
-vim.o.colorcolumn    = '81'
+-- vim.o.colorcolumn    = '81'
 vim.o.shiftwidth     = 4
 vim.o.softtabstop    = 4
 vim.o.tabstop        = 4
@@ -35,7 +35,7 @@ vim.o.wrap           = true
 vim.opt.listchars = {trail = '»', tab = '»-'}
 vim.opt.fillchars:append('vert:│')
 
-vim.g.cursorhold_updatetime            = 100
+vim.g.cursorhold_updatetime            = 300
 vim.g.tex_conceal                      = ''
 vim.g.vim_json_syntax_conceal          = 0
 vim.g.vim_markdown_conceal             = 0
@@ -88,12 +88,6 @@ autocmd('VimEnter', {
 autocmd('VimEnter', {
   pattern = 'init.lua',
   command = 'cmap q qa'
-})
-
-autocmd('VimEnter', {
-  pattern = '*kitty/*.conf',
-  command = 'nmap <leader>x :w<CR>:execute' ..
-    '"!fish -c refresh-kitty"<CR>'
 })
 
 autocmd('InsertLeavePre', {
